@@ -15,5 +15,8 @@
   },
   "dependencies": {
     "ejs": "^4.0.1"
+  },
+  "volta": {
+    "node": "22.22.0"
   }
 }
