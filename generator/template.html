@@ -35,9 +35,15 @@
   <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 text-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-20">
-        <a href="index.html"
-          class="text-2xl font-bold tracking-tight hover:opacity-80 transition-opacity drop-shadow-md">
-          <%= WEBSITE_NAV_BRAND %>
+        <a href="index.html" class="hover:opacity-80 transition-opacity drop-shadow-md flex items-center">
+          <% if (WEBSITE_LOGO && WEBSITE_LOGO.enabled && WEBSITE_LOGO.src) { %>
+            <img src="<%= WEBSITE_LOGO.src %>" alt="<%= WEBSITE_NAV_BRAND %>"
+              width="<%= WEBSITE_LOGO.width || '120px' %>" class="block h-auto">
+            <% } else { %>
+              <span class="text-2xl font-bold tracking-tight">
+                <%= WEBSITE_NAV_BRAND %>
+              </span>
+              <% } %>
         </a>
         <div id="nav-links" class="hidden md:flex space-x-3 text-sm font-medium">
         </div>

@@ -173,6 +173,7 @@ async function processAlbum(albumDirName) {
     TITLE: title,
     WEBSITE_TITLE_SUFFIX: config.website.titleSuffix,
     WEBSITE_NAV_BRAND: config.website.navBrand,
+    WEBSITE_LOGO: config.website.logo,
   });
   const htmlPath = path.join(WEB_DIR, `${id}.html`);
   fs.writeFileSync(htmlPath, htmlContent);
