@@ -145,3 +145,6 @@ generator/photos/
 web/images/
 web/data/
 web/fonts/
+web/*.html
+
+*.sh
