@@ -64,10 +64,10 @@ async function renderNavigation() {
       }`;
 
       link.innerHTML = `
-        <span class="text-xl md:text-2xl font-bold tracking-tight break-words pr-4">${
+        <span class="text-sm md:text-base font-bold tracking-tight break-words pr-4">${
           item.title
         }</span>
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform transition-transform duration-500 ${
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform transition-transform duration-500 ${
           isActive
             ? "opacity-100 translate-x-0"
             : "opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0"
