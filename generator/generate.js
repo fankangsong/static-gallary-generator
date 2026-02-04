@@ -171,7 +171,7 @@ async function processAlbum(albumDirName) {
   const htmlContent = ejs.render(htmlTemplate, {
     DATA_FILE: `${id}.json`,
     TITLE: title,
-    WEBSITE_TITLE_SUFFIX: config.website.titleSuffix,
+    WEBSITE_TITLE_SUFFIX: config.website.url,
     WEBSITE_NAV_BRAND: config.website.navBrand,
     WEBSITE_LOGO: config.website.logo,
   });
