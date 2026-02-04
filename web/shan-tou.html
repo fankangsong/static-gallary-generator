@@ -55,37 +55,38 @@
       </div>
     </div>
 
-    <!-- Navigation Overlay / Sidebar -->
-    <div id="mobile-menu" class="fixed inset-0 z-[60] pointer-events-none">
-      <!-- Backdrop (only visible on desktop or when sidebar is partial) -->
-      <div id="menu-backdrop"
-        class="absolute inset-0 bg-black/40 md:bg-black/20 backdrop-blur-sm opacity-0 transition-opacity duration-500">
+  </nav>
+
+  <!-- Navigation Overlay / Sidebar -->
+  <div id="mobile-menu" class="fixed inset-0 z-[60] pointer-events-none">
+    <!-- Backdrop (only visible on desktop or when sidebar is partial) -->
+    <div id="menu-backdrop"
+      class="absolute inset-0 bg-black/40 md:bg-black/20 backdrop-blur-sm opacity-0 transition-opacity duration-500">
+    </div>
+
+    <!-- Content Panel -->
+    <div id="menu-panel"
+      class="absolute top-0 bottom-0 right-0 w-full md:w-96 bg-gray-950 md:bg-gray-900/90 md:backdrop-blur-2xl shadow-2xl flex flex-col overflow-hidden transform translate-x-full transition-transform duration-500 ease-in-out">
+      <!-- Sidebar Header -->
+      <div class="flex justify-between items-center p-6 md:p-8 bg-transparent shrink-0">
+        <span class="text-white/40 text-xs font-bold tracking-[0.2em] uppercase">Navigation</span>
+        <button id="close-menu-btn"
+          class="p-2 rounded-full text-white/60 hover:text-white hover:bg-white/10 transition-all duration-300">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
       </div>
 
-      <!-- Content Panel -->
-      <div id="menu-panel"
-        class="absolute top-0 bottom-0 right-0 w-full md:w-96 bg-gray-950 md:bg-gray-900/90 md:backdrop-blur-2xl shadow-2xl flex flex-col overflow-hidden transform translate-x-full transition-transform duration-500 ease-in-out">
-        <!-- Sidebar Header -->
-        <div class="flex justify-between items-center p-6 md:p-8 bg-transparent shrink-0">
-          <span class="text-white/40 text-xs font-bold tracking-[0.2em] uppercase">Navigation</span>
-          <button id="close-menu-btn"
-            class="p-2 rounded-full text-white/60 hover:text-white hover:bg-white/10 transition-all duration-300">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-              stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-
-        <!-- Links Container -->
-        <div class="flex-1 overflow-y-auto no-scrollbar px-8 pb-12">
-          <div id="mobile-nav-links" class="flex flex-col space-y-2">
-            <!-- Links Injected Here -->
-          </div>
+      <!-- Links Container -->
+      <div class="flex-1 overflow-y-auto no-scrollbar px-8 pb-12">
+        <div id="mobile-nav-links" class="flex flex-col space-y-2">
+          <!-- Links Injected Here -->
         </div>
       </div>
     </div>
-  </nav>
+  </div>
 
   <main class="min-h-screen">
     <header id="album-header" class="relative h-screen w-full overflow-hidden bg-gray-900">
