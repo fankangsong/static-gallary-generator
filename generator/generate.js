@@ -12,6 +12,7 @@ const IMAGES_DIR = path.join(WEB_DIR, "images");
 const CONFIG_DIR = path.join(WEB_DIR, "config");
 const FONTS_DIR = path.join(WEB_DIR, "fonts");
 const TEMPLATE_PATH = path.join(__dirname, "template.html");
+const INDEX_TEMPLATE_PATH = path.join(__dirname, "index_template.html");
 const SOURCE_FONT = path.join(__dirname, "fonts/SourceHanSerifCN-Regular.otf");
 
 // Ensure directories exist
@@ -236,6 +237,20 @@ async function main() {
   // Write Nav JSON
   fs.writeFileSync(navPath, JSON.stringify(existingNav, null, 2));
   console.log("Updated nav.json");
+
+  // Generate web/index.html with redirect
+  if (fs.existsSync(INDEX_TEMPLATE_PATH)) {
+    const indexTemplate = fs.readFileSync(INDEX_TEMPLATE_PATH, "utf-8");
+    const redirectUrl = existingNav.length > 0 ? existingNav[0].link : "";
+    const indexHtmlContent = ejs.render(indexTemplate, {
+      REDIRECT_URL: redirectUrl,
+    });
+    const indexHtmlPath = path.join(WEB_DIR, "index.html");
+    fs.writeFileSync(indexHtmlPath, indexHtmlContent);
+    console.log(`Generated web/index.html with redirect to: ${redirectUrl}`);
+  } else {
+    console.warn("index_template.html not found, skipping index generation.");
+  }
 
   // Collect nav items text
   existingNav.forEach((item) => {
