@@ -20,7 +20,7 @@ const SOURCE_FONT = path.join(
   __dirname,
   config.website.font
     ? config.website.font.source
-    : "fonts/SourceHanSerifCN-Regular.otf"
+    : "fonts/SourceHanSerifCN-Regular.otf",
 );
 
 const CONTENT_DEFAULT = ``;
@@ -148,6 +148,7 @@ async function processImages(albumPath, albumImagesOutDir, id, meta) {
     // 1. Generate Thumbnail (300x300, cover)
     if (!fs.existsSync(thumbPath)) {
       await sharp(filePath)
+        .rotate()
         .resize(config.thumbnail.width, config.thumbnail.height, {
           fit: config.thumbnail.fit,
         })
@@ -160,7 +161,7 @@ async function processImages(albumPath, albumImagesOutDir, id, meta) {
     let width, height;
 
     if (!fs.existsSync(largePath)) {
-      const image = sharp(filePath);
+      const image = sharp(filePath).rotate();
       const metadata = await image.metadata();
 
       // Resize if needed
@@ -236,7 +237,7 @@ async function generateFontSubset() {
         Fontmin.glyph({
           text: allText,
           hinting: false,
-        })
+        }),
       )
       .dest(FONTS_DIR);
 
@@ -254,7 +255,7 @@ async function generateFontSubset() {
   } else {
     console.warn(
       "Source font not found, skipping subset generation:",
-      SOURCE_FONT
+      SOURCE_FONT,
     );
   }
 }
@@ -304,7 +305,7 @@ async function processAlbum(albumDirName, isInitMode) {
     albumPath,
     albumImagesOutDir,
     id,
-    meta
+    meta,
   );
 
   // Construct Data JSON
@@ -337,7 +338,7 @@ async function main() {
   const isInitMode = args.includes("init");
 
   console.log(
-    `Starting static site generation${isInitMode ? " (INIT MODE)" : ""}...`
+    `Starting static site generation${isInitMode ? " (INIT MODE)" : ""}...`,
   );
 
   if (!fs.existsSync(PHOTOS_DIR)) {

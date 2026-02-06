@@ -7,7 +7,7 @@
   },
   "large": {
     "maxSize": 3000,
-    "quality": 90,
+    "quality": 60,
     "fit": "inside"
   },
   "supportedExtensions": [".jpg", ".jpeg", ".png", ".webp"],
