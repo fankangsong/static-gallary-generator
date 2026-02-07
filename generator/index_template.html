@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/favicon-32x32.png" type="image/png">
+    <% if (REDIRECT_URL) { %>
+        <meta http-equiv="refresh" content="0;url=<%= REDIRECT_URL %>">
+        <script>window.location.replace("<%= REDIRECT_URL %>");</script>
+        <% } %>
+            <title>Loading...</title>
+            <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50 flex items-center justify-center min-h-screen">
+    <div id="loading-content" class="text-center">
+        <% if (REDIRECT_URL) { %>
+            <!-- Spinner -->
+            <svg class="animate-spin h-10 w-10 text-gray-400 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg"
+                fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                </path>
+            </svg>
+            <p class="text-gray-500 font-medium animate-pulse tracking-wider">加载...</p>
+            <p class="mt-4 text-gray-400 text-sm"><a href="<%= REDIRECT_URL %>"
+                    class="underline hover:text-gray-600">👉点击直接访问相册</a>
+            </p>
+            <% } else { %>
+                <div class="text-red-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mx-auto mb-4" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <p class="text-gray-500 font-medium animate-pulse tracking-wider">没有找到相册。</p>
+                </div>
+                <% } %>
+    </div>
+</body>
+
+</html>

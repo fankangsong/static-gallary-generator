@@ -1,0 +1,28 @@
+{
+  "thumbnail": {
+    "width": 800,
+    "height": 800,
+    "quality": 80,
+    "fit": "inside"
+  },
+  "large": {
+    "maxSize": 3000,
+    "quality": 60,
+    "fit": "inside"
+  },
+  "supportedExtensions": [".jpg", ".jpeg", ".png", ".webp"],
+  "defaultAuthor": "Fan Kangsong(Colin)",
+  "website": {
+    "url": "imcolin.fan",
+    "navBrand": "COLIN PHOTO",
+    "logo": {
+      "enabled": true,
+      "src": "assets/logo.svg",
+      "width": "180px"
+    },
+    "font": {
+      "name": "KingHwaOldSong",
+      "source": "fonts/京華老宋体v3.0.ttf"
+    }
+  }
+}
