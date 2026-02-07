@@ -87,12 +87,13 @@ function getOrGenerateMeta(albumPath, albumDirName) {
  */
 function getOrGenerateContent(albumPath, title, albumDirName) {
   let contentHtml = "";
+  let markdown = "";
   const contentPath = path.join(albumPath, "content.md");
 
   if (fs.existsSync(contentPath)) {
     try {
-      const markdown = fs.readFileSync(contentPath, "utf-8");
-      allText += markdown; // Add markdown content to font subset
+      markdown = fs.readFileSync(contentPath, "utf-8");
+      // allText += markdown; // Add markdown content to font subset
       const rawHtml = marked.parse(markdown);
       contentHtml = sanitizeHtml(rawHtml, {
         allowedTags: sanitizeHtml.defaults.allowedTags.concat([
@@ -115,12 +116,13 @@ function getOrGenerateContent(albumPath, title, albumDirName) {
     try {
       fs.writeFileSync(contentPath, CONTENT_DEFAULT);
       contentHtml = CONTENT_DEFAULT;
+      markdown = CONTENT_DEFAULT;
       console.log(`  Created default content.md for: ${albumDirName}`);
     } catch (e) {
       console.error(`Error writing default content.md for ${albumDirName}:`, e);
     }
   }
-  return contentHtml;
+  return { html: contentHtml, markdown };
 }
 
 /**
@@ -275,7 +277,11 @@ async function processAlbum(albumDirName, isInitMode) {
   const title = meta.title || albumDirName;
 
   // 2. Get or Generate Content
-  const contentHtml = getOrGenerateContent(albumPath, title, albumDirName);
+  const { html: contentHtml, markdown } = getOrGenerateContent(
+    albumPath,
+    title,
+    albumDirName,
+  );
 
   // If init mode, stop here
   if (isInitMode) {
@@ -288,6 +294,7 @@ async function processAlbum(albumDirName, isInitMode) {
 
   // Collect text for font generation
   allText += title;
+  allText += markdown;
   allText += meta.author || "";
   allText += meta.description
     ? Array.isArray(meta.description)
