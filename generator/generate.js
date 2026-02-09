@@ -8,26 +8,41 @@ const sanitizeHtml = require("sanitize-html");
 const pinyin = require("pinyin").default;
 const config = require("./config.json");
 
+// Photo source directory, storing original images and metadata
 const PHOTOS_DIR = path.join(__dirname, "photos");
+// Website output root directory
 const WEB_DIR = path.join(__dirname, "../web");
-const DATA_DIR = path.join(WEB_DIR, "data");
+// Processed images output directory
 const IMAGES_DIR = path.join(WEB_DIR, "images");
+// Website config directory (e.g., nav.json)
 const CONFIG_DIR = path.join(WEB_DIR, "config");
+// Font files directory
 const FONTS_DIR = path.join(WEB_DIR, "fonts");
+// Detail page HTML template path
 const TEMPLATE_PATH = path.join(__dirname, "template.html");
+// Index page HTML template path
 const INDEX_TEMPLATE_PATH = path.join(__dirname, "index_template.html");
-const SOURCE_FONT = path.join(
-  __dirname,
-  config.website.font
-    ? config.website.font.source
-    : "fonts/SourceHanSerifCN-Regular.otf",
-);
+// Source font path for subsetting
+const SOURCE_FONT = path.join(__dirname, config.website.font.source);
 
+// Default Markdown content
 const CONTENT_DEFAULT = ``;
-const DESCRIPTION_DEFAULT = ["📷 理光 GR3  🎞️ 伊尔夫 PAN200 📅 2024-01-01"];
+// Default album description
+let DESCRIPTION_DEFAULT = "";
+// Try to read default description from DEFAULT_DESCRIPTION file
+const defaultDescPath = path.join(__dirname, "./DEFAULT_DESCRIPTION");
+if (fs.existsSync(defaultDescPath)) {
+  try {
+    const defaultDescText = fs.readFileSync(defaultDescPath, "utf-8");
+    console.log("ℹ️ Loaded default description from file");
+    DESCRIPTION_DEFAULT = [defaultDescText.trim()];
+  } catch (e) {
+    console.warn(`⚠️ Warning: Failed to read DEFAULT_DESCRIPTION:`, e.message);
+    // do nothing
+  }
+}
 
 // Ensure directories exist
-if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 if (!fs.existsSync(IMAGES_DIR)) fs.mkdirSync(IMAGES_DIR, { recursive: true });
 if (!fs.existsSync(CONFIG_DIR)) fs.mkdirSync(CONFIG_DIR, { recursive: true });
 if (!fs.existsSync(FONTS_DIR)) fs.mkdirSync(FONTS_DIR, { recursive: true });
@@ -49,11 +64,13 @@ function getOrGenerateMeta(albumPath, albumDirName) {
     try {
       meta = JSON.parse(fs.readFileSync(metaPath, "utf-8"));
     } catch (e) {
-      console.error(`Error reading meta.json for ${albumDirName}:`, e);
+      console.error(`❌ Error reading meta.json for ${albumDirName}:`, e);
     }
   } else {
     // Auto-generate meta.json
-    console.log(`  meta.json not found, creating default for: ${albumDirName}`);
+    console.log(
+      `  ✨ meta.json not found, creating default for: ${albumDirName}`
+    );
 
     // Generate ID from folder name (use Pinyin if Chinese)
     let generatedId = albumDirName;
@@ -76,7 +93,10 @@ function getOrGenerateMeta(albumPath, albumDirName) {
     try {
       fs.writeFileSync(metaPath, JSON.stringify(meta, null, 2));
     } catch (e) {
-      console.error(`Error writing default meta.json for ${albumDirName}:`, e);
+      console.error(
+        `❌ Error writing default meta.json for ${albumDirName}:`,
+        e
+      );
     }
   }
   return meta;
@@ -108,18 +128,21 @@ function getOrGenerateContent(albumPath, title, albumDirName) {
           "*": ["class", "style"],
         },
       });
-      console.log(`  Processed content.md for: ${albumDirName}`);
+      console.log(`  ✅ Processed content.md for: ${albumDirName}`);
     } catch (e) {
-      console.error(`Error processing content.md for ${albumDirName}:`, e);
+      console.error(`❌ Error processing content.md for ${albumDirName}:`, e);
     }
   } else {
     try {
       fs.writeFileSync(contentPath, CONTENT_DEFAULT);
       contentHtml = CONTENT_DEFAULT;
       markdown = CONTENT_DEFAULT;
-      console.log(`  Created default content.md for: ${albumDirName}`);
+      console.log(`  📝 Created default content.md for: ${albumDirName}`);
     } catch (e) {
-      console.error(`Error writing default content.md for ${albumDirName}:`, e);
+      console.error(
+        `❌ Error writing default content.md for ${albumDirName}:`,
+        e
+      );
     }
   }
   return { html: contentHtml, markdown };
@@ -156,7 +179,7 @@ async function processImages(albumPath, albumImagesOutDir, id, meta) {
         })
         .toFormat("jpeg", { quality: config.thumbnail.quality })
         .toFile(thumbPath);
-      console.log(`  Generated thumbnail: ${thumbFilename}`);
+      console.log(`    🖼️`, ` Generated thumbnail: ${thumbFilename}`);
     }
 
     // 2. Generate Large Image (Max 3000px, inside)
@@ -178,12 +201,12 @@ async function processImages(albumPath, albumImagesOutDir, id, meta) {
           })
           .toFormat("jpeg", { quality: config.large.quality })
           .toFile(largePath);
-        console.log(`  Generated large image: ${largeFilename}`);
+        console.log(`    🖼️`, ` Generated large image: ${largeFilename}`);
       } else {
         await image
           .toFormat("jpeg", { quality: config.large.quality })
           .toFile(largePath);
-        console.log(`  Processed large image: ${largeFilename}`);
+        console.log(`    🖼️`, ` Processed large image: ${largeFilename}`);
       }
     }
 
@@ -210,7 +233,6 @@ async function processImages(albumPath, albumImagesOutDir, id, meta) {
 function generateHtml(id, albumData, contentHtml, meta) {
   const htmlTemplate = fs.readFileSync(TEMPLATE_PATH, "utf-8");
   const htmlContent = ejs.render(htmlTemplate, {
-    DATA_FILE: `${id}.json`,
     ALBUM_DATA: albumData,
     TITLE: albumData.title,
     CONTENT_HTML: contentHtml,
@@ -224,7 +246,7 @@ function generateHtml(id, albumData, contentHtml, meta) {
   });
   const htmlPath = path.join(WEB_DIR, `${id}.html`);
   fs.writeFileSync(htmlPath, htmlContent);
-  console.log(`  Generated HTML: ${id}.html`);
+  console.log(`  📄 Generated HTML: ${id}.html`);
 }
 
 /**
@@ -232,32 +254,32 @@ function generateHtml(id, albumData, contentHtml, meta) {
  */
 async function generateFontSubset() {
   if (fs.existsSync(SOURCE_FONT)) {
-    console.log("Generating font subset...");
+    console.log("🔡 Generating font subset...");
     const fontmin = new Fontmin()
       .src(SOURCE_FONT)
       .use(
         Fontmin.glyph({
           text: allText,
           hinting: false,
-        }),
+        })
       )
       .dest(FONTS_DIR);
 
     await new Promise((resolve, reject) => {
       fontmin.run((err, files) => {
         if (err) {
-          console.error("Fontmin error:", err);
+          console.error("❌ Fontmin error:", err);
           reject(err);
         } else {
-          console.log("Font subset generated successfully!");
+          console.log("✅ Font subset generated successfully!");
           resolve();
         }
       });
     });
   } else {
     console.warn(
-      "Source font not found, skipping subset generation:",
-      SOURCE_FONT,
+      "⚠️ Source font not found, skipping subset generation:",
+      SOURCE_FONT
     );
   }
 }
@@ -267,7 +289,7 @@ async function processAlbum(albumDirName, isInitMode) {
   const stats = fs.statSync(albumPath);
   if (!stats.isDirectory()) return null;
 
-  console.log(`Processing album: ${albumDirName}`);
+  console.log(`📁 Processing album: ${albumDirName}`);
 
   // 1. Get or Generate Meta
   const meta = getOrGenerateMeta(albumPath, albumDirName);
@@ -280,12 +302,12 @@ async function processAlbum(albumDirName, isInitMode) {
   const { html: contentHtml, markdown } = getOrGenerateContent(
     albumPath,
     title,
-    albumDirName,
+    albumDirName
   );
 
   // If init mode, stop here
   if (isInitMode) {
-    console.log(`  [Init] Completed meta and content for: ${albumDirName}`);
+    console.log(`  ✨ [Init] Completed meta and content for: ${albumDirName}`);
     return null; // Don't return nav item in init mode? Or should we?
     // Usually init is for setting up new folders.
     // We can return null to skip nav update or return basic info.
@@ -312,7 +334,7 @@ async function processAlbum(albumDirName, isInitMode) {
     albumPath,
     albumImagesOutDir,
     id,
-    meta,
+    meta
   );
 
   // Construct Data JSON
@@ -324,11 +346,6 @@ async function processAlbum(albumDirName, isInitMode) {
     description: meta.description || "",
     images: imagesData,
   };
-
-  // Write Data JSON
-  const dataJsonPath = path.join(DATA_DIR, `${id}.json`);
-  fs.writeFileSync(dataJsonPath, JSON.stringify(albumData, null, 2));
-  console.log(`  Generated data: ${id}.json`);
 
   // 4. Generate HTML
   generateHtml(id, albumData, contentHtml, meta);
@@ -345,11 +362,11 @@ async function main() {
   const isInitMode = args.includes("init");
 
   console.log(
-    `Starting static site generation${isInitMode ? " (INIT MODE)" : ""}...`,
+    `🚀 Starting static site generation${isInitMode ? " (INIT MODE)" : ""}...`
   );
 
   if (!fs.existsSync(PHOTOS_DIR)) {
-    console.error("Photos directory not found:", PHOTOS_DIR);
+    console.error("❌ Photos directory not found:", PHOTOS_DIR);
     return;
   }
 
@@ -379,13 +396,13 @@ async function main() {
   }
 
   if (isInitMode) {
-    console.log("Init complete. Run without 'init' to generate full site.");
+    console.log("✨ Init complete. Run without 'init' to generate full site.");
     return;
   }
 
   // Write Nav JSON
   fs.writeFileSync(navPath, JSON.stringify(existingNav, null, 2));
-  console.log("Updated nav.json");
+  console.log("💾 Updated nav.json");
 
   // Generate web/index.html with redirect
   if (fs.existsSync(INDEX_TEMPLATE_PATH)) {
@@ -396,9 +413,11 @@ async function main() {
     });
     const indexHtmlPath = path.join(WEB_DIR, "index.html");
     fs.writeFileSync(indexHtmlPath, indexHtmlContent);
-    console.log(`Generated web/index.html with redirect to: ${redirectUrl}`);
+    console.log(`🌐 Generated web/index.html with redirect to: ${redirectUrl}`);
   } else {
-    console.warn("index_template.html not found, skipping index generation.");
+    console.warn(
+      "⚠️ index_template.html not found, skipping index generation."
+    );
   }
 
   // Collect nav items text for font subset
@@ -409,7 +428,7 @@ async function main() {
   // 5. Generate Font Subset
   await generateFontSubset();
 
-  console.log("Generation complete!");
+  console.log("🎉 Generation complete!");
 }
 
 main().catch((err) => console.error(err));

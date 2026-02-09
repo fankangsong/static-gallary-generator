@@ -28,7 +28,11 @@
       <%
     }
 
-    %>body {
+    %>html {
+      scrollbar-gutter: stable;
+    }
+
+    body {
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       font-family: 'Courier New',
@@ -38,14 +42,33 @@
 
     a:link,
     a:visited {
-      color: #4a8cd3;
+      color: rgb(240, 80, 55);
       text-decoration: none;
     }
 
     a:hover,
     a:focus {
-      color: #171868;
+      color: rgb(247, 147, 131);
       text-decoration: underline;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background-color: rgba(0, 0, 0, 0.2);
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background-color: rgba(0, 0, 0, 0.4);
     }
   </style>
 </head>
@@ -198,11 +221,6 @@
   </footer>
 
   <script src="js/gallery.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      initGallery('data/<%= DATA_FILE %>');
-    });
-  </script>
 </body>
 
 </html>

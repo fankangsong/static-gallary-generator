@@ -1,44 +1,29 @@
 // Gallery Application Logic
 
-async function initGallery(dataPath) {
+async function initGallery() {
   try {
     // 1. Fetch Nav Data and Render Navigation
     await renderNavigation();
 
-    // 2. Fetch Album Data
-    const response = await fetch(dataPath);
-    const albumData = await response.json();
+    // 3. Trigger Header Animations
+    requestAnimationFrame(() => {
+      const heroBg = document.getElementById("hero-bg");
+      if (heroBg) {
+        heroBg.classList.remove("opacity-0");
+        heroBg.classList.remove("scale-105");
+        heroBg.classList.add("scale-100");
+      }
+    });
+    setTimeout(() => {
+      const title = document.getElementById("album-title");
+      const desc = document.getElementById("album-desc");
+      if (title) title.classList.remove("translate-y-8", "opacity-0");
+      if (desc) desc.classList.remove("translate-y-8", "opacity-0");
+    }, 100);
 
-    // 3. Render Header (if not already rendered by SSR)
-    const titleEl = document.getElementById("album-title");
-    if (!titleEl.textContent.trim()) {
-      renderHeader(albumData);
-    } else {
-      // Trigger animations even if SSR rendered
-      requestAnimationFrame(() => {
-        const heroBg = document.getElementById("hero-bg");
-        if (heroBg) {
-          heroBg.classList.remove("opacity-0");
-          heroBg.classList.remove("scale-105");
-          heroBg.classList.add("scale-100");
-        }
-      });
-      setTimeout(() => {
-        const title = document.getElementById("album-title");
-        const desc = document.getElementById("album-desc");
-        if (title) title.classList.remove("translate-y-8", "opacity-0");
-        if (desc) desc.classList.remove("translate-y-8", "opacity-0");
-
-        // Author logic might need check if exists, but for now simple animation trigger
-      }, 100);
-    }
-
-    // 4. Render Grid (if not already rendered by SSR)
+    // 4. Trigger Grid Animations
     const gridContainer = document.getElementById("gallery-grid");
-    if (!gridContainer.children.length) {
-      renderGrid(albumData);
-    } else {
-      // Trigger animation for grid
+    if (gridContainer) {
       gridContainer.classList.remove("opacity-0");
     }
 
@@ -47,9 +32,6 @@ async function initGallery(dataPath) {
 
     // 6. Init Navbar Scroll Effect
     initNavbarEffect();
-
-    // 7. Render Footer
-    renderFooter(albumData);
   } catch (error) {
     console.error("Error loading gallery:", error);
     document.body.innerHTML =
@@ -135,109 +117,6 @@ async function renderNavigation() {
   } catch (error) {
     console.error("Error loading navigation:", error);
   }
-}
-
-function renderHeader(data) {
-  document.title = `${data.title} - Gallery`;
-  document.getElementById("album-title").textContent = data.title;
-
-  const descEl = document.getElementById("album-desc");
-  if (Array.isArray(data.description)) {
-    descEl.innerHTML = data.description
-      .map((line) => `<p class="block">${line}</p>`)
-      .join("");
-  } else {
-    descEl.textContent = data.description;
-  }
-
-  const heroBg = document.getElementById("hero-bg");
-  if (data.cover) {
-    heroBg.style.backgroundImage = `url('${data.cover}')`;
-    // Trigger animation
-    requestAnimationFrame(() => {
-      heroBg.classList.remove("opacity-0");
-      heroBg.classList.remove("scale-105");
-      heroBg.classList.add("scale-100");
-    });
-  }
-
-  // Animate text in
-  setTimeout(() => {
-    const title = document.getElementById("album-title");
-    const desc = document.getElementById("album-desc");
-    title.classList.remove("translate-y-8", "opacity-0");
-    desc.classList.remove("translate-y-8", "opacity-0");
-
-    // Render Album Author if exists
-    if (data.author) {
-      const metaDiv = document.createElement("div");
-      metaDiv.className =
-        "mt-4 flex items-center text-white/80 translate-y-8 opacity-0 transition-all duration-700 delay-500";
-      metaDiv.innerHTML = `
-        <span class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium">
-            © ${data.author}
-        </span>
-      `;
-      desc.parentNode.appendChild(metaDiv);
-
-      requestAnimationFrame(() => {
-        metaDiv.classList.remove("translate-y-8", "opacity-0");
-      });
-    }
-  }, 100);
-}
-
-function renderGrid(data) {
-  const gridContainer = document.getElementById("gallery-grid");
-  let html = "";
-
-  data.images.forEach((img) => {
-    html += `
-            <a href="${img.src}" 
-               data-pswp-width="${img.width}" 
-               data-pswp-height="${img.height}" 
-               data-author="${img.author || ""}"
-               target="_blank"
-               class="relative block mb-4 break-inside-avoid group overflow-hidden rounded-lg shadow-sm hover:shadow-xl transition-shadow duration-300">
-                <img src="${img.thumbnail || img.src}" 
-                     alt="${img.alt || ""}" 
-                     class="w-full h-auto object-contain transition-transform duration-700 group-hover:scale-105"
-                     loading="lazy" />
-                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
-                ${
-                  img.author
-                    ? `
-                <div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <p class="text-white text-xs font-medium tracking-wide truncate">© ${img.author}</p>
-                </div>
-                `
-                    : ""
-                }
-            </a>
-        `;
-  });
-
-  gridContainer.innerHTML = html;
-  document.getElementById("gallery-grid").classList.remove("opacity-0");
-}
-
-function renderFooter(data) {
-  // Only create footer if it doesn't exist
-  if (document.querySelector("footer")) return;
-
-  const footer = document.createElement("footer");
-  footer.className = "py-12 bg-white text-center";
-  footer.innerHTML = `
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <p class="text-gray-500 text-sm">
-                © ${new Date().getFullYear()} ${
-    data.author
-  }. All rights reserved.
-            </p>
-            <p class="text-gray-500 text-sm">Powered by <a href="https://github.com/fankangsong/static-gallary-generator" target="_blank" class="text-blue-600 hover:underline">static-gallary-generator</a>
-        </div>
-    `;
-  document.querySelector("main").appendChild(footer);
 }
 
 function initPhotoSwipe() {
@@ -327,3 +206,7 @@ function initNavbarEffect() {
     }
   }
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  initGallery();
+});
