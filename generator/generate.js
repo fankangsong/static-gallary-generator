@@ -6,6 +6,7 @@ const Fontmin = require("fontmin");
 const { marked } = require("marked");
 const sanitizeHtml = require("sanitize-html");
 const pinyin = require("pinyin").default;
+const ExifReader = require("exifreader");
 const config = require("./config.json");
 
 // Photo source directory, storing original images and metadata
@@ -215,13 +216,79 @@ async function processImages(albumPath, albumImagesOutDir, id, meta) {
     width = largeImageMeta.width;
     height = largeImageMeta.height;
 
+    // 3. Extract EXIF Data
+    let exifData = {};
+    try {
+      const tags = await ExifReader.load(filePath);
+
+      // Model
+      if (tags.Model) {
+        exifData.model = tags.Model.description;
+      }
+
+      // DateTime
+      if (tags.DateTimeOriginal) {
+        // Format: YYYY:MM:DD HH:MM:SS -> YYYY-MM-DD HH:mm
+        // Sometimes it might be different, but this is standard EXIF
+        const dateStr = tags.DateTimeOriginal.description;
+        if (dateStr && dateStr.length >= 16) {
+          exifData.date = dateStr
+            .replace(/:/g, "-")
+            .replace(" ", " ")
+            .substring(0, 16)
+            .replace("-", ":")
+            .replace("-", ":");
+          // Wait, replace(/:/g, "-") changes time colons too.
+          // Standard EXIF is "YYYY:MM:DD HH:MM:SS"
+          // We want "YYYY-MM-DD HH:mm"
+          const [datePart, timePart] = dateStr.split(" ");
+          if (datePart && timePart) {
+            exifData.date = `${datePart.replace(
+              /:/g,
+              "-"
+            )} ${timePart.substring(0, 5)}`;
+          }
+        }
+      }
+
+      // Shutter Speed (ExposureTime)
+      if (tags.ExposureTime) {
+        exifData.shutter = tags.ExposureTime.description;
+      }
+
+      // Aperture (FNumber)
+      if (tags.FNumber) {
+        // ExifReader description often includes "f/" but let's check
+        // If it's just a number, add f/
+        const fVal = tags.FNumber.description;
+        exifData.aperture = fVal.startsWith("f/") ? fVal : `f/${fVal}`;
+      }
+
+      // ISO
+      if (tags.ISOSpeedRatings) {
+        exifData.iso = `ISO${tags.ISOSpeedRatings.description}`;
+      }
+
+      // Focal Length
+      if (tags.FocalLength) {
+        exifData.focalLength = tags.FocalLength.description;
+      }
+    } catch (e) {
+      console.warn(`    ⚠️ Failed to read EXIF for ${filename}:`, e.message);
+    }
+
+    // Add filename to allText for font subsetting
+    allText += filename;
+
     imagesData.push({
       src: `images/${id}/${largeFilename}`,
       thumbnail: `images/${id}/${thumbFilename}`,
       width: width,
       height: height,
       alt: filename,
+      title: filename, // Use filename as title
       author: meta.author || "Unknown",
+      exif: exifData,
     });
   }
   return imagesData;

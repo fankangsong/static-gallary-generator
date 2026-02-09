@@ -146,18 +146,51 @@ function initPhotoSwipe() {
         lightbox.pswp.on("change", () => {
           const currSlide = lightbox.pswp.currSlide;
           if (currSlide && currSlide.data && currSlide.data.element) {
-            const author = currSlide.data.element.getAttribute("data-author");
-            if (author) {
-              el.innerHTML = `
-                <div class="absolute bottom-6 left-0 right-0 text-center pointer-events-none">
-                  <span class="inline-block bg-black/50 backdrop-blur-md text-white/90 px-4 py-2 rounded-full text-sm font-medium shadow-lg">
-                    © ${author}
-                  </span>
-                </div>
-              `;
-            } else {
-              el.innerHTML = "";
+            const elAttr = (name) => currSlide.data.element.getAttribute(name);
+
+            const author = elAttr("data-author");
+            const title = elAttr("data-title");
+            const exif = {
+              model: elAttr("data-exif-model"),
+              date: elAttr("data-exif-date"),
+              shutter: elAttr("data-exif-shutter"),
+              aperture: elAttr("data-exif-aperture"),
+              iso: elAttr("data-exif-iso"),
+              focalLength: elAttr("data-exif-focallength"),
+            };
+
+            const hasExif = Object.values(exif).some((v) => v);
+
+            let html =
+              '<div class="absolute bottom-0 left-0 right-0 p-6 pointer-events-none flex flex-col items-center justify-end bg-gradient-to-t from-black/80 to-transparent pt-20">';
+
+            // Title - Separate Line, slightly larger
+            if (title) {
+              html += `<h3 class="text-white text-lg md:text-xl font-medium mb-3 tracking-wide drop-shadow-md opacity-90">${title}</h3>`;
             }
+
+            // Info Row - Low key, combined EXIF and Author
+            if (hasExif || author) {
+              html += `<div class="flex flex-wrap justify-center items-center gap-x-3 gap-y-1 text-white/50 text-[10px] md:text-xs font-light font-sans tracking-wider">`;
+
+              if (author) {
+                html += `<span class="opacity-70">© ${author}</span>`;
+                if (hasExif) html += `<span class="opacity-30">|</span>`;
+              }
+
+              if (exif.model) html += `<span>${exif.model}</span>`;
+              if (exif.focalLength) html += `<span>${exif.focalLength}</span>`;
+              if (exif.aperture) html += `<span>${exif.aperture}</span>`;
+              if (exif.shutter) html += `<span>${exif.shutter}s</span>`;
+              if (exif.iso) html += `<span>${exif.iso}</span>`;
+              if (exif.date)
+                html += `<span class="opacity-60">${exif.date}</span>`;
+
+              html += `</div>`;
+            }
+
+            html += "</div>";
+            el.innerHTML = html;
           }
         });
       },

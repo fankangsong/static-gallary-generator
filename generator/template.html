@@ -190,7 +190,13 @@
           class="pswp-gallery max-w-7xl mx-auto columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 px-4 pb-12 opacity-0 transition-opacity duration-700 delay-200">
           <% ALBUM_DATA.images.forEach(function(img) { %>
             <a href="<%= img.src %>" data-pswp-width="<%= img.width %>" data-pswp-height="<%= img.height %>"
-              data-author="<%= img.author || '' %>" target="_blank"
+              data-author="<%= img.author || '' %>" data-title="<%= img.title || '' %>"
+              data-exif-model="<%= img.exif ? img.exif.model : '' %>"
+              data-exif-date="<%= img.exif ? img.exif.date : '' %>"
+              data-exif-shutter="<%= img.exif ? img.exif.shutter : '' %>"
+              data-exif-aperture="<%= img.exif ? img.exif.aperture : '' %>"
+              data-exif-iso="<%= img.exif ? img.exif.iso : '' %>"
+              data-exif-focallength="<%= img.exif ? img.exif.focalLength : '' %>" target="_blank"
               class="relative block mb-4 break-inside-avoid group overflow-hidden rounded-lg shadow-sm hover:shadow-xl transition-shadow duration-300">
               <img src="<%= img.thumbnail || img.src %>" alt="<%= img.alt || '' %>"
                 class="w-full h-auto object-contain transition-transform duration-700 group-hover:scale-105"
@@ -199,6 +205,9 @@
               <% if (img.author) { %>
                 <div
                   class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <p class="text-white text-sm font-medium tracking-wide truncate">
+                    <%= img.title || '' %>
+                  </p>
                   <p class="text-white text-xs font-medium tracking-wide truncate">© <%= img.author %>
                   </p>
                 </div>
