@@ -93,7 +93,7 @@
           <!-- Navigation Menu Button -->
           <button id="mobile-menu-btn"
             class="flex items-center space-x-2 px-3 py-2 rounded-lg text-white hover:bg-white/10 transition-all duration-300 group">
-            <span class="text-sm font-bold tracking-widest uppercase opacity-80 group-hover:opacity-100">导航</span>
+            <span class="text-sm font-bold tracking-widest uppercase opacity-80 group-hover:opacity-100">MENU</span>
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
               stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -117,7 +117,7 @@
       class="absolute top-0 bottom-0 right-0 w-full md:w-96 bg-gray-950 md:bg-gray-900/90 md:backdrop-blur-2xl shadow-2xl flex flex-col overflow-hidden transform translate-x-full transition-transform duration-500 ease-in-out">
       <!-- Sidebar Header -->
       <div class="flex justify-between items-center p-6 md:p-8 bg-transparent shrink-0">
-        <span class="text-white/40 text-xs font-bold tracking-[0.2em] uppercase">所有相册</span>
+        <span class="text-white/40 text-xs font-bold tracking-[0.2em] uppercase">INDEX</span>
         <button id="close-menu-btn"
           class="p-2 rounded-full text-white/60 hover:text-white hover:bg-white/10 transition-all duration-300">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -170,7 +170,7 @@
     <% if (typeof CONTENT_HTML !=='undefined' && CONTENT_HTML) { %>
       <div id="text-content" class="max-w-3xl mx-auto px-6 py-16 prose prose-lg text-black 
     prose-headings:font-bold prose-headings:text-black 
-    prose-h1:text-4xl prose-h1:mb-8 prose-h1:tracking-tight
+    prose-h1:text-4xl prose-h1:mb-8 prose-h1:tracking-tight prose-h1:text-center
     prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-6 prose-h2:border-b prose-h2:pb-2
     prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-4
     prose-p:leading-relaxed prose-p:mb-6 prose-p:text-justify
@@ -186,34 +186,47 @@
       <% } %>
 
         <div class="w-full bg-white mt-5"></div>
-        <div id="gallery-grid"
-          class="pswp-gallery max-w-7xl mx-auto columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 px-4 pb-12 opacity-0 transition-opacity duration-700 delay-200">
-          <% ALBUM_DATA.images.forEach(function(img) { %>
-            <a href="<%= img.src %>" data-pswp-width="<%= img.width %>" data-pswp-height="<%= img.height %>"
-              data-author="<%= img.author || '' %>" data-title="<%= img.title || '' %>"
-              data-exif-model="<%= img.exif ? img.exif.model : '' %>"
-              data-exif-date="<%= img.exif ? img.exif.date : '' %>"
-              data-exif-shutter="<%= img.exif ? img.exif.shutter : '' %>"
-              data-exif-aperture="<%= img.exif ? img.exif.aperture : '' %>"
-              data-exif-iso="<%= img.exif ? img.exif.iso : '' %>"
-              data-exif-focallength="<%= img.exif ? img.exif.focalLength : '' %>" target="_blank"
-              class="relative block mb-4 break-inside-avoid group overflow-hidden rounded-lg shadow-sm hover:shadow-xl transition-shadow duration-300">
-              <img src="<%= img.thumbnail || img.src %>" alt="<%= img.alt || '' %>"
-                class="w-full h-auto object-contain transition-transform duration-700 group-hover:scale-105"
-                loading="lazy" />
-              <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
-              <% if (img.author) { %>
-                <div
-                  class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <p class="text-white text-sm font-medium tracking-wide truncate">
-                    <%= img.title || '' %>
-                  </p>
-                  <p class="text-white text-xs font-medium tracking-wide truncate">© <%= img.author %>
-                  </p>
+        <div id="gallery-grid" class="max-w-7xl mx-auto px-4 pb-12 opacity-0 transition-opacity duration-700 delay-200">
+          <% ALBUM_DATA.groups.forEach(function(group) { %>
+            <% if (group.name) { %>
+              <div class="flex items-center justify-center mt-24 mb-12">
+                <div class="w-16 h-px bg-gray-200"></div>
+                <h2 class="text-2xl font-bold text-gray-900 px-8 tracking-wide">
+                  <%= group.name %>
+                </h2>
+                <div class="w-16 h-px bg-gray-200"></div>
+              </div>
+              <% } %>
+                <div class="pswp-gallery columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4">
+                  <% group.images.forEach(function(img) { %>
+                    <a href="<%= img.src %>" data-pswp-width="<%= img.width %>" data-pswp-height="<%= img.height %>"
+                      data-author="<%= img.author || '' %>" data-title="<%= img.title || '' %>"
+                      data-exif-model="<%= img.exif ? img.exif.model : '' %>"
+                      data-exif-date="<%= img.exif ? img.exif.date : '' %>"
+                      data-exif-shutter="<%= img.exif ? img.exif.shutter : '' %>"
+                      data-exif-aperture="<%= img.exif ? img.exif.aperture : '' %>"
+                      data-exif-iso="<%= img.exif ? img.exif.iso : '' %>"
+                      data-exif-focallength="<%= img.exif ? img.exif.focalLength : '' %>" target="_blank"
+                      class="relative block mb-4 break-inside-avoid group overflow-hidden rounded-lg shadow-sm hover:shadow-xl transition-shadow duration-300">
+                      <img src="<%= img.thumbnail || img.src %>" alt="<%= img.alt || '' %>"
+                        class="w-full h-auto object-contain transition-transform duration-700 group-hover:scale-105"
+                        loading="lazy" />
+                      <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300">
+                      </div>
+                      <% if (img.author) { %>
+                        <div
+                          class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          <p class="text-white text-sm font-medium tracking-wide truncate">
+                            <%= img.title || '' %>
+                          </p>
+                          <p class="text-white text-xs font-medium tracking-wide truncate">© <%= img.author %>
+                          </p>
+                        </div>
+                        <% } %>
+                    </a>
+                    <% }); %>
                 </div>
-                <% } %>
-            </a>
-            <% }); %>
+                <% }); %>
         </div>
         </div>
   </main>

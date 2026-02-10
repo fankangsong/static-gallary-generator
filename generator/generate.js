@@ -21,6 +21,7 @@ const CONFIG_DIR = path.join(WEB_DIR, "config");
 const FONTS_DIR = path.join(WEB_DIR, "fonts");
 // Detail page HTML template path
 const TEMPLATE_PATH = path.join(__dirname, "template.html");
+const TEMPLATE_MAGAZINE_PATH = path.join(__dirname, "template_magazine.html");
 // Index page HTML template path
 const INDEX_TEMPLATE_PATH = path.join(__dirname, "index_template.html");
 // Source font path for subsetting
@@ -90,6 +91,7 @@ function getOrGenerateMeta(albumPath, albumDirName) {
       title: albumDirName,
       author: config.defaultAuthor,
       description: DESCRIPTION_DEFAULT,
+      template: config.template || "default",
     };
     try {
       fs.writeFileSync(metaPath, JSON.stringify(meta, null, 2));
@@ -150,26 +152,26 @@ function getOrGenerateContent(albumPath, title, albumDirName) {
 }
 
 /**
- * 3. Image Processing
+ * 3. Image Processing Helper
  */
-async function processImages(albumPath, albumImagesOutDir, id, meta) {
-  // Process images
-  const files = fs.readdirSync(albumPath).filter((file) => {
-    const ext = path.extname(file).toLowerCase();
-    return config.supportedExtensions.includes(ext);
-  });
-
+async function processImageBatch(
+  files,
+  sourceDir,
+  outputDir,
+  webRelativePath,
+  meta
+) {
   const imagesData = [];
 
   for (const file of files) {
-    const filePath = path.join(albumPath, file);
+    const filePath = path.join(sourceDir, file);
     const filename = path.parse(file).name;
 
     const thumbFilename = `thumb_${filename}.jpg`;
     const largeFilename = `large_${filename}.jpg`;
 
-    const thumbPath = path.join(albumImagesOutDir, thumbFilename);
-    const largePath = path.join(albumImagesOutDir, largeFilename);
+    const thumbPath = path.join(outputDir, thumbFilename);
+    const largePath = path.join(outputDir, largeFilename);
 
     // 1. Generate Thumbnail (300x300, cover)
     if (!fs.existsSync(thumbPath)) {
@@ -212,9 +214,14 @@ async function processImages(albumPath, albumImagesOutDir, id, meta) {
     }
 
     // Read dimensions of the generated large file
-    const largeImageMeta = await sharp(largePath).metadata();
-    width = largeImageMeta.width;
-    height = largeImageMeta.height;
+    try {
+      const largeImageMeta = await sharp(largePath).metadata();
+      width = largeImageMeta.width;
+      height = largeImageMeta.height;
+    } catch (e) {
+      console.error(`    ❌ Failed to read metadata for ${largePath}`, e);
+      continue; // Skip this image if metadata read fails
+    }
 
     // 3. Extract EXIF Data
     let exifData = {};
@@ -228,19 +235,8 @@ async function processImages(albumPath, albumImagesOutDir, id, meta) {
 
       // DateTime
       if (tags.DateTimeOriginal) {
-        // Format: YYYY:MM:DD HH:MM:SS -> YYYY-MM-DD HH:mm
-        // Sometimes it might be different, but this is standard EXIF
         const dateStr = tags.DateTimeOriginal.description;
         if (dateStr && dateStr.length >= 16) {
-          exifData.date = dateStr
-            .replace(/:/g, "-")
-            .replace(" ", " ")
-            .substring(0, 16)
-            .replace("-", ":")
-            .replace("-", ":");
-          // Wait, replace(/:/g, "-") changes time colons too.
-          // Standard EXIF is "YYYY:MM:DD HH:MM:SS"
-          // We want "YYYY-MM-DD HH:mm"
           const [datePart, timePart] = dateStr.split(" ");
           if (datePart && timePart) {
             exifData.date = `${datePart.replace(
@@ -258,8 +254,6 @@ async function processImages(albumPath, albumImagesOutDir, id, meta) {
 
       // Aperture (FNumber)
       if (tags.FNumber) {
-        // ExifReader description often includes "f/" but let's check
-        // If it's just a number, add f/
         const fVal = tags.FNumber.description;
         exifData.aperture = fVal.startsWith("f/") ? fVal : `f/${fVal}`;
       }
@@ -281,8 +275,8 @@ async function processImages(albumPath, albumImagesOutDir, id, meta) {
     allText += filename;
 
     imagesData.push({
-      src: `images/${id}/${largeFilename}`,
-      thumbnail: `images/${id}/${thumbFilename}`,
+      src: `${webRelativePath}/${largeFilename}`,
+      thumbnail: `${webRelativePath}/${thumbFilename}`,
       width: width,
       height: height,
       alt: filename,
@@ -295,10 +289,79 @@ async function processImages(albumPath, albumImagesOutDir, id, meta) {
 }
 
 /**
+ * 3. Image Processing Main
+ */
+async function processImages(albumPath, albumImagesOutDir, id, meta) {
+  const groups = [];
+  const entries = fs.readdirSync(albumPath, { withFileTypes: true });
+
+  // 1. Root files
+  const rootFiles = entries
+    .filter(
+      (e) =>
+        e.isFile() &&
+        config.supportedExtensions.includes(path.extname(e.name).toLowerCase())
+    )
+    .map((e) => e.name);
+
+  if (rootFiles.length > 0) {
+    // Output dir is albumImagesOutDir
+    // Web path is `images/${id}`
+    const processed = await processImageBatch(
+      rootFiles,
+      albumPath,
+      albumImagesOutDir,
+      `images/${id}`,
+      meta
+    );
+    groups.push({ name: null, images: processed });
+  }
+
+  // 2. Subdirectories
+  const subDirs = entries.filter((e) => e.isDirectory());
+  for (const dir of subDirs) {
+    const dirName = dir.name;
+    const subDirPath = path.join(albumPath, dirName);
+    const subOutDir = path.join(albumImagesOutDir, dirName);
+
+    if (!fs.existsSync(subOutDir)) fs.mkdirSync(subOutDir, { recursive: true });
+
+    const subFiles = fs
+      .readdirSync(subDirPath)
+      .filter((file) =>
+        config.supportedExtensions.includes(path.extname(file).toLowerCase())
+      );
+
+    if (subFiles.length > 0) {
+      const processed = await processImageBatch(
+        subFiles,
+        subDirPath,
+        subOutDir,
+        `images/${id}/${dirName}`,
+        meta
+      );
+      groups.push({ name: dirName, images: processed });
+    }
+  }
+
+  return groups;
+}
+
+/**
  * 4. HTML Generation
  */
 function generateHtml(id, albumData, contentHtml, meta) {
-  const htmlTemplate = fs.readFileSync(TEMPLATE_PATH, "utf-8");
+  // Determine which template to use
+  // Priority: meta.json template > config.json website.template > default
+  const templateName = meta.template || config.website.template || "default";
+  let templatePath = TEMPLATE_PATH;
+
+  if (templateName === "magazine") {
+    templatePath = TEMPLATE_MAGAZINE_PATH;
+    console.log(`  📖 Using Magazine Template for: ${id}`);
+  }
+
+  const htmlTemplate = fs.readFileSync(templatePath, "utf-8");
   const htmlContent = ejs.render(htmlTemplate, {
     ALBUM_DATA: albumData,
     TITLE: albumData.title,
@@ -375,10 +438,7 @@ async function processAlbum(albumDirName, isInitMode) {
   // If init mode, stop here
   if (isInitMode) {
     console.log(`  ✨ [Init] Completed meta and content for: ${albumDirName}`);
-    return null; // Don't return nav item in init mode? Or should we?
-    // Usually init is for setting up new folders.
-    // We can return null to skip nav update or return basic info.
-    // Let's return null to skip heavy processing effects.
+    return null;
   }
 
   // Collect text for font generation
@@ -396,22 +456,28 @@ async function processAlbum(albumDirName, isInitMode) {
   if (!fs.existsSync(albumImagesOutDir))
     fs.mkdirSync(albumImagesOutDir, { recursive: true });
 
-  // 3. Process Images
-  const imagesData = await processImages(
-    albumPath,
-    albumImagesOutDir,
-    id,
-    meta
-  );
+  // 3. Process Images (Now returns groups)
+  const groups = await processImages(albumPath, albumImagesOutDir, id, meta);
+
+  // Add group names to font subsetting
+  groups.forEach((group) => {
+    if (group.name) {
+      allText += group.name;
+    }
+  });
+
+  // Flatten images for backward compatibility and cover selection
+  const allImages = groups.flatMap((g) => g.images);
 
   // Construct Data JSON
   const albumData = {
     id: id,
     title: title,
     author: meta.author || config.defaultAuthor,
-    cover: meta.cover || (imagesData.length > 0 ? imagesData[0].src : ""),
+    cover: meta.cover || (allImages.length > 0 ? allImages[0].src : ""),
     description: meta.description || "",
-    images: imagesData,
+    images: allImages,
+    groups: groups,
   };
 
   // 4. Generate HTML
