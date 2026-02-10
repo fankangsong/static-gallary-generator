@@ -83,7 +83,8 @@ function getOrGenerateMeta(albumPath, albumDirName) {
       })
         .flat()
         .join("-")
-        .toLowerCase();
+        .toLowerCase()
+        .replace(/-+/g, "-");
     }
 
     meta = {
