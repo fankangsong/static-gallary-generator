@@ -10,7 +10,11 @@ const ExifReader = require("exifreader");
 const config = require("./config.json");
 
 // Photo source directory, storing original images and metadata
-const PHOTOS_DIR = path.join(__dirname, "photos");
+const rawPhotosDir = config.photosDir || "photos";
+// Fix: normalize "D:path" to "D:/path" if it looks like a Windows drive path without root slash
+const normalizedRaw = rawPhotosDir.replace(/^([a-zA-Z]):(?![\\/])/, "$1:/");
+const normalizedPhotosDir = normalizedRaw.replace(/\\/g, "/");
+const PHOTOS_DIR = path.resolve(__dirname, normalizedPhotosDir);
 // Website output root directory
 const WEB_DIR = path.join(__dirname, "../web");
 // Processed images output directory

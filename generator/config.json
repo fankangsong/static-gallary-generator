@@ -12,6 +12,7 @@
   },
   "supportedExtensions": [".jpg", ".jpeg", ".png", ".webp"],
   "defaultAuthor": "Fan Kangsong(Colin)",
+  "photosDir": "../../photography",
   "template": "magazine",
   "website": {
     "url": "imcolin.fan",
