@@ -15,14 +15,19 @@ Generate static gallery pages based on file system directories.
 
 ## 🚀 Installation and Usage
 
-- 📦 `npm install`
-- 📂 Place folders and images into the `generator/photos/` directory.
-- ⚙️ Run `npm run build init`. This will generate corresponding `meta.json` and `content.md` files in the `generator/photos/` directory.
-- 📝 Modify `meta.json` and `content.md` as needed, or leave them as is.
-- 🏗️ Run `npm run build`. This will generate the static page files in the `web/` directory.
-- 🌐 Run `npm run dev` to preview the result at `http://localhost:5173`.
+Install dependencies: `npm install`
 
-## 🔧 Configuration Options
+### Project Configuration
+
+Modify `generator/config.json` file to configure the image source directory.
+
+### Initialization
+
+- `npm run index`: Initialize the project, generating `generator/.temp/data.json`.
+- `npm run build`: Generate the `web/` directory containing static page files.
+- `npm run dev`: Preview at `http://localhost:3000`.
+
+## Configuration Options
 
 | Option                 | Description                               | Default Value                        |
 | ---------------------- | ----------------------------------------- | ------------------------------------ |

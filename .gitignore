@@ -143,12 +143,9 @@ vite.config.ts.timestamp-*
 
 generator/photos/
 generator/DEFAULT_DESCRIPTION
-web/config
-web/images/
-web/data/
-web/fonts/
-web/*.html
+web/
+
+*.stylelintcache
+.trae
 
 *.sh
-
-web/favicon-32x32.png

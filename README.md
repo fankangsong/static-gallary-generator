@@ -15,12 +15,17 @@
 
 ## 🚀 如何安装与使用
 
-- 📦 `npm install`
-- 📂 把文件夹和图片存放到 `generator/photos/` 目录下
-- ⚙️ 执行 `npm run build init` 后，会在 `generator/photos/` 目录下生成对应的 `meta.json` 文件和 `content.md` 文件
-- 📝 根据自定义需求，修改 `meta.json` 文件和 `content.md` 文件，也可不修改。
-- 🏗️ 执行 `npm run build` 后，会在 `web/` 目录下生成对应的静态页面文件。
-- 🌐 执行 `npm run dev` 后，会在 `http://localhost:5173` 预览效果。
+安装依赖：`npm install`
+
+### 配置项目
+
+修改 `generator/config.json` 文件，配置图片源目录。
+
+### 初始化
+
+- `npm run index`，初始化项目，生成`generator/.temp/data.json`。
+- `npm run build`，生成 `web/` 目录，包含静态页面文件。
+- `npm run dev`，在 `http://localhost:3000` 预览效果。
 
 ## 配置项目
 

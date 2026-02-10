@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "vite",
+    "preview": "vite",
+    "index": "node generator/generate.js init",
     "build": "node generator/generate.js",
     "clear": "node scripts/clear.js"
   },
