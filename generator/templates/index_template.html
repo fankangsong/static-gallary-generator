@@ -2,43 +2,136 @@
 <html lang="zh-CN">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="/assets/favicon.png" type="image/png">
-    <% if (REDIRECT_URL) { %>
-        <meta http-equiv="refresh" content="0;url=<%= REDIRECT_URL %>">
-        <script>window.location.replace("<%= REDIRECT_URL %>");</script>
-        <% } %>
-            <title>Loading...</title>
-            <script src="https://cdn.tailwindcss.com"></script>
+    <%- include('partials/head') %>
+        <style>
+            <% if (WEBSITE_FONT) {
+                %>@font-face {
+                    font-family: '<%= WEBSITE_FONT.name %>';
+                    src: url('<%= "fonts/" + WEBSITE_FONT.source.split("/").pop() %>') format('opentype');
+                    font-weight: normal;
+                    font-style: normal;
+                    font-display: swap;
+                }
+
+                <%
+            }
+
+            %>body {
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+                font-family: 'Courier New',
+                Courier,
+                <%- WEBSITE_FONT ? `'${WEBSITE_FONT.name}' `: '' %>, monospace;
+            }
+
+            a {
+                text-decoration: none;
+                color: inherit;
+            }
+
+            /* Custom Scrollbar */
+            ::-webkit-scrollbar {
+                width: 6px;
+                height: 6px;
+            }
+
+            ::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background-color: rgba(0, 0, 0, 0.2);
+                border-radius: 3px;
+            }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background-color: rgba(0, 0, 0, 0.4);
+                border-radius: 3px;
+            }
+        </style>
 </head>
 
-<body class="bg-gray-50 flex items-center justify-center min-h-screen">
-    <div id="loading-content" class="text-center">
-        <% if (REDIRECT_URL) { %>
-            <!-- Spinner -->
-            <svg class="animate-spin h-10 w-10 text-gray-400 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg"
-                fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                </path>
-            </svg>
-            <p class="text-gray-500 font-medium animate-pulse tracking-wider">加载...</p>
-            <p class="mt-4 text-gray-400 text-sm"><a href="<%= REDIRECT_URL %>"
-                    class="underline hover:text-gray-600">👉点击直接访问相册</a>
-            </p>
+<body class="bg-white text-gray-900 min-h-screen flex flex-col">
+
+    <!-- Header / Brand -->
+    <header class="py-12 md:py-20 px-6 text-center">
+        <% if (WEBSITE_LOGO && WEBSITE_LOGO.enabled) { %>
+            <div class="mb-6 flex justify-center">
+                <img src="<%= WEBSITE_LOGO.src %>" alt="<%= WEBSITE_TITLE_SUFFIX %>"
+                    style="width: <%= WEBSITE_LOGO.width %>; max-width: 100%; height: auto;">
+            </div>
             <% } else { %>
-                <div class="text-red-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mx-auto mb-4" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                    <p class="text-gray-500 font-medium animate-pulse tracking-wider">没有找到相册。</p>
-                </div>
+                <h1 class="text-3xl md:text-4xl font-bold tracking-widest uppercase">
+                    <%= WEBSITE_TITLE_SUFFIX %>
+                </h1>
                 <% } %>
-    </div>
+                    <p class="text-gray-500 text-sm tracking-wider mt-4 uppercase">Photography Portfolio</p>
+    </header>
+
+    <!-- Album List -->
+    <main class="flex-grow max-w-4xl mx-auto w-full px-6 pb-20">
+        <div class="space-y-24 md:space-y-32">
+            <% ALBUMS.forEach(function(album) { %>
+                <article class="group relative">
+                    <a href="<%= album.link %>" class="block relative overflow-hidden shadow-lg">
+                        <!-- Cover Image Container -->
+                        <div class="aspect-[3/2] md:aspect-[16/9] w-full bg-gray-200">
+                            <% if (album.cover) { %>
+                                <img src="<%= album.cover %>" alt="<%= album.title %>"
+                                    class="object-cover w-full h-full transition-transform duration-1000 group-hover:scale-105 filter grayscale group-hover:grayscale-0">
+                                <% } else { %>
+                                    <div class="flex items-center justify-center h-full text-gray-400">
+                                        <span class="text-xs uppercase tracking-widest">No Cover</span>
+                                    </div>
+                                    <% } %>
+                        </div>
+
+                        <!-- Dark Overlay for Text Readability -->
+                        <div
+                            class="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-700">
+                        </div>
+
+                        <!-- Centered Text Content (Fused) -->
+                        <div
+                            class="absolute inset-0 flex flex-col justify-center items-center text-center p-6 text-white z-10">
+                            <h2
+                                class="text-3xl md:text-5xl font-bold tracking-widest uppercase drop-shadow-lg transform transition-transform duration-700 group-hover:-translate-y-2">
+                                <%= album.title %>
+                            </h2>
+
+                            <% if (album.description) { %>
+                                <div
+                                    class="w-12 h-0.5 bg-white/80 my-4 md:my-6 transition-all duration-700 group-hover:w-20">
+                                </div>
+                                <p
+                                    class="text-sm md:text-lg tracking-wide max-w-2xl leading-relaxed drop-shadow-md line-clamp-2 md:line-clamp-3 opacity-90">
+                                    <%= album.description %>
+                                </p>
+                                <% } %>
+
+                                    <div
+                                        class="mt-8 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-700 delay-100">
+                                        <span
+                                            class="text-xs font-bold tracking-[0.2em] uppercase border-b border-white pb-1 hover:text-gray-200 hover:border-gray-200">
+                                            View Album
+                                        </span>
+                                    </div>
+                        </div>
+                    </a>
+                </article>
+                <% }); %>
+
+                    <% if (ALBUMS.length===0) { %>
+                        <div class="text-center py-20 text-gray-400">
+                            <p>No albums found.</p>
+                        </div>
+                        <% } %>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <%- include('partials/footer') %>
+
 </body>
 
 </html>

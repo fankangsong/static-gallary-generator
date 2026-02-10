@@ -92,8 +92,7 @@ async function main() {
   }
 
   // 4. Generate Index HTML
-  const redirectUrl = albums.length > 0 ? albums[0].link : "";
-  htmlGenerator.generateIndexHtml(redirectUrl);
+  htmlGenerator.generateIndexHtml(albums);
 
   // 5. Collect Nav Text
   albums.forEach((a) => (allText += a.title));

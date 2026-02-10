@@ -48,14 +48,22 @@ class HtmlGenerator {
     logger.log(`  📄 Generated HTML: ${id}.html`);
   }
 
-  generateIndexHtml(redirectUrl) {
+  generateIndexHtml(albums) {
     const indexTemplatePath = path.join(TEMPLATES_DIR, "index_template.html");
     if (fs.existsSync(indexTemplatePath)) {
       const indexTemplate = fs.readFileSync(indexTemplatePath, "utf-8");
       const indexHtmlContent = ejs.render(
         indexTemplate,
         {
-          REDIRECT_URL: redirectUrl,
+          ALBUMS: albums,
+          TITLE: "Home",
+          DESCRIPTION: config.website.description || "Photography Portfolio",
+          WEBSITE_TITLE_SUFFIX: config.website.url,
+          WEBSITE_NAV_BRAND: config.website.navBrand,
+          WEBSITE_LOGO: config.website.logo,
+          WEBSITE_FONT: config.website.font,
+          FULL_YEAR: new Date().getFullYear(),
+          AUTHOR: config.defaultAuthor,
         },
         {
           root: TEMPLATES_DIR,
@@ -64,9 +72,7 @@ class HtmlGenerator {
       );
       const indexHtmlPath = path.join(WEB_DIR, "index.html");
       fs.writeFileSync(indexHtmlPath, indexHtmlContent);
-      logger.log(
-        `🌐 Generated web/index.html with redirect to: ${redirectUrl}`
-      );
+      logger.log(`🌐 Generated web/index.html with ${albums.length} albums`);
     } else {
       logger.warn(
         "⚠️ index_template.html not found, skipping index generation."
