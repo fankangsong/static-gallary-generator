@@ -1,11 +1,11 @@
-const path = require('path');
+const path = require("path");
 
 const logger = {
-  info: (...args) => console.log('ℹ️ ', ...args),
-  success: (...args) => console.log('✅', ...args),
-  warn: (...args) => console.warn('⚠️ ', ...args),
-  error: (...args) => console.error('❌', ...args),
-  log: (...args) => console.log(...args)
+  info: (...args) => console.log("ℹ️ ", ...args),
+  success: (...args) => console.log("✅", ...args),
+  warn: (...args) => console.warn("⚠️ ", ...args),
+  error: (...args) => console.error("❌", ...args),
+  log: (...args) => console.log(...args),
 };
 
 function normalizePath(p) {
@@ -14,7 +14,20 @@ function normalizePath(p) {
   return normalized.replace(/\\/g, "/");
 }
 
+function getDescription(deviceStr, dateStr) {
+  let desc = "";
+  if (deviceStr && dateStr) {
+    desc = `📷 ${deviceStr} 📆 ${dateStr}`;
+  } else if (deviceStr) {
+    desc = `📷 ${deviceStr}`;
+  } else if (dateStr) {
+    desc = `📷 ${dateStr}`;
+  }
+  return desc;
+}
+
 module.exports = {
   logger,
-  normalizePath
+  normalizePath,
+  getDescription,
 };

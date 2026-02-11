@@ -13,7 +13,6 @@ module.exports = {
   FONTS_DIR: path.join(WEB_DIR, "fonts"),
   TEMP_DIR: path.join(GENERATOR_DIR, ".temp"),
   TEMPLATES_DIR: path.join(GENERATOR_DIR, "templates"),
-  DEFAULT_DESC_FILE: path.join(GENERATOR_DIR, "DEFAULT_DESCRIPTION"),
   DATA_JSON_NAME: "data.json",
   NAV_JSON_NAME: "nav.json",
 };

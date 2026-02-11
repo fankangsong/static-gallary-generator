@@ -3,297 +3,295 @@
 
 <head>
   <%- include('partials/head') %>
-  <style>
-    <% if (WEBSITE_FONT) {
-      %>@font-face {
-        font-family: '<%= WEBSITE_FONT.name %>';
-        src: url('<%= "fonts/" + WEBSITE_FONT.source.split("/").pop() %>') format('opentype');
-        font-weight: normal;
-        font-style: normal;
-        font-display: swap;
+    <style>
+      <% if (WEBSITE_FONT) {
+        %>@font-face {
+          font-family: '<%= WEBSITE_FONT.name %>';
+          src: url('<%= "fonts/" + WEBSITE_FONT.source.split("/").pop() %>') format('opentype');
+          font-weight: normal;
+          font-style: normal;
+          font-display: swap;
+        }
+
+        <%
       }
-      <%
-    }
 
-    %>html {
-      scrollbar-gutter: stable;
-    }
+      %>html {
+        scrollbar-gutter: stable;
+      }
 
-    body {
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      font-family: 'Courier New',
-      Courier,
-      <%- WEBSITE_FONT ? `'${WEBSITE_FONT.name}' `: '' %>, monospace;
-      background-color: #fdfbf7;
-      /* Warm paper-like background */
-      color: #1a1a1a;
+      body {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        font-family: 'Courier New',
+        Courier,
+        <%- WEBSITE_FONT ? `'${WEBSITE_FONT.name}' `: '' %>, monospace;
+        background-color: #fdfbf7;
+        /* Warm paper-like background */
+        color: #1a1a1a;
 
-    }
+      }
 
-    /* Magazine Header Style */
-    .magazine-header {
-      position: relative;
-      padding-top: 120px;
-      padding-bottom: 60px;
-      text-align: center;
-      border-bottom: 1px solid #e5e5e5;
-      margin-bottom: 60px;
-    }
+      /* Magazine Header Style */
+      .magazine-header {
+        position: relative;
+        padding-top: 120px;
+        padding-bottom: 60px;
+        text-align: center;
+        border-bottom: 1px solid #e5e5e5;
+        margin-bottom: 60px;
+      }
 
-    .magazine-title {
-      font-size: 3.5rem;
-      line-height: 1.1;
-      margin-bottom: 1.5rem;
-      letter-spacing: -0.02em;
-    }
-
-    .magazine-meta {
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      font-size: 0.75rem;
-      color: #666;
-      margin-bottom: 2rem;
-    }
-
-    .magazine-desc {
-      font-size: 1.25rem;
-      line-height: 1.8;
-      max-width: 680px;
-      margin: 0 auto;
-      color: #444;
-      font-style: italic;
-    }
-
-    /* Magazine Grid */
-    .magazine-grid {
-      column-gap: 40px;
-      /* Wider gap */
-    }
-
-    .magazine-item {
-      margin-bottom: 60px;
-      break-inside: avoid;
-    }
-
-    .magazine-img {
-      display: block;
-      width: 100%;
-      height: auto;
-      transition: filter 0.3s ease;
-    }
-
-    .magazine-item:hover .magazine-img {
-      filter: brightness(0.95);
-    }
-
-    .magazine-caption {
-      margin-top: 12px;
-      text-align: left;
-    }
-
-    .caption-title {
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: #111;
-      margin-bottom: 4px;
-    }
-
-    .caption-meta {
-      font-size: 0.7rem;
-      color: #888;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background-color: rgba(0, 0, 0, 0.2);
-      border-radius: 3px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background-color: rgba(0, 0, 0, 0.4);
-    }
-
-    /* Navigation override for light theme */
-    #navbar {
-      color: #1a1a1a !important;
-    }
-
-    #mobile-menu-btn svg {
-      stroke: #1a1a1a;
-    }
-
-    @media (max-width: 768px) {
       .magazine-title {
-        font-size: 2.5rem;
+        font-size: 3.5rem;
+        line-height: 1.1;
+        margin-bottom: 1.5rem;
+        letter-spacing: -0.02em;
       }
 
-      .magazine-grid {
-        column-gap: 20px;
+      .magazine-meta {
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        font-size: 0.75rem;
+        color: #666;
+        margin-bottom: 2rem;
       }
-    }
-  </style>
+
+      .magazine-desc {
+        font-size: 1.25rem;
+        line-height: 1.8;
+        max-width: 680px;
+        margin: 0 auto;
+        color: #444;
+        font-style: italic;
+      }
+
+      /* Magazine Grid */
+      .magazine-grid {
+        column-gap: 40px;
+        /* Wider gap */
+      }
+
+      .magazine-item {
+        margin-bottom: 60px;
+        break-inside: avoid;
+      }
+
+      .magazine-img {
+        display: block;
+        width: 100%;
+        height: auto;
+        transition: filter 0.3s ease;
+      }
+
+      .magazine-item:hover .magazine-img {
+        filter: brightness(0.95);
+      }
+
+      .magazine-caption {
+        margin-top: 12px;
+        text-align: left;
+      }
+
+      .caption-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #111;
+        margin-bottom: 4px;
+      }
+
+      .caption-meta {
+        font-size: 0.7rem;
+        color: #888;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.2);
+        border-radius: 3px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(0, 0, 0, 0.4);
+      }
+
+      /* Navigation override for light theme */
+      #navbar {
+        color: #1a1a1a !important;
+      }
+
+      #mobile-menu-btn svg {
+        stroke: #1a1a1a;
+      }
+
+      @media (max-width: 768px) {
+        .magazine-title {
+          font-size: 2.5rem;
+        }
+
+        .magazine-grid {
+          column-gap: 20px;
+        }
+      }
+    </style>
 </head>
 
 <body class="bg-[#fdfbf7] text-gray-900">
 
   <!-- Navigation (Light Theme) -->
   <%- include('partials/nav', {
-      navClass: 'fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-[#fdfbf7]/90 backdrop-blur-md border-b border-gray-100',
-      logoClass: 'flex items-center group',
-      btnClass: 'flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-black/5 transition-all duration-300 group',
-      btnTextClass: 'text-sm font-bold tracking-widest uppercase opacity-60 group-hover:opacity-100 text-black',
-      iconClass: 'text-black',
-      iconWidth: '1.5'
-  }) %>
+    navClass: 'fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-[#fdfbf7]/90 backdrop-blur-md border-b border-gray-100'
+    , logoClass: 'flex items-center group' ,
+    btnClass: 'flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-black/5 transition-all duration-300 group' ,
+    btnTextClass: 'text-sm font-bold tracking-widest uppercase opacity-60 group-hover:opacity-100 text-black' ,
+    iconClass: 'text-black' , iconWidth: '1.5' }) %>
 
-  <!-- Navigation Overlay / Sidebar -->
-  <div id="mobile-menu" class="fixed inset-0 z-[60] pointer-events-none">
-    <!-- Backdrop -->
-    <div id="menu-backdrop"
-      class="absolute inset-0 bg-white/60 backdrop-blur-sm opacity-0 transition-opacity duration-500">
-    </div>
-
-    <!-- Content Panel (Dark Theme for Magazine) -->
-    <div id="menu-panel"
-      class="absolute top-0 bottom-0 right-0 w-full md:w-96 bg-gray-950 md:bg-gray-900/90 md:backdrop-blur-2xl shadow-2xl flex flex-col overflow-hidden transform translate-x-full transition-transform duration-500 ease-in-out border-l border-gray-800">
-      <!-- Sidebar Header -->
-      <div class="flex justify-between items-center p-6 md:p-8 bg-transparent shrink-0">
-        <span class="text-white/40 text-xs font-bold tracking-[0.2em] uppercase font-sans">Index</span>
-        <button id="close-menu-btn"
-          class="p-2 rounded-full text-white/60 hover:text-white hover:bg-white/10 transition-all duration-300">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+    <!-- Navigation Overlay / Sidebar -->
+    <div id="mobile-menu" class="fixed inset-0 z-[60] pointer-events-none">
+      <!-- Backdrop -->
+      <div id="menu-backdrop"
+        class="absolute inset-0 bg-white/60 backdrop-blur-sm opacity-0 transition-opacity duration-500">
       </div>
 
-      <!-- Links Container -->
-      <div class="flex-1 overflow-y-auto no-scrollbar px-8 pb-12">
-        <div id="mobile-nav-links" class="flex flex-col space-y-4">
-          <!-- Links Injected Here via JS (Need to update JS to handle dark text) -->
+      <!-- Content Panel (Dark Theme for Magazine) -->
+      <div id="menu-panel"
+        class="absolute top-0 bottom-0 right-0 w-full md:w-96 bg-gray-950 md:bg-gray-900/90 md:backdrop-blur-2xl shadow-2xl flex flex-col overflow-hidden transform translate-x-full transition-transform duration-500 ease-in-out border-l border-gray-800">
+        <!-- Sidebar Header -->
+        <div class="flex justify-between items-center p-6 md:p-8 bg-transparent shrink-0">
+          <span class="text-white/40 text-xs font-bold tracking-[0.2em] uppercase font-sans">Index</span>
+          <button id="close-menu-btn"
+            class="p-2 rounded-full text-white/60 hover:text-white hover:bg-white/10 transition-all duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Links Container -->
+        <div class="flex-1 overflow-y-auto no-scrollbar px-8 pb-12">
+          <div id="mobile-nav-links" class="flex flex-col space-y-4">
+            <!-- Links Injected Here via JS (Need to update JS to handle dark text) -->
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <main class="min-h-screen pt-20">
+    <main class="min-h-screen pt-20">
 
-    <!-- Magazine Header -->
-    <header class="magazine-header max-w-4xl mx-auto px-6 animate-fade-in-up">
-      <div class="magazine-meta">
-        <span>
-          <%= FULL_YEAR %>
-        </span> • <span>
-          <%= AUTHOR %>
-        </span>
-      </div>
-      <h1 class="magazine-title text-gray-900">
-        <%= ALBUM_DATA.title %>
-      </h1>
-      <div class="magazine-desc">
-        <% if (Array.isArray(ALBUM_DATA.description)) { %>
-          <% ALBUM_DATA.description.forEach(function(line) { %>
-            <p class="mb-2">
-              <%= line %>
-            </p>
-            <% }); %>
-              <% } else { %>
-                <p>
-                  <%= ALBUM_DATA.description %>
-                </p>
-                <% } %>
-      </div>
-    </header>
+      <!-- Magazine Header -->
+      <header class="magazine-header max-w-4xl mx-auto px-6 animate-fade-in-up">
+        <div class="magazine-meta">
+          <span>
+            <%= FULL_YEAR %> UPDATED
+          </span> • <span>
+            <%= AUTHOR %>
+          </span>
+        </div>
+        <h1 class="magazine-title text-gray-900">
+          <%= ALBUM_DATA.title %>
+        </h1>
+        <div class="magazine-desc">
+          <% if (Array.isArray(ALBUM_DATA.description)) { %>
+            <% ALBUM_DATA.description.forEach(function(line) { %>
+              <p class="mb-2">
+                <%= line %>
+              </p>
+              <% }); %>
+                <% } else { %>
+                  <p>
+                    <%= ALBUM_DATA.description %>
+                  </p>
+                  <% } %>
+        </div>
+      </header>
 
-    <% if (typeof CONTENT_HTML !=='undefined' && CONTENT_HTML) { %>
-      <div id="text-content" class="max-w-2xl mx-auto px-6 py-12 prose prose-xl prose-stone
+      <% if (typeof CONTENT_HTML !=='undefined' && CONTENT_HTML) { %>
+        <div id="text-content" class="max-w-2xl mx-auto px-6 py-12 prose prose-xl prose-stone
     prose-headings:font-normal prose-headings:text-gray-900 prose-h1:text-center
     prose-p:text-gray-700 prose-p:leading-loose
     prose-a:text-black prose-a:underline hover:prose-a:text-gray-600
     prose-img:shadow-none prose-img:rounded-none">
-        <%- CONTENT_HTML %>
-      </div>
-      <!-- Divider -->
-      <div class="w-24 h-px bg-gray-300 mx-auto my-16"></div>
-      <% } %>
-
-        <!-- Magazine Grid -->
-        <div id="gallery-grid"
-          class="max-w-[1600px] mx-auto px-6 pb-24 opacity-0 transition-opacity duration-700 delay-200">
-          <% ALBUM_DATA.groups.forEach(function(group) { %>
-            <% if (group.name) { %>
-              <div class="flex items-center justify-center mt-32 mb-16">
-                <div class="w-16 h-px bg-gray-200"></div>
-                <h2 class="text-3xl text-gray-900 px-8 tracking-wide">
-                  <%= group.name %>
-                </h2>
-                <div class="w-16 h-px bg-gray-200"></div>
-              </div>
-              <% } %>
-                <div class="pswp-gallery magazine-grid columns-1 md:columns-2 lg:columns-3">
-                  <% group.images.forEach(function(img) { %>
-                    <div class="magazine-item group">
-                      <a href="<%= img.src %>" data-pswp-width="<%= img.width %>" data-pswp-height="<%= img.height %>"
-                        data-author="<%= img.author || '' %>" data-title="<%= img.title || '' %>"
-                        data-exif-model="<%= img.exif ? img.exif.model : '' %>"
-                        data-exif-date="<%= img.exif ? img.exif.date : '' %>"
-                        data-exif-shutter="<%= img.exif ? img.exif.shutter : '' %>"
-                        data-exif-aperture="<%= img.exif ? img.exif.aperture : '' %>"
-                        data-exif-iso="<%= img.exif ? img.exif.iso : '' %>"
-                        data-exif-focallength="<%= img.exif ? img.exif.focalLength : '' %>" target="_blank"
-                        class="block cursor-zoom-in">
-                        <img src="<%= img.thumbnail || img.src %>" alt="<%= img.alt || '' %>" class="magazine-img"
-                          loading="lazy" />
-                      </a>
-
-                      <!-- Visible Caption for Magazine Style -->
-                      <div class="magazine-caption">
-                        <% if (img.title) { %>
-                          <div class="caption-title">
-                            <%= img.title %>
-                          </div>
-                          <% } %>
-                            <div class="caption-meta flex flex-wrap gap-2">
-                              <% if (img.exif) { %>
-                                <% if (img.exif.model) { %><span>
-                                    <%= img.exif.model %>
-                                  </span>
-                                  <% } %>
-                                    <% if (img.exif.focalLength) { %><span>
-                                        <%= img.exif.focalLength %>
-                                      </span>
-                                      <% } %>
-                                        <% if (img.exif.aperture) { %><span>
-                                            <%= img.exif.aperture %>
-                                          </span>
-                                          <% } %>
-                                            <% } %>
-                            </div>
-                      </div>
-                    </div>
-                    <% }); %>
-                </div>
-                <% }); %>
+          <%- CONTENT_HTML %>
         </div>
-  </main>
+        <!-- Divider -->
+        <div class="w-24 h-px bg-gray-300 mx-auto my-16"></div>
+        <% } %>
 
-  <%- include('partials/footer', {
-      footerClass: 'text-center py-12 border-t border-gray-100 bg-[#fdfbf7]'
-  }) %>
+          <!-- Magazine Grid -->
+          <div id="gallery-grid"
+            class="max-w-[1600px] mx-auto px-6 pb-24 opacity-0 transition-opacity duration-700 delay-200">
+            <% ALBUM_DATA.groups.forEach(function(group) { %>
+              <% if (group.name) { %>
+                <div class="flex items-center justify-center mt-32 mb-16">
+                  <div class="w-16 h-px bg-gray-200"></div>
+                  <h2 class="text-3xl text-gray-900 px-8 tracking-wide">
+                    <%= group.name %>
+                  </h2>
+                  <div class="w-16 h-px bg-gray-200"></div>
+                </div>
+                <% } %>
+                  <div class="pswp-gallery magazine-grid columns-1 md:columns-2 lg:columns-3">
+                    <% group.images.forEach(function(img) { %>
+                      <div class="magazine-item group">
+                        <a href="<%= img.src %>" data-pswp-width="<%= img.width %>" data-pswp-height="<%= img.height %>"
+                          data-author="<%= img.author || '' %>" data-title="<%= img.title || '' %>"
+                          data-exif-model="<%= img.exif ? img.exif.model : '' %>"
+                          data-exif-date="<%= img.exif ? img.exif.date : '' %>"
+                          data-exif-shutter="<%= img.exif ? img.exif.shutter : '' %>"
+                          data-exif-aperture="<%= img.exif ? img.exif.aperture : '' %>"
+                          data-exif-iso="<%= img.exif ? img.exif.iso : '' %>"
+                          data-exif-focallength="<%= img.exif ? img.exif.focalLength : '' %>" target="_blank"
+                          class="block cursor-zoom-in">
+                          <img src="<%= img.thumbnail || img.src %>" alt="<%= img.alt || '' %>" class="magazine-img"
+                            loading="lazy" />
+                        </a>
 
-  <script src="js/gallery.js"></script>
+                        <!-- Visible Caption for Magazine Style -->
+                        <div class="magazine-caption">
+                          <% if (img.title) { %>
+                            <div class="caption-title">
+                              <%= img.title %>
+                            </div>
+                            <% } %>
+                              <div class="caption-meta flex flex-wrap gap-2">
+                                <% if (img.exif) { %>
+                                  <% if (img.exif.model) { %><span>
+                                      <%= img.exif.model %>
+                                    </span>
+                                    <% } %>
+                                      <% if (img.exif.focalLength) { %><span>
+                                          <%= img.exif.focalLength %>
+                                        </span>
+                                        <% } %>
+                                          <% if (img.exif.aperture) { %><span>
+                                              <%= img.exif.aperture %>
+                                            </span>
+                                            <% } %>
+                                              <% } %>
+                              </div>
+                        </div>
+                      </div>
+                      <% }); %>
+                  </div>
+                  <% }); %>
+          </div>
+    </main>
+
+    <%- include('partials/footer', { footerClass: 'text-center py-12 border-t border-gray-100 bg-[#fdfbf7]' }) %>
+
+      <script src="js/gallery.js"></script>
 </body>
 
 </html>

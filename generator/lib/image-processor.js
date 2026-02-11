@@ -11,6 +11,7 @@ class ImageProcessor {
     let exifData = {};
     try {
       const tags = await ExifReader.load(filePath);
+      if (tags.Make) exifData.make = tags.Make.description;
       if (tags.Model) exifData.model = tags.Model.description;
       if (tags.DateTimeOriginal) {
         const dateStr = tags.DateTimeOriginal.description;

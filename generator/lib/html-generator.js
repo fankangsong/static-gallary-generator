@@ -56,7 +56,7 @@ class HtmlGenerator {
         indexTemplate,
         {
           ALBUMS: albums,
-          TITLE: "Home",
+          TITLE: config.website.navBrand,
           DESCRIPTION: config.website.description || "Photography Portfolio",
           WEBSITE_TITLE_SUFFIX: config.website.url,
           WEBSITE_NAV_BRAND: config.website.navBrand,
@@ -64,6 +64,7 @@ class HtmlGenerator {
           WEBSITE_FONT: config.website.font,
           FULL_YEAR: new Date().getFullYear(),
           AUTHOR: config.defaultAuthor,
+          WEBSITE_BRAND_DESCRIPTION: config.website.brandDescription,
         },
         {
           root: TEMPLATES_DIR,

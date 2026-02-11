@@ -17,6 +17,7 @@
   "website": {
     "url": "imcolin.fan",
     "navBrand": "COLIN PHOTO",
+    "brandDescription": "摄影于我的意义是回忆和美。",
     "logo": {
       "enabled": true,
       "src": "assets/logo.svg",

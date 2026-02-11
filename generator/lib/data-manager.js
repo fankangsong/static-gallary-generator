@@ -4,33 +4,12 @@ const { marked } = require("marked");
 const sanitizeHtml = require("sanitize-html");
 const pinyin = require("pinyin").default;
 const config = require("./config");
-const {
-  CONFIG_DIR,
-  DATA_JSON_NAME,
-  GENERATOR_DIR,
-  TEMP_DIR,
-  DEFAULT_DESC_FILE,
-} = require("./constants");
-const { logger } = require("./utils");
+const { DATA_JSON_NAME, TEMP_DIR } = require("./constants");
+const { logger, getDescription } = require("./utils");
 const imageProcessor = require("./image-processor");
 
-let CONTENT_DEFAULT = `这是一个默认的相册描述。
-你可以在这里添加更多关于这个相册的详细信息。`;
+let CONTENT_DEFAULT = ``;
 
-if (!fs.existsSync(DEFAULT_DESC_FILE)) {
-  try {
-    fs.writeFileSync(DEFAULT_DESC_FILE, CONTENT_DEFAULT);
-    logger.info("Created default description file at: " + DEFAULT_DESC_FILE);
-  } catch (e) {
-    logger.warn("Failed to create DEFAULT_DESCRIPTION:", e);
-  }
-} else {
-  try {
-    CONTENT_DEFAULT = fs.readFileSync(DEFAULT_DESC_FILE, "utf-8");
-  } catch (e) {
-    logger.warn("Failed to load DEFAULT_DESCRIPTION:", e);
-  }
-}
 const DATA_JSON_PATH = path.join(TEMP_DIR, DATA_JSON_NAME);
 
 class DataManager {
@@ -90,13 +69,14 @@ class DataManager {
 
     // 1. Load existing data (Persistent)
     let existingData = [];
-    if (fs.existsSync(DATA_JSON_PATH)) {
-      try {
-        existingData = JSON.parse(fs.readFileSync(DATA_JSON_PATH, "utf-8"));
-      } catch (e) {
-        logger.warn("Failed to parse existing data.json, starting fresh.", e);
-      }
-    }
+    // Force refresh: Do not load existing data
+    // if (fs.existsSync(DATA_JSON_PATH)) {
+    //   try {
+    //     existingData = JSON.parse(fs.readFileSync(DATA_JSON_PATH, "utf-8"));
+    //   } catch (e) {
+    //     logger.warn("Failed to parse existing data.json, starting fresh.", e);
+    //   }
+    // }
 
     const albumDirs = fs.readdirSync(photosDir);
     const newAlbumsData = [];
@@ -127,7 +107,7 @@ class DataManager {
           id: generatedId,
           title: albumDirName,
           author: config.defaultAuthor,
-          description: config.defaultDescription,
+          description: "",
           template: config.template || "default",
           dirName: albumDirName,
           groups: [], // Will be populated
@@ -187,6 +167,76 @@ class DataManager {
 
       albumEntry.groups = groups;
       albumEntry.link = `${albumEntry.id}.html`; // Ensure link is set
+
+      // Deduce Date and Description from first image
+      if (groups.length > 0) {
+        // Try to find first group with files
+        const groupWithFiles = groups.find(
+          (g) => g.files && g.files.length > 0
+        );
+        if (groupWithFiles) {
+          const firstFile = groupWithFiles.files[0];
+
+          // Deduce Date
+          if (!albumEntry.date && firstFile.exif && firstFile.exif.date) {
+            try {
+              // firstFile.exif.date is "2023-10-27 12:00"
+              const datePart = firstFile.exif.date.split(" ")[0]; // 2023-10-27
+              albumEntry.date = datePart.replace(/-/g, ".");
+            } catch (e) {
+              logger.warn(`Failed to parse date for ${albumEntry.id}:`, e);
+            }
+          }
+
+          // Deduce Description
+          // Only update description if it is default or empty
+          if (
+            !albumEntry.description ||
+            albumEntry.description === config.defaultDescription
+          ) {
+            let desc = "";
+            let dateStr = "";
+            let deviceStr = "";
+
+            // Get Date
+            if (firstFile.exif && firstFile.exif.date) {
+              try {
+                // 2023-10-27 12:00 -> 2023/10/27
+                const rawDate = firstFile.exif.date.split(" ")[0];
+                dateStr = rawDate.replace(/-/g, "/");
+              } catch (e) {}
+            }
+
+            // Get Device (Make + Model)
+            if (firstFile.exif) {
+              const make = firstFile.exif.make || "";
+              const model = firstFile.exif.model || "";
+
+              // Clean up Make (e.g. "Apple" -> "Apple")
+              // Sometimes Model contains Make, e.g. "Canon EOS 5D"
+              if (make && model) {
+                if (model.toLowerCase().includes(make.toLowerCase())) {
+                  deviceStr = model;
+                } else {
+                  deviceStr = `${make} ${model}`;
+                }
+              } else {
+                deviceStr = make || model;
+              }
+            }
+
+            desc = getDescription(deviceStr, dateStr);
+
+            // Only set if we generated something
+            if (desc) {
+              albumEntry.description = desc;
+            } else {
+              // If no info, keep it empty string instead of default text
+              albumEntry.description = "";
+            }
+          }
+        }
+      }
 
       // Auto-set cover if empty
       if (

@@ -11,6 +11,9 @@ class FontManager {
   }
 
   async generateSubset(text) {
+    // Add brand description to the text
+    text += config.website.brandDescription;
+
     if (fs.existsSync(this.sourceFont)) {
       logger.info("Generating font subset...");
 
