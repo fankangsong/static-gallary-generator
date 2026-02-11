@@ -77,12 +77,9 @@
                                     class="text-xl md:text-2xl font-bold text-gray-900 group-hover:text-gray-600 transition-colors leading-tight">
                                     <%= album.title %>
                                 </h2>
-                                <% if (album.date) { %>
-                                    <span
-                                        class="text-xs font-bold text-gray-400 uppercase tracking-widest ml-4 shrink-0">
-                                        <%= album.date %>
-                                    </span>
-                                    <% } %>
+                                <span class="text-xs font-bold text-gray-400 tracking-widest ml-4 shrink-0">
+                                    &copy; <%= AUTHOR %>
+                                </span>
                             </div>
 
                             <% if (album.description) { %>
