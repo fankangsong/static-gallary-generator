@@ -279,7 +279,15 @@
                                               <%= img.exif.aperture %>
                                             </span>
                                             <% } %>
-                                              <% } %>
+                                              <% if (img.exif.shutter) { %><span>
+                                                  <%= img.exif.shutter %>
+                                                </span>
+                                                <% } %>
+                                                  <% if (img.exif.iso) { %><span>
+                                                      <%= img.exif.iso %>
+                                                    </span>
+                                                    <% } %>
+                                                      <% } %>
                               </div>
                         </div>
                       </div>

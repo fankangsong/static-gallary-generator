@@ -1,7 +1,7 @@
 <nav id="navbar" class="<%= typeof navClass !== 'undefined' ? navClass : 'fixed top-0 left-0 right-0 z-50 transition-all duration-300 text-white' %>">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-20">
-        <a href="/" class="<%= typeof logoClass !== 'undefined' ? logoClass : 'p-2 bg-white/80 w-[180px] hover:opacity-80 transition-opacity flex items-center rounded-lg' %>">
+        <a href="./" class="<%= typeof logoClass !== 'undefined' ? logoClass : 'p-2 bg-white/80 w-[180px] hover:opacity-80 transition-opacity flex items-center rounded-lg' %>">
           <% if (WEBSITE_LOGO && WEBSITE_LOGO.enabled && WEBSITE_LOGO.src) { %>
             <img src="<%= WEBSITE_LOGO.src %>" alt="<%= WEBSITE_NAV_BRAND %>"
               width="<%= WEBSITE_LOGO.width || '180px' %>" class="block h-auto">
