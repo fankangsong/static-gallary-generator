@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const config = require("../../common/lib/config");
 const blogManager = require("./blog-manager");
 const htmlGenerator = require("./html-generator");
 const { CONFIG_DIR } = require("../../common/lib/constants");
@@ -18,7 +19,10 @@ async function buildBlog(allText, albums) {
   htmlGenerator.generateBlogIndexHtml(posts);
 
   const navItems = albums.map((a) => ({ title: a.title, link: a.link }));
-  navItems.push({ title: "随笔", link: "blog/index.html" });
+  navItems.push({
+    title: config.site.blog?.title || "随笔",
+    link: "blog/index.html",
+  });
 
   // const navJsonPath = path.join(CONFIG_DIR, "nav.json");
   // fs.writeFileSync(navJsonPath, JSON.stringify(navItems, null, 2));

@@ -9,13 +9,22 @@ function loadConfig() {
     throw new Error(`Config file not found at ${configPath}`);
   }
 
-  const config = JSON.parse(fs.readFileSync(configPath, "utf-8"));
+  const rawConfig = JSON.parse(fs.readFileSync(configPath, "utf-8"));
+  
+  // Flatten config for easier access, but keep structure clean
+  const config = {
+    website: rawConfig.common.site,
+    defaultAuthor: rawConfig.common.defaultAuthor,
+    gallery: rawConfig.gallery,
+    site: rawConfig.site,
+    blog: rawConfig.site.blog // Alias for easier access
+  };
 
   // Resolve Photos Dir
-  const rawPhotosDir = config.photosDir || "photos";
+  const rawPhotosDir = config.gallery.photosDir || "photos";
   const normalizedRaw = normalizePath(rawPhotosDir);
   // Resolve relative to project root now
-  config.absolutePhotosDir = path.resolve(PROJECT_ROOT, normalizedRaw);
+  config.gallery.absolutePhotosDir = path.resolve(PROJECT_ROOT, normalizedRaw);
 
   return config;
 }

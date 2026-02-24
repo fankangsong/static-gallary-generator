@@ -61,7 +61,7 @@ class DataManager {
 
   // Init Phase: Scan directory, update data.json (Source of Truth)
   async scanAlbums() {
-    const photosDir = config.absolutePhotosDir;
+    const photosDir = config.gallery.absolutePhotosDir;
     if (!fs.existsSync(photosDir)) {
       logger.error("Photos directory not found:", photosDir);
       return [];
@@ -108,7 +108,7 @@ class DataManager {
           title: albumDirName,
           author: config.defaultAuthor,
           description: "",
-          template: config.template || "default",
+          template: config.gallery.template || "default",
           dirName: albumDirName,
           groups: [], // Will be populated
         };
@@ -126,7 +126,7 @@ class DataManager {
         .filter(
           (e) =>
             e.isFile() &&
-            config.supportedExtensions.includes(
+            config.gallery.supportedExtensions.includes(
               path.extname(e.name).toLowerCase()
             )
         )
@@ -149,7 +149,7 @@ class DataManager {
         const subFiles = fs
           .readdirSync(subDirPath)
           .filter((file) =>
-            config.supportedExtensions.includes(
+            config.gallery.supportedExtensions.includes(
               path.extname(file).toLowerCase()
             )
           );

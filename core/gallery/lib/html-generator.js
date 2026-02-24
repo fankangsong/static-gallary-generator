@@ -13,7 +13,7 @@ const { logger } = require("../../common/lib/utils");
 
 class HtmlGenerator {
   generateAlbumHtml(id, albumData, contentHtml, meta) {
-    const templateName = meta.template || config.website.template || "default";
+    const templateName = meta.template || config.gallery.template || "default";
     let templateFile = "template.html";
     if (templateName === "magazine") {
       templateFile = "template_magazine.html";
@@ -40,8 +40,8 @@ class HtmlGenerator {
       CONTENT_HTML: contentHtml,
       DESCRIPTION: meta.description,
       WEBSITE_TITLE_SUFFIX: config.website.url,
-      WEBSITE_NAV_BRAND: config.website.navBrand,
-      WEBSITE_LOGO: config.website.logo,
+      WEBSITE_NAV_BRAND: config.gallery.navBrand,
+      WEBSITE_LOGO: config.gallery.logo,
       WEBSITE_FONT: config.website.font,
       FULL_YEAR: new Date().getFullYear(),
       AUTHOR: meta.author || config.defaultAuthor,
@@ -91,15 +91,15 @@ class HtmlGenerator {
         indexTemplate,
         {
           ALBUMS: albumsWithUpdatedLinks,
-          TITLE: config.website.navBrand,
+          TITLE: config.gallery.navBrand,
           DESCRIPTION: config.website.description || "Photography Portfolio",
           WEBSITE_TITLE_SUFFIX: config.website.url,
-          WEBSITE_NAV_BRAND: config.website.navBrand,
-          WEBSITE_LOGO: config.website.logo,
+          WEBSITE_NAV_BRAND: config.gallery.navBrand,
+          WEBSITE_LOGO: config.gallery.logo,
           WEBSITE_FONT: config.website.font,
           FULL_YEAR: new Date().getFullYear(),
           AUTHOR: config.defaultAuthor,
-          WEBSITE_BRAND_DESCRIPTION: config.website.brandDescription,
+          WEBSITE_BRAND_DESCRIPTION: config.gallery.brandDescription,
         },
         {
           root: [GALLERY_TEMPLATES_DIR, COMMON_TEMPLATES_DIR],

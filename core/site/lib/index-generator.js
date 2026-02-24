@@ -17,25 +17,12 @@ class IndexGenerator {
 
     const htmlTemplate = fs.readFileSync(templatePath, "utf-8");
 
-    // Load content from external JSON file
-    const indexDataPath = path.join(__dirname, "index.json");
-    let links = [];
-    let quotes = [];
-
-    if (fs.existsSync(indexDataPath)) {
-      try {
-        const indexData = JSON.parse(fs.readFileSync(indexDataPath, "utf8"));
-        links = indexData.links || [];
-        quotes = indexData.quotes || [];
-      } catch (error) {
-        logger.error(`Error reading index.json: ${error.message}`);
-      }
-    } else {
-      logger.warn(`index.json not found at ${indexDataPath}`);
-    }
+    // Load content from config
+    const links = config.site.index?.links || [];
+    const quotes = config.site.index?.quotes || [];
 
     const data = {
-      WEBSITE_TITLE: config.site.title,
+      WEBSITE_TITLE: config.website.title,
       WEBSITE_FONT: config.website.font,
       LINKS: links,
       QUOTES: quotes,

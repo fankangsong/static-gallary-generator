@@ -22,11 +22,11 @@ class TravelGenerator {
     const htmlTemplate = fs.readFileSync(templatePath, "utf-8");
 
     const data = {
-      TITLE: "旅行",
-      DESCRIPTION: "Travel Map",
+      TITLE: config.site.travel?.title || "旅行",
+      DESCRIPTION: config.site.travel?.description || "Travel Map",
       WEBSITE_TITLE_SUFFIX: config.website.url,
-      WEBSITE_NAV_BRAND: config.website.navBrand,
-      WEBSITE_LOGO: config.website.logo,
+      WEBSITE_NAV_BRAND: config.gallery.navBrand,
+      WEBSITE_LOGO: config.gallery.logo,
       WEBSITE_FONT: config.website.font,
       FULL_YEAR: new Date().getFullYear(),
       AUTHOR: config.defaultAuthor || "Author",

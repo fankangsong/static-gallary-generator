@@ -40,8 +40,8 @@ class HtmlGenerator {
         config.website.description ||
         "Blog Post",
       WEBSITE_TITLE_SUFFIX: config.website.url,
-      WEBSITE_NAV_BRAND: config.website.navBrand,
-      WEBSITE_LOGO: config.website.logo,
+      WEBSITE_NAV_BRAND: config.gallery.navBrand,
+      WEBSITE_LOGO: config.gallery.logo,
       WEBSITE_FONT: config.website.font,
       FULL_YEAR: new Date().getFullYear(),
       AUTHOR: post.author || config.defaultAuthor,
@@ -91,15 +91,15 @@ class HtmlGenerator {
 
     const data = {
       POSTS: postsWithUpdatedLinks,
-      TITLE: "随笔",
-      DESCRIPTION: config.website.blogDescription || "随笔",
+      TITLE: config.site.blog?.title || "随笔",
+      DESCRIPTION: config.site.blog?.description || "随笔",
       WEBSITE_TITLE_SUFFIX: config.website.url,
-      WEBSITE_NAV_BRAND: config.website.navBrand,
-      WEBSITE_LOGO: config.website.logo,
+      WEBSITE_NAV_BRAND: config.gallery.navBrand,
+      WEBSITE_LOGO: config.gallery.logo,
       WEBSITE_FONT: config.website.font,
       FULL_YEAR: new Date().getFullYear(),
       AUTHOR: config.defaultAuthor,
-      WEBSITE_BRAND_DESCRIPTION: config.website.brandDescription,
+      WEBSITE_BRAND_DESCRIPTION: config.gallery.brandDescription,
     };
 
     const options = {

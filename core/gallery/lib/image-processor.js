@@ -53,8 +53,8 @@ class ImageProcessor {
       const filename = fileEntry.filename;
       // Reconstruct source path using dirName stored in album
       const sourceDir = subDirName
-        ? path.join(config.absolutePhotosDir, album.dirName, subDirName)
-        : path.join(config.absolutePhotosDir, album.dirName);
+        ? path.join(config.gallery.absolutePhotosDir, album.dirName, subDirName)
+        : path.join(config.gallery.absolutePhotosDir, album.dirName);
 
       const filePath = path.join(sourceDir, filename);
 
@@ -79,10 +79,10 @@ class ImageProcessor {
       if (!fs.existsSync(thumbPath)) {
         await sharp(filePath)
           .rotate()
-          .resize(config.thumbnail.width, config.thumbnail.height, {
-            fit: config.thumbnail.fit,
+          .resize(config.gallery.thumbnail.width, config.gallery.thumbnail.height, {
+            fit: config.gallery.thumbnail.fit,
           })
-          .toFormat("jpeg", { quality: config.thumbnail.quality })
+          .toFormat("jpeg", { quality: config.gallery.thumbnail.quality })
           .toFile(thumbPath);
         logger.log(`    🖼️`, ` Generated thumbnail: ${thumbFilename}`);
       }
@@ -94,20 +94,20 @@ class ImageProcessor {
         const metadata = await image.metadata();
 
         if (
-          metadata.width > config.large.maxSize ||
-          metadata.height > config.large.maxSize
+          metadata.width > config.gallery.large.maxSize ||
+          metadata.height > config.gallery.large.maxSize
         ) {
           await image
-            .resize(config.large.maxSize, config.large.maxSize, {
-              fit: config.large.fit,
+            .resize(config.gallery.large.maxSize, config.gallery.large.maxSize, {
+              fit: config.gallery.large.fit,
               withoutEnlargement: true,
             })
-            .toFormat("jpeg", { quality: config.large.quality })
+            .toFormat("jpeg", { quality: config.gallery.large.quality })
             .toFile(largePath);
           logger.log(`    🖼️`, ` Generated large image: ${largeFilename}`);
         } else {
           await image
-            .toFormat("jpeg", { quality: config.large.quality })
+            .toFormat("jpeg", { quality: config.gallery.large.quality })
             .toFile(largePath);
           logger.log(`    🖼️`, ` Processed large image: ${largeFilename}`);
         }

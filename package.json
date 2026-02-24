@@ -8,6 +8,7 @@
     "index:gallary": "node core/main.js index:gallary",
     "build:gallary": "node core/main.js build:gallary",
     "build:site": "node core/main.js build:site",
+    "build": "pnpm build:gallary && pnpm build:site",
     "clear": "node core/main.js clear"
   },
   "author": "",

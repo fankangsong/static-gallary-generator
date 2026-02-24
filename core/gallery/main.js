@@ -57,7 +57,7 @@ async function run(args) {
   for (const album of albums) {
     logger.log(`Processing album: ${album.title} (${album.id})`);
 
-    const albumPath = path.join(config.absolutePhotosDir, album.dirName);
+    const albumPath = path.join(config.gallery.absolutePhotosDir, album.dirName);
     const { html: contentHtml, markdown } = dataManager.getOrGenerateContent(
       albumPath,
       album.title,

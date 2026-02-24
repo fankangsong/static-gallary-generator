@@ -12,7 +12,7 @@ class FontManager {
 
   async generateSubset(text, outputDir = null) {
     // Add brand description to the text
-    text += config.website.brandDescription;
+    text += config.gallery.brandDescription;
     const outputName = config.website.font.name + ".ttf";
 
     if (fs.existsSync(this.sourceFont)) {
