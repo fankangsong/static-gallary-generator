@@ -91,6 +91,10 @@ async function run(args) {
 
   htmlGenerator.generateIndexHtml(albums);
 
+  const navLinks = config.site.index?.links || [];
+  const navText = navLinks.map((l) => l.text).join("");
+  allText += navText;
+
   await fontManager.generateSubset(
     allText,
     path.join(WEB_DIR, "assets/fonts/gallary/"),

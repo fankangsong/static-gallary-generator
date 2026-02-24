@@ -45,6 +45,7 @@ class HtmlGenerator {
       WEBSITE_FONT: config.website.font,
       FULL_YEAR: new Date().getFullYear(),
       AUTHOR: post.author || config.defaultAuthor,
+      NAV_LINKS: config.site.index?.links || [],
     };
 
     const options = {
@@ -100,6 +101,7 @@ class HtmlGenerator {
       FULL_YEAR: new Date().getFullYear(),
       AUTHOR: config.defaultAuthor,
       WEBSITE_BRAND_DESCRIPTION: config.gallery.brandDescription,
+      NAV_LINKS: config.site.index?.links || [],
     };
 
     const options = {
@@ -113,8 +115,10 @@ class HtmlGenerator {
     logger.log(`🌐 Generated web/blog/index.html with ${posts.length} posts`);
 
     // 为首页生成字体子集
+    const navLinks = config.site.index?.links || [];
+    const navText = navLinks.map((l) => l.text).join("");
     const text =
-      posts.map((p) => p.title).join("\n") + config.defaultAuthor || "";
+      posts.map((p) => p.title).join("\n") + (config.defaultAuthor || "") + navText;
 
     try {
       await fontManager.generateSubset(

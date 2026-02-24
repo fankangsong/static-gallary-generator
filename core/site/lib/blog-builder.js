@@ -20,7 +20,7 @@ async function buildBlog(allText, albums) {
 
   const navItems = albums.map((a) => ({ title: a.title, link: a.link }));
   navItems.push({
-    title: config.site.blog?.title || "随笔",
+    title: config.site.blog?.title,
     link: "blog/index.html",
   });
 

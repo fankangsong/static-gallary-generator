@@ -98,7 +98,9 @@ class BlogManager {
     }
 
     const fontFilename = `${title}.ttf`;
-    const text = title + mdContent + summary + (config.defaultAuthor || "");
+    const navLinks = config.site.index?.links || [];
+    const navText = navLinks.map((l) => l.text).join("");
+    const text = title + mdContent + summary + (config.defaultAuthor || "") + navText;
 
     try {
       await fontManager.generateSubset(text, fontDir);

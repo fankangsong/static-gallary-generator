@@ -30,6 +30,7 @@ class TravelGenerator {
       WEBSITE_FONT: config.website.font,
       FULL_YEAR: new Date().getFullYear(),
       AUTHOR: config.defaultAuthor || "Author",
+      NAV_LINKS: config.site.index?.links || [],
     };
 
     const options = {

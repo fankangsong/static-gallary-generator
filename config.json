@@ -37,6 +37,7 @@
   "site": {
     "index": {
       "links": [
+        { "text": "首页", "url": "/" },
         { "text": "随笔", "url": "/blog/" },
         { "text": "摄影", "url": "/photography/" },
         { "text": "跑步", "url": "/running/" },

@@ -25,6 +25,7 @@ class IndexGenerator {
       WEBSITE_TITLE: config.website.title,
       WEBSITE_FONT: config.website.font,
       LINKS: links,
+      NAV_LINKS: links,
       QUOTES: quotes,
     };
 
