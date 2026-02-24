@@ -49,7 +49,7 @@
       ]
     },
     "blog": {
-      "dir": "../blog-post/new",
+      "dir": "../blog-post",
       "template": "blog_post",
       "indexTemplate": "blog_index",
       "title": "随笔",

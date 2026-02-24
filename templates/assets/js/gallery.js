@@ -131,7 +131,7 @@ function initPhotoSwipe() {
     // showHideOpacity: true, // Fade opacity for smoother transition
     // showAnimationDuration: 500, // Slightly slower animation
     // hideAnimationDuration: 400,
-    // bgOpacity: 0.92, // Darker background
+    bgOpacity: 1, // Darker background
     // wheelToZoom: true, // Enable mouse wheel zoom
     // // Improve closing behavior
     // closeOnVerticalDrag: true,

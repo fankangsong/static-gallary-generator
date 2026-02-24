@@ -44,9 +44,9 @@
             </nav>
 
             <!-- Quotes Content (Left side, flowing right to left visually) -->
-            <div class="flex flex-col gap-12 md:gap-20 leading-loose tracking-wider text-xl md:text-2xl opacity-90 py-12 shrink-0">
+            <div class="flex flex-col gap-12 md:gap-20 leading-loose tracking-wider text-xl md:text-2xl opacity-90 py-12 shrink-0 max-h-full">
                 <% QUOTES.forEach(function(quote) { %>
-                    <p class="whitespace-nowrap"><%= quote %></p>
+                    <p class=""><%= quote %></p>
                 <% }); %>
             </div>
 

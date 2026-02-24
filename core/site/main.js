@@ -7,6 +7,7 @@ const dataManager = require("../gallery/lib/data-manager");
 const { buildBlog } = require("./lib/blog-builder");
 const indexGenerator = require("./lib/index-generator");
 const travelGenerator = require("./lib/travel-generator");
+const sitemapGenerator = require("./lib/sitemap-generator");
 
 async function run(args) {
   logger.log(`🚀 Starting site (blog) build...`);
@@ -24,13 +25,16 @@ async function run(args) {
   }
 
   const initialText = "";
-  await buildBlog(initialText, albums);
+  const { posts } = await buildBlog(initialText, albums);
 
   // Generate main index page
   await indexGenerator.generate();
 
   // Generate travel page
   await travelGenerator.generate();
+
+  // Generate Sitemap
+  sitemapGenerator.generate(albums, posts);
 
   logger.success("Site build complete!");
 }
