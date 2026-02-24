@@ -90,8 +90,49 @@ class HtmlGenerator {
       return post;
     });
 
+    // Group posts by month
+    const postsByMonth = {};
+    postsWithUpdatedLinks.forEach((post) => {
+      // post.date format is YYYY-MM-DD
+      const monthKey = post.date.substring(0, 7); // YYYY-MM
+      if (!postsByMonth[monthKey]) {
+        postsByMonth[monthKey] = [];
+      }
+      postsByMonth[monthKey].push(post);
+    });
+
+    const groupedPosts = Object.keys(postsByMonth)
+      .sort((a, b) => b.localeCompare(a)) // Sort months descending
+      .map((monthKey) => {
+        // monthKey format expected: YYYY-MM
+        // But sometimes it might be just YYYY if folder structure is not strict YYYY-MM
+        const parts = monthKey.split("-");
+        let year = parts[0];
+        let month = parts[1];
+
+        // Fallback if month is undefined (e.g. folder is just "2023")
+        if (!month) {
+          month = "All"; 
+        }
+
+        let monthLabel = "";
+        if (month && month !== "All") {
+             monthLabel = `${year}年${month}月`;
+        } else {
+             monthLabel = `${year}年`; 
+        }
+
+        return {
+          monthLabel: monthLabel,
+          year: year,
+          month: month === "All" ? "" : month, 
+          posts: postsByMonth[monthKey], 
+        };
+      });
+
     const data = {
       POSTS: postsWithUpdatedLinks,
+      GROUPED_POSTS: groupedPosts,
       TITLE: config.site.blog?.title || "随笔",
       DESCRIPTION: config.site.blog?.description || "随笔",
       WEBSITE_TITLE_SUFFIX: config.website.url,
