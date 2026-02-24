@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= WEBSITE_TITLE %></title>
+    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+    <script src="/assets/js/vendor/tailwindcss.js"></script>
+    <style>
+        @font-face {
+            font-family: '<%= WEBSITE_FONT.name %>';
+            src: url('<%= "/assets/fonts/index/" + WEBSITE_FONT.name + ".ttf" %>') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        body {
+            font-family: '<%= WEBSITE_FONT.name %>', serif;
+            background-color: #fdfbf7; /* 纸张色 */
+            color: #2c2c2c; /* 墨色 */
+        }
+
+        .vertical-text {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+        }
+    </style>
+</head>
+<body class="bg-[#fdfbf7] h-screen w-screen overflow-hidden">
+    <!-- Scroll Container -->
+    <!-- 
+        Mobile (default): overflow-x-auto, flex-row-reverse (starts from right, scrolls left)
+        Desktop (md+): justify-center (content centered), no scroll if content fits
+    -->
+    <div class="w-full h-full overflow-x-auto overflow-y-hidden flex flex-row-reverse md:justify-center">
+        <main class="vertical-text h-full p-8 md:p-16 flex flex-col gap-16 md:gap-24 items-start shrink-0 min-w-min">
+            
+            <!-- Navigation Links (Right side) -->
+            <nav class="flex flex-row gap-12 text-lg tracking-widest border-l border-gray-300 pl-8 shrink-0">
+                <% LINKS.forEach(function(link) { %>
+                <a href="<%= link.url %>" class="hover:text-[#8b4513] transition-colors duration-300 py-2"><%= link.text %></a>
+                <% }); %>
+            </nav>
+
+            <!-- Quotes Content (Left side, flowing right to left visually) -->
+            <div class="flex flex-col gap-12 md:gap-20 leading-loose tracking-wider text-xl md:text-2xl opacity-90 py-12 shrink-0">
+                <% QUOTES.forEach(function(quote) { %>
+                    <p class="whitespace-nowrap"><%= quote %></p>
+                <% }); %>
+            </div>
+
+        </main>
+    </div>
+</body>
+</html>

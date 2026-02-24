@@ -1,0 +1,41 @@
+{
+  "site": {
+    "title": "imcolin.fan",
+    "description": ""
+  },
+  "thumbnail": {
+    "width": 800,
+    "height": 800,
+    "quality": 80,
+    "fit": "inside"
+  },
+  "large": {
+    "maxSize": 3000,
+    "quality": 60,
+    "fit": "inside"
+  },
+  "supportedExtensions": [".jpg", ".jpeg", ".png", ".webp"],
+  "defaultAuthor": "Fan Kangsong",
+  "photosDir": "../photography",
+  "template": "magazine",
+  "website": {
+    "url": "imcolin.fan",
+    "navBrand": "COLIN PHOTO",
+    "brandDescription": "摄影于我的意义是回忆和美。",
+
+    "logo": {
+      "enabled": true,
+      "src": "/assets/logo.svg",
+      "width": "180px"
+    },
+    "font": {
+      "name": "KingHwaOldSong",
+      "source": "templates/assets/fonts/京華老宋体v3.0.ttf"
+    }
+  },
+  "blog": {
+    "dir": "../blog-post/new",
+    "template": "blog_post",
+    "indexTemplate": "blog_index"
+  }
+}

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <%- include('/partials/head') %>
+  <style>
+    <% if (WEBSITE_FONT) { %>@font-face {
+      font-family: '<%= WEBSITE_FONT.name %>';
+      src: url('<%= "/assets/fonts/site/" + WEBSITE_FONT.name + ".ttf" %>') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    <% } %>html {
+      scrollbar-gutter: stable;
+    }
+
+    body {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      font-family: 'Courier New',
+      Courier,
+      <%- WEBSITE_FONT ? `'${WEBSITE_FONT.name}' `: '' %>, monospace;
+    }
+
+    a:link,
+    a:visited {
+      color: rgb(240, 80, 55);
+      text-decoration: none;
+    }
+
+    a:hover,
+    a:focus {
+      color: rgb(247, 147, 131);
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body class="bg-[#F9F9F9] text-gray-900 antialiased min-h-screen flex flex-col">
+
+  <%- include('/partials/site_nav') %>
+
+  <main class="flex-grow">
+    <header class="pt-32 pb-16 md:pt-40 md:pb-24 px-6 text-center max-w-[1600px] mx-auto w-full">
+      <div class="mb-8 flex justify-center">
+        <img src="/assets/avatar.jpg" alt="<%= WEBSITE_TITLE_SUFFIX %>"
+          class="w-24 h-24 md:w-28 md:h-28 rounded-full object-cover border border-white/70">
+      </div>
+    </header>
+
+    <section class="max-w-[1600px] mx-auto w-full px-6 md:px-12 pb-32">
+      <% 
+        // 纯 CSS Columns 会导致顺序变成“先第一列到底，再第二列”，导致最新的文章可能跑到左下角，而较旧的在右上角。
+        // 为了保证从左到右、从上到下的视觉顺序，我们需要手动分列。
+        // 将 POSTS 分配到 3 个列数组中
+        const columns = [[], [], []];
+        POSTS.forEach((post, index) => {
+          columns[index % 3].push(post);
+        });
+      %>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+        <% columns.forEach((columnPosts, colIndex) => { %>
+          <div class="flex flex-col gap-10">
+             <% columnPosts.forEach(function(post) { %>
+              <div class="w-full">
+                <a href="<%= post.date %>/<%= post.filename %>" class="group block h-full">
+                  <article class="group flex flex-col h-full bg-white p-6 shadow-sm hover:shadow-xl transition-shadow duration-300 border border-gray-100">
+                    <!-- Image Container -->
+                    <% if (post.cover) { %>
+                    <div class="relative overflow-hidden bg-gray-200 w-full mb-6 -mt-6 -mx-6 w-[calc(100%+3rem)]">
+                          <img src="<%= post.cover %>" alt="<%= post.title %>"
+                              class="w-full h-auto object-cover transition-all duration-700 ease-out group-hover:scale-[1.02] group-hover:brightness-95">
+                    </div>
+                    <% } %>
+
+                    <!-- Content -->
+                    <div class="flex flex-col flex-1 <%= post.cover ? '' : 'justify-center border-t-4 border-gray-900 pt-6' %>">
+                      <div class="text-gray-400 text-xs font-mono mb-3 tracking-wide"><%= post.date %></div>
+                      <h2 class="text-xl md:text-2xl font-bold text-gray-900 group-hover:text-gray-600 transition-colors leading-tight mb-3">
+                        <%= post.title %>
+                      </h2>
+                      <p class="text-gray-600 text-sm leading-relaxed line-clamp-4 mb-6 flex-1">
+                        <%= post.summary %>
+                      </p>
+                      <div class="flex items-center text-xs font-bold text-gray-900 tracking-[0.15em] uppercase mt-auto group-hover:text-gray-600 transition-colors">
+                          READ ARTICLE
+                      </div>
+                    </div>
+                  </article>
+                </a>
+              </div>
+            <% }); %>
+          </div>
+        <% }); %>
+        
+        <!-- Mobile View: Just stack all posts in one column if screen is small (handled by grid-cols-1 above, but we need to ensure content is visible) -->
+        <!-- Since we split into 3 columns div, on mobile grid-cols-1 will stack these 3 divs vertically. 
+             So user sees Column 1 posts, then Column 2 posts... which breaks chronological order again on mobile.
+             
+             To fix mobile order, we need a different strategy or accept that pure masonry with JS-free implementation is hard to get perfect order on all breakpoints.
+             
+             Better CSS-only approach for simple masonry-like feel without breaking order:
+             CSS Grid is rigid rows. CSS Columns is vertical ordering.
+             
+             To get "Left-Right-Top-Down" visual order with uneven heights, usually requires JS Masonry library.
+             
+             However, user wants "Latest on top". 
+             If we use CSS Columns, the order is Down-Then-Right.
+             So Item 1 is Top-Left, Item 2 is Below-Item 1... 
+             This means Item N/3 is Top-Middle.
+             
+             If we want Item 1 Top-Left, Item 2 Top-Middle, Item 3 Top-Right... we must use Flex/Grid columns approach like above.
+             But on Mobile, the above code stacks Col 1 (Items 1, 4, 7...) then Col 2 (Items 2, 5, 8...).
+             
+             Wait, on mobile `grid-cols-1`, the 3 divs stack.
+             Div 1 has [1, 4, 7]. Div 2 has [2, 5, 8].
+             User sees 1, 4, 7, then 2, 5, 8. Order is mixed.
+             
+             Let's refine the logic.
+             We can keep the 3-column split for Desktop/Tablet.
+             For Mobile, we might just show a single linear list? 
+             But we can't easily duplicate content.
+             
+             Actually, for a static generator, if we really care about mobile order, we might need a script to reorder, or accept mixed order on mobile.
+             OR, we use standard CSS Grid for mobile, and only split for desktop?
+             But the HTML structure is different.
+             
+             Let's optimize for Desktop first as requested ("Waterfall/Masonry"), and acceptable mobile behavior.
+             The "1, 4, 7... 2, 5, 8..." order on mobile is readable, just not strictly chronological.
+             
+             However, if we want strictly chronological on mobile, we need `display: contents` tricks or JS.
+             
+             Given "No JS" preference in previous context (though gallery.js exists), let's stick to the Column Split method which gives perfect Desktop Masonry Order (Left->Right->Down).
+             
+             To mitigate mobile order, we can make the columns `w-full` on mobile.
+             Yes, `grid-cols-1` does that.
+             
+             Let's refine the column visibility classes.
+             Actually, we can't hide col 2 and 3 on mobile, because they contain unique posts.
+             We must show all 3 columns stacked on mobile.
+             
+             Is there a way to solve this?
+             CSS Grid with `grid-template-rows: masonry` is experimental.
+             
+             Alternative: Use JS to distribute items? User said "No gallery.js".
+             
+             Let's stick to the explicit column split. It is the standard way to achieve Masonry with correct horizontal-first visual priority on Desktop without JS.
+        -->
+      </div>
+    </section>
+  </main>
+
+  <%- include('/partials/footer') %>
+</body>
+
+</html>

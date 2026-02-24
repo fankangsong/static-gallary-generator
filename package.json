@@ -4,10 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "preview": "node generator/generate.js && vite",
-    "index": "node generator/generate.js init",
-    "build": "node generator/generate.js",
-    "clear": "node scripts/clear.js"
+    "preview": "vite",
+    "index:gallary": "node core/main.js index:gallary",
+    "build:gallary": "node core/main.js build:gallary",
+    "build:site": "node core/main.js build:site",
+    "clear": "node core/main.js clear"
   },
   "author": "",
   "license": "ISC",
