@@ -3,6 +3,7 @@
 
 <head>
   <%- include('/partials/head') %>
+    <link rel="stylesheet" href="/assets/css/atom-one-dark.min.css">
     <style>
       <% if (WEBSITE_FONT) {
         %>@font-face {
@@ -44,7 +45,7 @@
 
 <body class="bg-white text-gray-900">
 
-    <%- include('/partials/site_nav') %>
+  <%- include('/partials/site_nav') %>
 
     <main class="min-h-screen pt-32 pb-12 px-4 sm:px-6 lg:px-8">
       <article class="max-w-3xl mx-auto">
@@ -67,6 +68,8 @@
     </main>
 
     <%- include('/partials/footer') %>
+      <script src="/assets/js/vendor/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script>
 </body>
 
 </html>
