@@ -159,7 +159,9 @@ class HtmlGenerator {
     const navLinks = config.site.index?.links || [];
     const navText = navLinks.map((l) => l.text).join("");
     const text =
-      posts.map((p) => p.title).join("\n") + (config.defaultAuthor || "") + navText;
+      posts.map((p) => p.title + (p.summary || "")).join("\n") +
+      (config.defaultAuthor || "") +
+      navText;
 
     try {
       await fontManager.generateSubset(
