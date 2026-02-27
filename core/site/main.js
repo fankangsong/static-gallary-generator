@@ -7,6 +7,7 @@ const dataManager = require("../gallery/lib/data-manager");
 const { buildBlog } = require("./lib/blog-builder");
 const indexGenerator = require("./lib/index-generator");
 const travelGenerator = require("./lib/travel-generator");
+const errorPageGenerator = require("./lib/error-page-generator");
 const sitemapGenerator = require("./lib/sitemap-generator");
 
 async function run(args) {
@@ -32,6 +33,9 @@ async function run(args) {
 
   // Generate travel page
   await travelGenerator.generate();
+
+  // Generate 404 page
+  await errorPageGenerator.generate();
 
   // Generate Sitemap
   sitemapGenerator.generate(albums, posts);
