@@ -19,7 +19,7 @@
       "src": "/assets/logo.svg",
       "width": "180px"
     },
-    "photosDir": "../photography",
+    "photosDir": "./data-source/photography",
     "template": "magazine",
     "supportedExtensions": [".jpg", ".jpeg", ".png", ".webp"],
     "thumbnail": {
@@ -50,7 +50,7 @@
       ]
     },
     "blog": {
-      "dir": "../blog-post",
+      "dir": "./data-source/blog",
       "template": "blog_post",
       "indexTemplate": "blog_index",
       "title": "随笔",

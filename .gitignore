@@ -141,8 +141,7 @@ vite.config.ts.timestamp-*
 .vite/
 
 
-generator/photos/
-generator/DEFAULT_DESCRIPTION
+data-source/
 web/
 
 *.stylelintcache
