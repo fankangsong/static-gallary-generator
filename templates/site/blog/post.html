@@ -9,7 +9,7 @@
       <% if (WEBSITE_FONT) {
         %>@font-face {
           font-family: '<%= WEBSITE_FONT.name %>';
-          src: url('./fonts/<%= WEBSITE_FONT.name %>.ttf') format('truetype') !important;
+          src: url('./fonts/<%= WEBSITE_FONT.name %>.ttf') format('truetype');
           font-weight: normal;
           font-style: normal;
           font-display: swap;
@@ -69,6 +69,20 @@
         line-height: 1;
         color: rgb(107, 114, 128);
         letter-spacing: 0.02em;
+      }
+
+      /* Fix for highlight.js code blocks within Tailwind Typography */
+      .prose pre {
+        background-color: #282c34 !important;
+        color: #abb2bf !important;
+      }
+      
+      .prose pre code {
+        background-color: transparent !important;
+        color: inherit !important;
+        padding: 0 !important;
+        border-radius: 0 !important;
+        font-weight: normal !important;
       }
     </style>
 </head>
