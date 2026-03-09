@@ -1,7 +1,7 @@
 {
   "common": {
     "site": {
-      "title": "imcolin.fan",
+      "title": "IMCOLIN.FAN",
       "description": "",
       "url": "imcolin.fan",
       "font": {
@@ -35,30 +35,48 @@
     }
   },
   "site": {
-    "index": {
-      "links": [
-        { "text": "首页", "url": "/" },
-        { "text": "随笔", "url": "/blog/" },
-        { "text": "摄影", "url": "/photography/" },
-        { "text": "跑步", "url": "/running/" },
-        { "text": "旅行", "url": "/travel/" }
-      ],
-      "quotes": [
-        "予生八零，以代码为业，耕于数字之野。",
-        "平生所好者众：跑健以强其身，摄影以悦其心，摇滚以畅其怀。",
-        "今此小站，借<ruby>智<rt>A</rt>巧<rt>I</rt></ruby>而成，代码尽皆开源，愿与同好共之。"
-      ]
-    },
+    "nav": [
+      { "text": "首页", "url": "/" },
+      { "text": "随笔", "url": "/blog/" },
+      { "text": "摄影", "url": "/photography/" },
+      { "text": "跑步", "url": "/running/" },
+      { "text": "旅行", "url": "/travel/" }
+    ],
+    "pages": [
+      {
+        "name": "index",
+        "template": "index.html",
+        "output": "index.html",
+        "fontOutput": "assets/fonts/index/",
+        "data": {}
+      },
+      {
+        "name": "travel",
+        "template": "travel/index.html",
+        "output": "travel/index.html",
+        "fontOutput": "assets/fonts/travel/",
+        "data": {
+          "TITLE": "旅行",
+          "DESCRIPTION": "Travel Map"
+        }
+      },
+      {
+        "name": "404",
+        "template": "404.html",
+        "output": "404.html",
+        "fontOutput": "assets/fonts/error/",
+        "data": {
+          "TITLE": "404 - Page Not Found",
+          "DESCRIPTION": "Page not found"
+        }
+      }
+    ],
     "blog": {
       "dir": "./data-source/blog",
-      "template": "blog_post",
-      "indexTemplate": "blog_index",
+      "template": "blog/post",
+      "indexTemplate": "blog/index",
       "title": "随笔",
       "description": "随笔"
-    },
-    "travel": {
-      "title": "旅行",
-      "description": "Travel Map"
     }
   }
 }

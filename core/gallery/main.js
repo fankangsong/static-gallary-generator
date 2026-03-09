@@ -91,7 +91,7 @@ async function run(args) {
 
   htmlGenerator.generateIndexHtml(albums);
 
-  const navLinks = config.site.index?.links || [];
+  const navLinks = config.site.nav || [];
   const navText = navLinks.map((l) => l.text).join("");
   allText += navText;
 

@@ -45,7 +45,7 @@ class HtmlGenerator {
       WEBSITE_FONT: config.website.font,
       FULL_YEAR: new Date().getFullYear(),
       AUTHOR: meta.author || config.defaultAuthor,
-      NAV_LINKS: config.site.index?.links || [],
+      NAV_LINKS: config.site.nav || [],
     };
 
     // EJS Options: set root for includes
@@ -101,7 +101,7 @@ class HtmlGenerator {
           FULL_YEAR: new Date().getFullYear(),
           AUTHOR: config.defaultAuthor,
           WEBSITE_BRAND_DESCRIPTION: config.gallery.brandDescription,
-          NAV_LINKS: config.site.index?.links || [],
+          NAV_LINKS: config.site.nav || [],
         },
         {
           root: [GALLERY_TEMPLATES_DIR, COMMON_TEMPLATES_DIR],

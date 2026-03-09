@@ -9,7 +9,8 @@ const {
 const { logger } = require("./utils");
 
 class ResourceManager {
-  copyResources() {
+  copyResources(options = {}) {
+    const { silent = false } = options;
     // 1. Copy items from SRC_DIR_LIST Recursively
     const copyRecursive = (src, dest) => {
       if (!fs.existsSync(src)) return;
@@ -50,7 +51,7 @@ class ResourceManager {
         fs.mkdirSync(configDestDir, { recursive: true });
       fs.copyFileSync(dataSrc, dataDest);
       logger.success("Copied data.json to web/config/");
-    } else {
+    } else if (!silent) {
       logger.warn(
         `Source data.json not found at ${dataSrc}. Run 'init' first.`,
       );

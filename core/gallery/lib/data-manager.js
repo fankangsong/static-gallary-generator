@@ -280,12 +280,14 @@ class DataManager {
     logger.success(`Saved data to ${DATA_JSON_PATH}`);
   }
 
-  loadData() {
+  loadData(silent = false) {
     // Load from generator/data.json (Persistent)
     if (fs.existsSync(DATA_JSON_PATH)) {
       return JSON.parse(fs.readFileSync(DATA_JSON_PATH, "utf-8"));
     }
-    logger.warn("No data found. Please run 'init' first.");
+    if (!silent) {
+      logger.warn("No data found. Please run 'init' first.");
+    }
     return [];
   }
 }
