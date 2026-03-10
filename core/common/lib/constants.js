@@ -15,7 +15,7 @@ module.exports = {
   FONTS_DIR: path.join(WEB_DIR, "assets/fonts"),
   TEMP_DIR: path.join(GENERATOR_DIR, ".temp"),
   TEMPLATES_DIR: path.join(PROJECT_ROOT, "templates"),
-  COMMON_TEMPLATES_DIR: path.join(PROJECT_ROOT, "templates/gallary"),
+  COMMON_TEMPLATES_DIR: path.join(PROJECT_ROOT, "templates/common"),
   GALLERY_TEMPLATES_DIR: path.join(PROJECT_ROOT, "templates/gallary"),
   SITE_TEMPLATES_DIR: path.join(PROJECT_ROOT, "templates/site"),
   ASSETS_DIR: path.join(PROJECT_ROOT, "templates/assets"),

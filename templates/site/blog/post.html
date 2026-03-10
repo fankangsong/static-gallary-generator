@@ -2,14 +2,17 @@
 <html lang="zh-CN">
 
 <head>
+
   <%- include('/partials/head') %>
+
+    <!-- highlight.js theme -->
     <link rel="stylesheet" href="/assets/css/atom-one-dark.min.css">
 
     <style>
       <% if (WEBSITE_FONT) {
         %>@font-face {
-          font-family: '<%= WEBSITE_FONT.name %>';
-          src: url('./fonts/<%= WEBSITE_FONT.name %>.ttf') format('truetype');
+          font-family: "<%= WEBSITE_FONT.name %>";
+          src: url("/fonts/<%= WEBSITE_FONT.name %>.ttf") format("truetype");
           font-weight: normal;
           font-style: normal;
           font-display: swap;
@@ -18,18 +21,57 @@
         <%
       }
 
-      %>html {
+      %>
+      /* ===== 基础 ===== */
+
+      html {
         scrollbar-gutter: stable;
       }
 
-      body,
-      .site-font-family {
+      body {
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
-        font-family: 'Courier New',
-        Courier,
-        <%- WEBSITE_FONT ? `'${WEBSITE_FONT.name}' `: '' %>, monospace !important;
+        text-rendering: optimizeLegibility;
+        font-kerning: normal;
+        font-variant-east-asian: proportional-width;
       }
+
+      /* ===== 正文字体 ===== */
+
+      body,
+      .site-font-family {
+        font-family: <% if (WEBSITE_FONT) {
+          %>"<%= WEBSITE_FONT.name %>",
+          <%
+        }
+
+        %>"KingHwa OldSong",
+        "Source Han Serif SC",
+        "Noto Serif CJK SC",
+        "Songti SC",
+        "STSong",
+        "Times New Roman",
+        serif;
+        line-height: 1.8;
+        letter-spacing: 0.01em;
+      }
+
+      /* ===== 代码字体 ===== */
+
+      code,
+      pre,
+      kbd,
+      samp {
+        font-family:
+          "JetBrains Mono",
+          "Fira Code",
+          "Source Code Pro",
+          "Courier New",
+          monospace;
+
+      }
+
+      /* ===== 链接 ===== */
 
       a:link,
       a:visited {
@@ -41,83 +83,60 @@
       a:focus {
         color: rgb(247, 147, 131);
         text-decoration: underline;
-      }
-
-      .prose strong {
-        font-weight: 700;
-        color: rgb(17, 24, 39);
-      }
-
-      .prose em {
-        font-style: italic;
-        color: rgb(17, 24, 39);
-      }
-
-      .prose u {
-        text-decoration-thickness: 2px;
         text-underline-offset: 3px;
-        text-decoration-color: rgba(240, 80, 55, 0.35);
-      }
-
-      .prose ruby {
-        ruby-position: over;
-        ruby-align: center;
-      }
-
-      .prose rt {
-        font-size: 0.75em;
-        line-height: 1;
-        color: rgb(107, 114, 128);
-        letter-spacing: 0.02em;
-      }
-
-      /* Fix for highlight.js code blocks within Tailwind Typography */
-      .prose pre {
-        background-color: #282c34 !important;
-        color: #abb2bf !important;
-      }
-      
-      .prose pre code {
-        background-color: transparent !important;
-        color: inherit !important;
-        padding: 0 !important;
-        border-radius: 0 !important;
-        font-weight: normal !important;
       }
     </style>
+
 </head>
 
-<body class="bg-white text-gray-900">
+<body class="bg-white text-gray-900 antialiased">
 
+  <!-- site navigation -->
   <%- include('/partials/site_nav') %>
 
     <main class="min-h-screen pt-32 pb-12 px-4 sm:px-6 lg:px-8">
+
       <article class="max-w-3xl mx-auto">
-        <header class="mb-12 text-center">
+
+        <header class="mb-12 text-center site-font-family">
+
           <div class="text-gray-500 text-sm mb-4">
             <%= DATE %>
           </div>
+
           <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-8">
             <%= TITLE %>
           </h1>
+
         </header>
 
+        <!-- article content -->
+
         <div class="prose prose-lg prose-slate mx-auto heti site-font-family
-            prose-headings:font-bold prose-headings:tracking-tight
-            prose-strong:font-semibold prose-strong:text-gray-900
-            prose-em:italic
-            prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline
-            prose-pre:rounded-xl prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-pre:shadow
-            prose-code:rounded prose-code:bg-gray-100 prose-code:px-1 prose-code:py-0.5 prose-code:text-gray-900 prose-code:before:content-[''] prose-code:after:content-['']
-            prose-img:rounded-xl prose-img:shadow-lg">
+        prose-headings:font-bold prose-headings:tracking-tight
+        prose-strong:font-semibold prose-strong:text-gray-900
+        prose-em:italic
+        prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline
+        prose-pre:rounded-xl prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-pre:shadow prose-pre:max-w-none
+        prose-code:rounded prose-code:bg-gray-900 prose-code:px-1 prose-code:py-0.5 prose-code:text-gray-300 prose-code:before:content-[''] prose-code:after:content-['']
+        prose-img:rounded-xl prose-img:shadow-lg">
           <%- CONTENT_HTML %>
         </div>
+
       </article>
+
     </main>
 
     <%- include('/partials/footer') %>
+
+      <!-- highlight.js -->
+
       <script src="/assets/js/vendor/highlight.min.js"></script>
-      <script>hljs.highlightAll();</script>
+
+      <script>
+        hljs.highlightAll();
+      </script>
+
 </body>
 
 </html>
