@@ -9,81 +9,12 @@
     <link rel="stylesheet" href="/assets/css/atom-one-dark.min.css">
 
     <style>
-      <% if (WEBSITE_FONT) {
-        %>@font-face {
-          font-family: "<%= WEBSITE_FONT.name %>";
-          src: url("/fonts/<%= WEBSITE_FONT.name %>.ttf") format("truetype");
-          font-weight: normal;
-          font-style: normal;
-          font-display: swap;
-        }
-
-        <%
-      }
-
-      %>
-      /* ===== 基础 ===== */
-
-      html {
-        scrollbar-gutter: stable;
-      }
-
-      body {
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        text-rendering: optimizeLegibility;
-        font-kerning: normal;
-        font-variant-east-asian: proportional-width;
-      }
-
-      /* ===== 正文字体 ===== */
-
-      body,
-      .site-font-family {
-        font-family: <% if (WEBSITE_FONT) {
-          %>"<%= WEBSITE_FONT.name %>",
-          <%
-        }
-
-        %>"KingHwa OldSong",
-        "Source Han Serif SC",
-        "Noto Serif CJK SC",
-        "Songti SC",
-        "STSong",
-        "Times New Roman",
-        serif;
-        line-height: 1.8;
-        letter-spacing: 0.01em;
-      }
-
-      /* ===== 代码字体 ===== */
-
-      code,
-      pre,
-      kbd,
-      samp {
-        font-family:
-          "JetBrains Mono",
-          "Fira Code",
-          "Source Code Pro",
-          "Courier New",
-          monospace;
-
-      }
-
-      /* ===== 链接 ===== */
-
-      a:link,
-      a:visited {
-        color: rgb(240, 80, 55);
-        text-decoration: none;
-      }
-
-      a:hover,
-      a:focus {
-        color: rgb(247, 147, 131);
-        text-decoration: underline;
-        text-underline-offset: 3px;
+      @font-face {
+        font-family: "<%= WEBSITE_FONT.name %>";
+        src: url("./fonts/<%= WEBSITE_FONT.name %>.ttf") format("truetype");
+        font-weight: normal;
+        font-style: normal;
+        font-display: swap;
       }
     </style>
 

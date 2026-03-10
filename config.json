@@ -48,7 +48,7 @@
         "template": "index.html",
         "output": "index.html",
         "fontOutput": "assets/fonts/index/",
-        "data": {}
+        "data": { "TITLE": "IMCOLIN.FAN", "DESCRIPTION": "" }
       },
       {
         "name": "travel",

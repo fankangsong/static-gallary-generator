@@ -4,60 +4,16 @@
 <head>
   <%- include('/partials/head') %>
     <style>
-      <% if (WEBSITE_FONT) {
-        %>@font-face {
-          font-family: '<%= WEBSITE_FONT.name %>';
-          src: url('<%= "/assets/fonts/gallary/" + WEBSITE_FONT.name + ".ttf" %>') format('truetype');
-          font-weight: normal;
-          font-style: normal;
-          font-display: swap;
-        }
-
-        <%
+      @font-face {
+        font-family: '<%= WEBSITE_FONT.name %>';
+        src: url('<%= "/assets/fonts/gallary/" + WEBSITE_FONT.name + ".ttf" %>') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+        font-display: swap;
       }
 
-      %>html {
-        scrollbar-gutter: stable;
-      }
-
-      body {
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        font-family: 'Courier New',
-        Courier,
-        <%- WEBSITE_FONT ? `'${WEBSITE_FONT.name}' `: '' %>, monospace;
-      }
-
-      a:link,
-      a:visited {
-        color: rgb(240, 80, 55);
-        text-decoration: none;
-      }
-
-      a:hover,
-      a:focus {
-        color: rgb(247, 147, 131);
-        text-decoration: underline;
-      }
-
-      /* Custom Scrollbar */
-      ::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
-      }
-
-      ::-webkit-scrollbar-track {
-        background: transparent;
-      }
-
-      ::-webkit-scrollbar-thumb {
-        background-color: rgba(0, 0, 0, 0.2);
-        border-radius: 3px;
-      }
-
-      ::-webkit-scrollbar-thumb:hover {
-        background-color: rgba(0, 0, 0, 0.4);
-        border-radius: 3px;
+      #mobile-menu-btn svg {
+        stroke: #1a1a1a;
       }
     </style>
 </head>
@@ -139,7 +95,7 @@
     prose-ul:list-disc prose-ul:pl-5 prose-ul:mb-6
     prose-ol:list-decimal prose-ol:pl-5 prose-ol:mb-6
     prose-li:mb-1 prose-li:leading-snug
-    prose-img:rounded-xl prose-img:shadow-lg prose-img:my-8
+    prose-img:rounded-xl prose-img:shadow-lg
     prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline
     prose-strong:font-bold prose-strong:text-black">
           <%- CONTENT_HTML %>

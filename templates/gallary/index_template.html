@@ -4,24 +4,17 @@
 <head>
     <%- include('/partials/head') %>
         <style>
-            <% if (WEBSITE_FONT) {
-                %>@font-face {
-                    font-family: '<%= WEBSITE_FONT.name %>';
-                    src: url('<%= "/assets/fonts/gallary/" + WEBSITE_FONT.name + ".ttf" %>') format('truetype');
-                    font-weight: normal;
-                    font-style: normal;
-                    font-display: swap;
-                }
-
-                <%
+            @font-face {
+                font-family: '<%= WEBSITE_FONT.name %>';
+                src: url('<%= "/assets/fonts/gallary/" + WEBSITE_FONT.name + ".ttf" %>') format('truetype');
             }
 
-            %>body {
-                -webkit-font-smoothing: antialiased;
-                -moz-osx-font-smoothing: grayscale;
-                font-family: 'Courier New',
-                Courier,
-                <%- WEBSITE_FONT ? `'${WEBSITE_FONT.name}' `: '' %>, monospace;
+            .site-nav-bar a {
+                color: #2c2c2c;
+            }
+
+            #mobile-menu-btn svg {
+                stroke: #1a1a1a;
             }
         </style>
 </head>
@@ -30,76 +23,77 @@
 
     <%- include('/partials/site_nav') %>
 
-    <!-- Header / Brand -->
-    <header class="pt-32 pb-16 md:pt-40 md:pb-24 px-6 text-center max-w-[1600px] mx-auto w-full">
+        <!-- Header / Brand -->
+        <header class="pt-32 pb-16 md:pt-40 md:pb-24 px-6 text-center max-w-[1600px] mx-auto w-full">
 
-        <% if (WEBSITE_LOGO && WEBSITE_LOGO.enabled) { %>
-            <div class="mb-8 flex justify-center">
-                <img src="<%= WEBSITE_LOGO.src %>" alt="<%= WEBSITE_TITLE_SUFFIX %>"
-                    style="width: <%= WEBSITE_LOGO.width %>; max-width: 100%; height: auto;">
+            <% if (WEBSITE_LOGO && WEBSITE_LOGO.enabled) { %>
+                <div class="mb-8 flex justify-center">
+                    <img src="<%= WEBSITE_LOGO.src %>" alt="<%= WEBSITE_TITLE_SUFFIX %>"
+                        style="width: <%= WEBSITE_LOGO.width %>; max-width: 100%; height: auto;">
+                </div>
+                <% } else { %>
+                    <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-gray-900 mb-4">
+                        <%= WEBSITE_TITLE_SUFFIX %>
+                    </h1>
+                    <% } %>
+                        <p class="text-gray-500 max-w-lg mx-auto text-sm leading-relaxed">
+                            <%= WEBSITE_BRAND_DESCRIPTION %>
+                        </p>
+        </header>
+
+        <!-- Album Grid -->
+        <main class="flex-grow max-w-[1600px] mx-auto w-full px-6 md:px-12 pb-32">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-20">
+                <% ALBUMS.forEach(function(album, index) { // Grid Pattern Logic let colSpanClass='md:col-span-1' ; let
+                    aspectClass='aspect-[4/3]' ; let modIndex=index % 7; if (modIndex===0 || modIndex===3) {
+                    colSpanClass='md:col-span-2' ; aspectClass='aspect-[16/9]' ; } else if (modIndex===1 ||
+                    modIndex===2) { colSpanClass='md:col-span-1' ; aspectClass='aspect-[3/4]' ; } else {
+                    colSpanClass='md:col-span-1' ; aspectClass='aspect-square' ; } %>
+                    <article class="group <%= colSpanClass %> flex flex-col gap-4">
+                        <a href="<%= album.link %>" class="block">
+                            <!-- Image Container -->
+                            <div class="relative overflow-hidden bg-gray-200 w-full mb-5">
+                                <div class="<%= aspectClass %> w-full">
+                                    <% if (album.cover) { %>
+                                        <img src="<%= album.cover %>" alt="<%= album.title %>"
+                                            class="object-cover w-full h-full transition-all duration-700 ease-out group-hover:scale-[1.02] group-hover:brightness-95">
+                                        <% } else { %>
+                                            <div
+                                                class="flex items-center justify-center h-full text-gray-400 bg-gray-100">
+                                                <span class="text-xs uppercase tracking-widest">No Cover</span>
+                                            </div>
+                                            <% } %>
+                                </div>
+                            </div>
+
+                            <!-- Content -->
+                            <div class="space-y-3 pr-4">
+                                <div class="flex items-baseline justify-between">
+                                    <h2
+                                        class="text-xl md:text-2xl font-bold text-gray-900 group-hover:text-gray-600 transition-colors leading-tight">
+                                        <%= album.title %>
+                                    </h2>
+                                    <span class="text-xs font-bold text-gray-400 tracking-widest ml-4 shrink-0">
+                                        &copy; <%= AUTHOR %>
+                                    </span>
+                                </div>
+
+                                <% if (album.description) { %>
+                                    <p class="text-gray-500 text-sm leading-relaxed line-clamp-2 max-w-xl font-normal">
+                                        <%= album.description %>
+                                    </p>
+                                    <% } %>
+                            </div>
+                        </a>
+                    </article>
+                    <% }); %>
             </div>
-            <% } else { %>
-                <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-gray-900 mb-4">
-                    <%= WEBSITE_TITLE_SUFFIX %>
-                </h1>
-                <% } %>
-                    <p class="text-gray-500 max-w-lg mx-auto text-sm leading-relaxed">
-                        <%= WEBSITE_BRAND_DESCRIPTION %>
-                    </p>
-    </header>
+        </main>
 
-    <!-- Album Grid -->
-    <main class="flex-grow max-w-[1600px] mx-auto w-full px-6 md:px-12 pb-32">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-20">
-            <% ALBUMS.forEach(function(album, index) { // Grid Pattern Logic let colSpanClass='md:col-span-1' ; let
-                aspectClass='aspect-[4/3]' ; let modIndex=index % 7; if (modIndex===0 || modIndex===3) {
-                colSpanClass='md:col-span-2' ; aspectClass='aspect-[16/9]' ; } else if (modIndex===1 || modIndex===2) {
-                colSpanClass='md:col-span-1' ; aspectClass='aspect-[3/4]' ; } else { colSpanClass='md:col-span-1' ;
-                aspectClass='aspect-square' ; } %>
-                <article class="group <%= colSpanClass %> flex flex-col gap-4">
-                    <a href="<%= album.link %>" class="block">
-                        <!-- Image Container -->
-                        <div class="relative overflow-hidden bg-gray-200 w-full mb-5">
-                            <div class="<%= aspectClass %> w-full">
-                                <% if (album.cover) { %>
-                                    <img src="<%= album.cover %>" alt="<%= album.title %>"
-                                        class="object-cover w-full h-full transition-all duration-700 ease-out group-hover:scale-[1.02] group-hover:brightness-95">
-                                    <% } else { %>
-                                        <div class="flex items-center justify-center h-full text-gray-400 bg-gray-100">
-                                            <span class="text-xs uppercase tracking-widest">No Cover</span>
-                                        </div>
-                                        <% } %>
-                            </div>
-                        </div>
+        <!-- Footer -->
+        <%- include('/partials/footer') %>
 
-                        <!-- Content -->
-                        <div class="space-y-3 pr-4">
-                            <div class="flex items-baseline justify-between">
-                                <h2
-                                    class="text-xl md:text-2xl font-bold text-gray-900 group-hover:text-gray-600 transition-colors leading-tight">
-                                    <%= album.title %>
-                                </h2>
-                                <span class="text-xs font-bold text-gray-400 tracking-widest ml-4 shrink-0">
-                                    &copy; <%= AUTHOR %>
-                                </span>
-                            </div>
-
-                            <% if (album.description) { %>
-                                <p class="text-gray-500 text-sm leading-relaxed line-clamp-2 max-w-xl font-normal">
-                                    <%= album.description %>
-                                </p>
-                                <% } %>
-                        </div>
-                    </a>
-                </article>
-                <% }); %>
-        </div>
-    </main>
-
-    <!-- Footer -->
-    <%- include('/partials/footer') %>
-
-    <script src="/assets/js/gallery.js"></script>
+            <script src="/assets/js/gallery.js"></script>
 </body>
 
 </html>

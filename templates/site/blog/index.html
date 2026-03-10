@@ -4,40 +4,12 @@
 <head>
   <%- include('/partials/head') %>
     <style>
-      <% if (WEBSITE_FONT) {
-        %>@font-face {
-          font-family: '<%= WEBSITE_FONT.name %>';
-          src: url('<%= "/assets/fonts/site/" + WEBSITE_FONT.name + ".ttf" %>') format('truetype');
-          font-weight: normal;
-          font-style: normal;
-          font-display: swap;
-        }
-
-        <%
-      }
-
-      %>html {
-        scrollbar-gutter: stable;
-      }
-
-      body {
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        font-family: 'Courier New',
-        Courier,
-        <%- WEBSITE_FONT ? `'${WEBSITE_FONT.name}' `: '' %>, monospace;
-      }
-
-      a:link,
-      a:visited {
-        color: rgb(240, 80, 55);
-        text-decoration: none;
-      }
-
-      a:hover,
-      a:focus {
-        color: rgb(247, 147, 131);
-        text-decoration: none;
+      @font-face {
+        font-family: '<%= WEBSITE_FONT.name %>';
+        src: url('<%= "/assets/fonts/site/" + WEBSITE_FONT.name + ".ttf" %>') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+        font-display: swap;
       }
     </style>
 </head>

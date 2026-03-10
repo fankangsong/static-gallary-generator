@@ -286,7 +286,7 @@ class DataManager {
       return JSON.parse(fs.readFileSync(DATA_JSON_PATH, "utf-8"));
     }
     if (!silent) {
-      logger.warn("No data found. Please run 'init' first.");
+      logger.warn("No data found. Please run 'index:gallary' first.");
     }
     return [];
   }

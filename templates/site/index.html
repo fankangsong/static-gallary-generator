@@ -2,49 +2,27 @@
 <html lang="zh-CN">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>
-        <%= WEBSITE_TITLE %>
-    </title>
-    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-    <script src="/assets/js/vendor/tailwindcss.js"></script>
-    <style>
-        @font-face {
-            font-family: '<%= WEBSITE_FONT.name %>';
-            src: url('<%= "/assets/fonts/index/" + WEBSITE_FONT.name + ".ttf" %>') format('truetype');
-            font-weight: normal;
-            font-style: normal;
-            font-display: swap;
-        }
+    <%- include('/partials/head') %>
+        <style>
+            @font-face {
+                font-family: '<%= WEBSITE_FONT.name %>';
+                src: url('<%= "/assets/fonts/index/" + WEBSITE_FONT.name + ".ttf" %>') format('truetype');
+            }
 
-        body {
-            font-family: 'Courier New',
-            Courier,
-            <%- WEBSITE_FONT ? `'${WEBSITE_FONT.name}' `: '' %>, monospace;
-            background-color: #fdfbf7;
-            /* 纸张色 */
-            color: #2c2c2c;
-            /* 墨色 */
-        }
+            body {
+                background-color: #fdfbf7;
+                color: #2c2c2c;
+            }
 
-        ruby {
-            font-weight: bold;
-        }
+            .vertical-text {
+                writing-mode: vertical-rl;
+                text-orientation: mixed;
+            }
 
-        ruby rt {
-            font-size: 14px;
-            font-family: 'Courier New',
-            Courier,
-            <%- WEBSITE_FONT ? `'${WEBSITE_FONT.name}' `: '' %>, monospace;
-            color: rgb(255, 66, 66)
-        }
-
-        .vertical-text {
-            writing-mode: vertical-rl;
-            text-orientation: mixed;
-        }
-    </style>
+            a.nav-link {
+                color: #2c2c2c;
+            }
+        </style>
 </head>
 
 <body class="bg-[#fdfbf7] h-screen w-screen overflow-hidden">
@@ -59,13 +37,12 @@
             <!-- Navigation Links (Right side) -->
             <nav class="flex flex-row gap-2 text-lg tracking-widest border-l border-gray-300 pl-4 shrink-0">
                 <% LINKS.forEach(function(link) { %>
-                    <a href="<%= link.url %>" class="hover:text-[#8b4513] transition-colors duration-300 py-2">
+                    <a href="<%= link.url %>" class="nav-link hover:text-[#8b4513] transition-colors duration-300 py-2">
                         <%= link.text %>
                     </a>
                     <% }); %>
             </nav>
 
-            <!-- Quotes Content (Left side, flowing right to left visually) -->
             <div
                 class="flex flex-col gap-12 md:gap-20 leading-loose tracking-wider text-xl md:text-2xl opacity-90 py-12 shrink-0 max-h-full">
                 <p>予生八零，以代码为业，耕于数字之野。</p>
