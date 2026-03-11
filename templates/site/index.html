@@ -5,8 +5,8 @@
     <%- include('/partials/head') %>
         <style>
             @font-face {
-                font-family: '<%= WEBSITE_FONT.name %>';
-                src: url('<%= "/assets/fonts/index/" + WEBSITE_FONT.name + ".ttf" %>') format('truetype');
+                font-family: 'KingHwaOldSong';
+                src: url('/assets/fonts/index/KingHwaOldSong.ttf') format('truetype');
             }
 
             body {
@@ -21,6 +21,21 @@
 
             a.nav-link {
                 color: #2c2c2c;
+            }
+
+            a.nav-link:hover {
+                text-decoration: underline;
+                text-decoration-color: rgb(253, 54, 54)
+            }
+
+            ruby {
+                text-decoration: underline rgb(253, 54, 54)
+            }
+
+            ruby rt {
+                font-family: Arial, Helvetica, sans-serif;
+                font-size: 1.1rem;
+                color: rgb(253, 54, 54)
             }
         </style>
 </head>
