@@ -3,10 +3,12 @@
 
 <head>
   <%- include('/partials/head') %>
+    <link rel="preload" href="/assets/fonts/gallary/<%= WEBSITE_FONT.name %>.ttf" as="font" type="font/woff2"
+      crossorigin>
     <style>
       @font-face {
         font-family: '<%= WEBSITE_FONT.name %>';
-        src: url('<%= "/assets/fonts/gallary/" + WEBSITE_FONT.name + ".ttf" %>') format('truetype');
+        src: url('/assets/fonts/gallary/<%= WEBSITE_FONT.name %>.ttf') format('truetype');
       }
 
       /* Magazine Header Style */

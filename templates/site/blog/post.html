@@ -7,14 +7,12 @@
 
     <!-- highlight.js theme -->
     <link rel="stylesheet" href="/assets/css/atom-one-dark.min.css">
-
+    <link rel="preload" href="./fonts/<%= WEBSITE_FONT.name %>.ttf" as="font" type="font/woff2" crossorigin>
     <style>
       @font-face {
         font-family: "<%= WEBSITE_FONT.name %>";
         src: url("./fonts/<%= WEBSITE_FONT.name %>.ttf") format("truetype");
-        font-weight: normal;
-        font-style: normal;
-        font-display: swap;
+        font-display: block;
       }
     </style>
 

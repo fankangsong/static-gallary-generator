@@ -3,10 +3,13 @@
 
 <head>
     <%- include('/partials/head') %>
+        <link rel="preload" href="/assets/fonts/index/<%= WEBSITE_FONT.name %>.ttf" as="font" type="font/woff2"
+            crossorigin>
         <style>
             @font-face {
                 font-family: 'KingHwaOldSong';
-                src: url('/assets/fonts/index/KingHwaOldSong.ttf') format('truetype');
+                src: url('/assets/fonts/index/<%= WEBSITE_FONT.name %>.ttf') format('truetype');
+                font-display: block;
             }
 
             body {
