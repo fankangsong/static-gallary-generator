@@ -1,0 +1,16 @@
+<nav
+    class="site-nav-bar fixed top-0 left-0 right-0 z-50 transition-all duration-300 backdrop-blur-md bg-white/80 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-center items-center h-20">
+            <!-- Unified Links -->
+            <div class="flex items-center space-x-6 md:space-x-8">
+                <% NAV_LINKS.forEach(function(link) { %>
+                    <a href="<%= link.url %>"
+                        class="hover:text-gray-600 font-medium transition-colors text-sm tracking-wide uppercase">
+                        <%= link.text %>
+                    </a>
+                    <% }); %>
+            </div>
+        </div>
+    </div>
+</nav>

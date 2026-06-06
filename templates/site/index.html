@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <%- include('/partials/head') %>
+        <link rel="preload" href="/assets/fonts/index/<%= WEBSITE_FONT.name %>.ttf" as="font" type="font/woff2"
+            crossorigin>
+        <style>
+            @font-face {
+                font-family: 'KingHwaOldSong';
+                src: url('/assets/fonts/index/<%= WEBSITE_FONT.name %>.ttf') format('truetype');
+                font-display: block;
+            }
+
+            body {
+                background-color: #fdfbf7;
+                color: #2c2c2c;
+            }
+
+            .vertical-text {
+                writing-mode: vertical-rl;
+                text-orientation: mixed;
+            }
+
+            a.nav-link {
+                color: #2c2c2c;
+            }
+
+            a.nav-link:hover {
+                text-decoration: underline;
+                text-decoration-color: rgb(253, 54, 54)
+            }
+
+            ruby {
+                text-decoration: underline rgb(253, 54, 54)
+            }
+
+            ruby rt {
+                font-family: Arial, Helvetica, sans-serif;
+                font-size: 1.1rem;
+                color: rgb(253, 54, 54)
+            }
+        </style>
+</head>
+
+<body class="bg-[#fdfbf7] h-screen w-screen overflow-hidden">
+    <!-- Scroll Container -->
+    <!-- 
+        Mobile (default): overflow-x-auto, flex-row-reverse (starts from right, scrolls left)
+        Desktop (md+): justify-center (content centered), no scroll if content fits
+    -->
+    <div class="w-full h-full overflow-x-auto overflow-y-hidden flex flex-row-reverse md:justify-center">
+        <main class="vertical-text h-full p-8 md:p-16 flex flex-col gap-16 md:gap-24 items-start shrink-0 min-w-min">
+
+            <!-- Navigation Links (Right side) -->
+            <nav class="flex flex-row gap-2 text-lg tracking-widest border-l border-gray-300 pl-4 shrink-0">
+                <% LINKS.forEach(function(link) { %>
+                    <a href="<%= link.url %>" class="nav-link hover:text-[#8b4513] transition-colors duration-300 py-2">
+                        <%= link.text %>
+                    </a>
+                    <% }); %>
+            </nav>
+
+            <div
+                class="flex flex-col gap-12 md:gap-20 leading-loose tracking-wider text-xl md:text-2xl opacity-90 py-12 shrink-0 max-h-full">
+                <p>予生八零，以代码为业，耕于数字之野。</p>
+                <p>平生所好者众：跑健以强其身，摄影以悦其心，摇滚以畅其怀。</p>
+                <p>今此小站，借<ruby>智<rt>A</rt>巧<rt>I</rt></ruby>而成，代码尽皆开源，愿与同好共之。</p>
+            </div>
+
+        </main>
+    </div>
+</body>
+
+</html>

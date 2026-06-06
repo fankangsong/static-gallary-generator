@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <%- include('/partials/head') %>
+    <link rel="preload" href="/assets/fonts/error/<%= WEBSITE_FONT.name %>.ttf" as="font" type="font/woff2" crossorigin>
+    <style>
+      @font-face {
+        font-family: '<%= WEBSITE_FONT.name %>';
+        src: url('/assets/fonts/error/<%= WEBSITE_FONT.name %>.ttf') format('truetype');
+        font-display: block;
+      }
+    </style>
+</head>
+
+<body class="bg-white text-gray-900 flex flex-col min-h-screen">
+
+  <%- include('/partials/site_nav') %>
+
+    <main class="flex-grow flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 text-center">
+      <div class="flex items-center justify-center space-x-2 sm:space-x-4 mb-12 select-none">
+        <!-- 4 -->
+        <span class="text-8xl sm:text-9xl font-extrabold text-gray-900 tracking-tighter">404</span>
+        <p><span>页面不要再或已移除</span>，<a href="/">返回</a>首页</p>
+      </div>
+
+
+    </main>
+
+    <%- include('/partials/footer') %>
+</body>
+
+</html>

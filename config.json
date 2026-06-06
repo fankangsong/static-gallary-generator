@@ -1,0 +1,82 @@
+{
+  "common": {
+    "site": {
+      "title": "IMCOLIN.FAN",
+      "description": "",
+      "url": "imcolin.fan",
+      "font": {
+        "name": "KingHwaOldSong",
+        "source": "templates/assets/fonts/京華老宋体v3.0.ttf"
+      }
+    },
+    "defaultAuthor": "Fan Kangsong"
+  },
+  "gallery": {
+    "navBrand": "COLIN PHOTO",
+    "brandDescription": "摄影于我的意义是回忆和美。",
+    "logo": {
+      "enabled": true,
+      "src": "/assets/logo.svg",
+      "width": "180px"
+    },
+    "photosDir": "../photography",
+    "template": "magazine",
+    "supportedExtensions": [".jpg", ".jpeg", ".png", ".webp"],
+    "thumbnail": {
+      "width": 800,
+      "height": 800,
+      "quality": 80,
+      "fit": "inside"
+    },
+    "large": {
+      "maxSize": 3000,
+      "quality": 60,
+      "fit": "inside"
+    }
+  },
+  "site": {
+    "nav": [
+      { "text": "首页", "url": "/" },
+      { "text": "随笔", "url": "/blog/" },
+      { "text": "摄影", "url": "/photography/" },
+      { "text": "跑步", "url": "/running/" },
+      { "text": "旅行", "url": "/travel/" }
+    ],
+    "pages": [
+      {
+        "name": "index",
+        "template": "index.html",
+        "output": "index.html",
+        "fontOutput": "assets/fonts/index/",
+        "data": { "TITLE": "IMCOLIN.FAN", "DESCRIPTION": "" }
+      },
+      {
+        "name": "travel",
+        "template": "travel/index.html",
+        "output": "travel/index.html",
+        "fontOutput": "assets/fonts/travel/",
+        "data": {
+          "TITLE": "旅行",
+          "DESCRIPTION": "Travel Map"
+        }
+      },
+      {
+        "name": "404",
+        "template": "404.html",
+        "output": "404.html",
+        "fontOutput": "assets/fonts/error/",
+        "data": {
+          "TITLE": "404 - Page Not Found",
+          "DESCRIPTION": "Page not found"
+        }
+      }
+    ],
+    "blog": {
+      "dir": "../blog-post",
+      "template": "blog/post",
+      "indexTemplate": "blog/index",
+      "title": "随笔",
+      "description": "随笔"
+    }
+  }
+}
