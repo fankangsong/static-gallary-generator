@@ -1,63 +1,68 @@
-# Repository Guidelines
+# 仓库指南
 
-This project is a static site generator that builds a personal photography gallery and blog site. It reads configuration and templates, processes images, and outputs static HTML/CSS/JS to the `web/` directory.
+本项目是一个静态站点生成器，用于构建个人摄影相册与博客站点。它读取配置和模板，处理图片，并将静态 HTML/CSS/JS 输出到 `web/` 目录。
 
-## Project Structure & Module Organization
+## 项目结构与模块组织
 
-| Path | Purpose |
+| 路径 | 用途 |
 |---|---|
-| `core/main.js` | CLI entry point; dispatches `index:gallary`, `build:gallary`, `build:site`, `clear` commands |
-| `core/gallery/` | Gallery generation: scans photos, generates thumbnails via Sharp, renders gallery index |
-| `core/site/` | Site page generation: renders templates with EJS, processes blog posts via Marked |
-| `core/common/` | Shared utilities, constants, and libraries |
-| `templates/` | HTML templates (EJS) and shared assets (CSS, JS, fonts) |
-| `config.json` | Site-wide configuration: titles, navigation, page definitions, image processing settings |
-| `web/` | **Generated output** — static site files (git-ignored; do not edit directly) |
-| `vite.config.js` | Vite dev server config; serves `web/` on port 3000 |
+| `core/main.js` | CLI 入口；分发 `index:gallary`、`build:gallary`、`build:site`（别名 `build:blog`）、`clear` 命令 |
+| `core/gallery/` | 相册生成：扫描照片、通过 Sharp 生成缩略图、渲染相册索引页 |
+| `core/site/` | 站点页面生成：以 EJS 渲染模板，通过 Marked 处理博客文章 |
+| `core/common/` | 共享工具函数、常量与类库 |
+| `templates/` | HTML 模板（EJS）及共享资源（CSS、JS、字体） |
+| `config.json` | 站点全局配置：标题、导航、页面定义、图片处理参数 |
+| `docs/` | 项目文档（`design-guide.md`） |
+| `data-source/` | 预留的源数据目录（当前为空） |
+| `web/` | **生成产物** — 静态站点文件（已被 git 忽略；请勿直接编辑） |
+| `vite.config.js` | Vite 开发服务器配置；在 3000 端口服务 `web/` 目录 |
 
-## Build, Test, and Development Commands
+## 构建、测试与开发命令
 
-| Command | Description |
+| 命令 | 说明 |
 |---|---|
-| `pnpm preview` | Start Vite dev server at `http://localhost:3000` to preview generated output |
-| `pnpm build` | Full build pipeline: generate gallery index, build gallery pages, build site pages, then upload |
-| `pnpm index:gallary` | Generate gallery index page only |
-| `pnpm build:gallary` | Process photos and generate gallery HTML pages |
-| `pnpm build:site` | Render site pages (home, blog, travel, 404) from EJS templates |
-| `pnpm clear` | Remove generated `web/` and `core/.temp/` directories |
+| `pnpm preview` | 启动 Vite 开发服务器于 `http://localhost:3000`，预览生成结果 |
+| `pnpm build` | 完整构建流水线：生成相册索引 → 构建相册页面 → 构建站点页面。**注意：** 末尾的 `upload` 步骤执行 `upload.sh`，该脚本不在仓库中 — 流水线当前会在该步骤失败 |
+| `pnpm build:blog` | `build:site` 的 CLI 别名（通过 `node core/main.js build:blog` 调用；未定义 npm script） |
+| `pnpm index:gallary` | 仅生成相册索引页 |
+| `pnpm build:gallary` | 处理照片并生成相册 HTML 页面 |
+| `pnpm build:site` | 从 EJS 模板渲染站点页面（首页、博客、旅行、404） |
+| `pnpm clear` | 移除生成的 `web/` 和 `core/.temp/` 目录 |
 
-Run `pnpm build` for a complete rebuild. Use `pnpm preview` to inspect output locally after building.
+完整重建请运行 `pnpm build`。构建后使用 `pnpm preview` 在本地检查输出结果。
 
-## Coding Style & Naming Conventions
+## 代码风格与命名规范
 
-- **Indentation**: 2 spaces (JavaScript and HTML)
-- **Language**: Node.js (CommonJS `require`), EJS templates, vanilla HTML/CSS/JS
-- **File naming**: `snake_case` or `kebab-case` for template files; `camelCase` for JavaScript modules
-- **Entry modules**: Each subdirectory under `core/` has a `main.js` as its entry point
-- **Configuration**: All site settings live in [`config.json`](config.json); avoid hardcoding values in templates or scripts
-- No linter or formatter is configured; match existing style when editing
+- **缩进**：2 空格（JavaScript 与 HTML）
+- **语言**：Node.js（CommonJS `require`）、EJS 模板、原生 HTML/CSS/JS
+- **文件命名**：模板文件使用 `snake_case` 或 `kebab-case`；JavaScript 模块使用 `camelCase`
+- **入口模块**：`core/gallery/` 与 `core/site/` 各自有 `main.js` 入口；`core/common/` 是共享工具库，无入口文件
+- **包管理器**：仅使用 pnpm；`pnpm-lock.yaml` 是唯一权威锁文件 — 请勿使用 npm/yarn
+- **运行时**：Node.js 22，通过 `package.json` 中的 `volta` 锁定
+- **配置**：所有站点设置统一放在 [`config.json`](config.json)；避免在模板或脚本中硬编码
+- 未配置 linter 或格式化工具；编辑时请与现有风格保持一致
 
-## Testing Guidelines
+## 测试指南
 
-Tests are standalone Node.js scripts in the repository root:
+测试是仓库根目录下的独立 Node.js 脚本：
 
-- [`test-template-renderer.js`](test-template-renderer.js) — tests the EJS template rendering pipeline
-- [`test-comprehensive.js`](test-comprehensive.js) — broader integration tests for the build system
+- [`test-template-renderer.js`](test-template-renderer.js) — 测试 EJS 模板渲染流水线
+- [`test-comprehensive.js`](test-comprehensive.js) — 构建系统的综合性集成测试
 
-Run tests directly:
+直接运行：
 
 ```bash
 node test-template-renderer.js
 node test-comprehensive.js
 ```
 
-Add new tests as sibling scripts when modifying template rendering or core build logic.
+修改模板渲染或核心构建逻辑时，请以同级脚本的形式新增测试。
 
-## Commit & Pull Request Guidelines
+## 提交与 Pull Request 规范
 
-### Commit Messages
+### 提交信息
 
-Use [Conventional Commits](https://www.conventionalcommits.org/) with scoped types:
+使用 [Conventional Commits](https://www.conventionalcommits.org/) 带作用域的类型：
 
 ```
 feat(blog): 为博客文章页面添加代码高亮功能
@@ -66,11 +71,13 @@ fix: resolve thumbnail generation for WebP images
 chore: 为构建脚本添加上传步骤
 ```
 
-Supported types: `feat`, `fix`, `refactor`, `chore`, `perf`, `style`, `docs`. Include a scope in parentheses when changes target a specific subsystem (`blog`, `site`, `gallery`, `template`, `font`).
+支持的类型：`feat`、`fix`、`refactor`、`chore`、`perf`、`style`、`docs`。当变更针对特定子系统（`blog`、`site`、`gallery`、`template`、`font`）时，请在括号中注明作用域。
 
-### Pull Requests
+历史提交早于本规范，不完全合规；所有新提交必须遵循上述规范。
 
-- Describe the change and its impact on the build output
-- Include screenshots for visible changes to gallery or site pages
-- Link any related issues
-- Run the full build (`pnpm build`) and verify `web/` output before merging
+### Pull Request
+
+- 描述变更内容及其对构建产物的影响
+- 涉及相册或站点页面的可见变更时，请附上截图
+- 关联相关 issue
+- 合并前运行完整构建（`pnpm build`）并检查 `web/` 输出
