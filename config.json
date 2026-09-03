@@ -34,6 +34,16 @@
       "fit": "inside"
     }
   },
+  "pictures": {
+    "sourceDir": "../daughter-pictures",
+    "supportedExtensions": [".jpg", ".jpeg", ".png", ".webp"],
+    "thumbnail": {
+      "width": 800,
+      "height": 800,
+      "quality": 80,
+      "fit": "inside"
+    }
+  },
   "site": {
     "nav": [
       { "text": "首页", "url": "/" },

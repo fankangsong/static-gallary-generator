@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 336 124" role="img" aria-label="香香的画">
+  <!-- 手绘画框：不对称圆角 + 微倾斜（呼应绘本封面的手工装帧） -->
+  <g transform="rotate(-3 63 66)">
+    <path d="M 35 24 H 94 A 11 11 0 0 1 105 35 V 102 A 7 7 0 0 1 98 109 H 33 A 9 9 0 0 1 24 100 V 33 A 8 8 0 0 1 32 24 Z"
+          fill="#FFFDF7" stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"/>
+    <!-- 蜡笔小花：六瓣橙 + 黄花心 -->
+    <ellipse cx="63" cy="48" rx="7.5" ry="12" fill="#FF8A5C"/>
+    <ellipse cx="63" cy="48" rx="7.5" ry="12" fill="#FF8A5C" transform="rotate(60 63 66)"/>
+    <ellipse cx="63" cy="48" rx="7.5" ry="12" fill="#FF8A5C" transform="rotate(120 63 66)"/>
+    <ellipse cx="63" cy="48" rx="7.5" ry="12" fill="#FF8A5C" transform="rotate(180 63 66)"/>
+    <ellipse cx="63" cy="48" rx="7.5" ry="12" fill="#FF8A5C" transform="rotate(240 63 66)"/>
+    <ellipse cx="63" cy="48" rx="7.5" ry="12" fill="#FF8A5C" transform="rotate(300 63 66)"/>
+    <circle cx="63" cy="66" r="9" fill="#FFC94D"/>
+    <circle cx="60" cy="63.5" r="1.4" fill="#D89A2B" opacity=".8"/>
+    <circle cx="65.5" cy="67.5" r="1.4" fill="#D89A2B" opacity=".8"/>
+    <!-- 茎与叶 -->
+    <path d="M 63 76 C 61 86 65 94 63 103" fill="none" stroke="#4FB8B2" stroke-width="3" stroke-linecap="round"/>
+    <path d="M 63 90 Q 72 87 74 78 Q 65 81 63 90 Z" fill="#4FB8B2" opacity=".85"/>
+  </g>
+  <!-- 香气：摆动上升的虚线，飘出画框 -->
+  <g fill="none" stroke="#4FB8B2" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="5 4" opacity=".75">
+    <path d="M 62 32 C 68 28 58 24 64 20 C 70 16 60 12 66 8"/>
+    <path d="M 74 36 C 80 32 70 28 76 24 C 82 20 72 16 78 12"/>
+  </g>
+  <!-- 主题字：楷体，与页面标题同款字体栈 -->
+  <text x="116" y="80" style="font-family:'Kaiti SC','STKaiti','KaiTi','DFKai-SB','TW-Kai',serif"
+        font-size="44" font-weight="700" letter-spacing="2.6" fill="#4A3B32">香香的画</text>
+  <!-- 蜡笔虚线下划线（呼应页首 scribble） -->
+  <path d="M 118 98 C 158 90 208 103 250 94 S 294 91 306 96"
+        fill="none" stroke="#FF8A5C" stroke-width="4.5" stroke-linecap="round"
+        stroke-dasharray="8 5" opacity=".9"/>
+  <!-- 收尾小星星 -->
+  <path d="M 315 84 L 317 89 L 322 91 L 317 93 L 315 98 L 313 93 L 308 91 L 313 89 Z" fill="#FFC94D"/>
+  <path d="M 327 74 L 328.3 77 L 331 78 L 328.3 79 L 327 82 L 325.7 79 L 323 78 L 325.7 77 Z" fill="#FF8A5C" opacity=".85"/>
+</svg>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 140" role="img" aria-label="香香的画">
+  <defs>
+    <!-- 水彩洇边：低频噪声扰动，让线条边缘微微出格、不闭合 -->
+    <filter id="wash" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.04 0.09" numOctaves="2" seed="11" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="3" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <!-- 纸纹颗粒：参数与页面 grain 底纹一致，颗粒尺度相同 -->
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.82" numOctaves="3" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+    </filter>
+  </defs>
+
+  <!-- 两条随手涂画的曲线：由细起笔，中段饱满，收笔渐细（变宽笔触 = 上下轮廓围合的填充面） -->
+  <g filter="url(#wash)">
+    <!-- 青瓷绿：第二笔，压在下层 -->
+    <path fill="#4FB8B2" d="M 58 107.4 C 76 110.4 84 111.8 96 109.7 C 112 107 122 99.6 136 98.4 C 150 97.6 162 104 176 103.8 C 190 103.6 202 98.4 214 96.6 C 222 95.4 230 91.6 236 89.4 L 236 90.6 C 230 93 222 98 214 99.4 C 202 101.4 190 108.4 176 108.2 C 162 108 150 102.4 136 101.6 C 122 100.8 112 111.6 96 114.3 C 84 116.1 76 111.4 58 108.6 Z"/>
+    <path fill="none" stroke="#4FB8B2" stroke-width=".9" stroke-linecap="round" opacity=".4" d="M 229 85 C 222 84 216 84.5 210 85.5"/>
+    <!-- 蜡笔橙：第一笔，收笔处停着画笔 -->
+    <path fill="#FF8A5C" d="M 26 91.4 C 42 82 50 76.5 62 77.8 C 78 79.6 86 92 100 94.9 C 114 97.4 124 85 138 80.6 C 150 77 160 68.5 172 65.7 C 184 63.6 196 63 206 63.4 L 206 64.6 C 196 65.2 184 67.4 172 70.3 C 160 74 150 83.8 138 87.4 C 124 92.6 114 104.6 100 101.1 C 86 98 78 84.4 62 82.2 C 50 83.9 42 89.4 26 92.6 Z"/>
+    <!-- 提笔飞白：毛刷分叉笔触 -->
+    <path fill="none" stroke="#FF8A5C" stroke-width="1" stroke-linecap="round" opacity=".45" d="M 196 61 C 188 59.5 180 59 171 59.5"/>
+    <path fill="none" stroke="#FF8A5C" stroke-width=".9" stroke-linecap="round" opacity=".35" d="M 198 67 C 190 66 183 66.5 176 67.5"/>
+  </g>
+
+  <!-- 画笔：墨棕笔杆 + 奶黄笔箍 + 蘸橙笔头，笔尖落在橙线末端，像刚画完这一笔 -->
+  <g filter="url(#wash)" transform="translate(206 64) rotate(-32)">
+    <!-- 笔毛（蘸橙） -->
+    <path fill="#FF8A5C" d="M 0 0 C 5 -5.5 13 -7.5 24 -7 L 24 7 C 13 7.5 5 5.5 0 0 Z"/>
+    <path fill="#E85D4A" d="M 0 0 C 4 -3.5 8 -5 13 -5.5 L 13 5.5 C 8 5 4 3.5 0 0 Z"/>
+    <!-- 笔箍（奶黄） -->
+    <rect x="24" y="-8" width="10" height="16" rx="2" fill="#FFC94D" stroke="#8C7A6B" stroke-width=".8"/>
+    <!-- 笔杆（墨棕） + 一道受光 -->
+    <rect x="34" y="-6.5" width="60" height="13" rx="6" fill="#4A3B32"/>
+    <path d="M 40 -2.5 L 86 -2.5" stroke="#FFFDF7" stroke-width="1.5" stroke-linecap="round" opacity=".3" fill="none"/>
+  </g>
+
+  <!-- 题字：圆、方交替的背景，随块微旋、基线错落 -->
+  <!-- 香：手绘不规则圆（奶黄） -->
+  <g transform="rotate(-3 312 73)">
+    <path d="M 312 40 C 331 39 345 55 344 74 C 343 92 328 106 310 106 C 292 105 279 90 280 71 C 281 53 293 41 312 40 Z" fill="#FFC94D" opacity=".5" filter="url(#wash)"/>
+    <text x="314" y="91" text-anchor="middle" font-size="52" font-weight="700" fill="#4A3B32" style="font-family:'Kaiti SC','STKaiti','KaiTi','DFKai-SB','TW-Kai',serif">香</text>
+  </g>
+  <!-- 香：便签矩形块，明显旋转（橙） -->
+  <g transform="rotate(4.5 378 79)">
+    <rect x="347" y="48" width="62" height="62" rx="7" fill="#FF8A5C" opacity=".38" filter="url(#wash)"/>
+    <text x="376" y="99" text-anchor="middle" font-size="52" font-weight="700" fill="#4A3B32" style="font-family:'Kaiti SC','STKaiti','KaiTi','DFKai-SB','TW-Kai',serif">香</text>
+  </g>
+  <!-- 的：手绘不规则圆（青瓷绿） -->
+  <g transform="rotate(-2.5 445 68)">
+    <path d="M 445 37 C 462 37 477 51 476 69 C 475 86 461 100 444 99 C 427 98 414 85 414 68 C 414 51 428 37 445 37 Z" fill="#4FB8B2" opacity=".35" filter="url(#wash)"/>
+    <text x="447" y="86" text-anchor="middle" font-size="52" font-weight="700" fill="#4A3B32" style="font-family:'Kaiti SC','STKaiti','KaiTi','DFKai-SB','TW-Kai',serif">的</text>
+  </g>
+  <!-- 画：便签矩形块，明显旋转（奶黄） -->
+  <g transform="rotate(5 512.5 75.5)">
+    <rect x="481" y="44" width="63" height="63" rx="5" fill="#FFC94D" opacity=".55" filter="url(#wash)"/>
+    <text x="511" y="95" text-anchor="middle" font-size="52" font-weight="700" fill="#4A3B32" style="font-family:'Kaiti SC','STKaiti','KaiTi','DFKai-SB','TW-Kai',serif">画</text>
+  </g>
+
+  <!-- 纸纹颗粒覆盖层 -->
+  <rect width="560" height="140" filter="url(#grain)" opacity=".05"/>
+</svg>

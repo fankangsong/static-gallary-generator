@@ -148,3 +148,6 @@ web/
 .trae
 
 *.sh
+
+.codebuddy
+.trae

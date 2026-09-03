@@ -176,6 +176,70 @@ magazine-img: transition filter 0.3s
 magazine-caption: margin-top 12px, text-align left
 ```
 
+### 画册列表 · 绘本封面
+
+画册列表页（`templates/gallary/index_template.html` → `web/photography/index.html`）使用**纯 CSS/SVG 绘制的绘本封面**，不加载任何图片资源。视觉语言与 `docs/simple/picture-books.html` 一致。
+
+**设计令牌：**
+
+```css
+--paper: #FFF8EC;        /* 暖纸底 */
+--paper-deep: #F5EBD8;   /* 封面纸底 */
+--paper-white: #FFFDF7;  /* 书壳 */
+--ink: #4A3B32;          /* 主文字 */
+--ink-soft: #8C7A6B;     /* 次级文字 */
+--edge: #E9DCC3;         /* 描边 */
+--crayon-orange: #FF8A5C;/* 焦点环 */
+--kai: "Kaiti SC", "STKaiti", "KaiTi", "DFKai-SB", "TW-Kai", [站点字体], serif;
+--grain: url("data:image/svg+xml,...feTurbulence...");  /* 宣纸颗粒噪点 */
+```
+
+**水彩调色板**：5 组低饱和色按 `index % 5` 循环，经 `--wash-a/b/c` 注入封面，由多层 `radial-gradient` 叠加成色晕。
+
+| 序号 | 主色 | 辅色 | 点缀 |
+|------|------|------|------|
+| 0 | 青瓷 `207,227,220` | 藕荷 `232,216,228` | 秋杏 `246,224,196` |
+| 1 | 藕荷 `232,216,228` | 苔绿 `220,229,206` | 黛蓝 `211,222,234` |
+| 2 | 秋杏 `246,224,196` | 青瓷 `207,227,220` | 苔绿 `220,229,206` |
+| 3 | 苔绿 `220,229,206` | 黛蓝 `211,222,234` | 藕荷 `232,216,228` |
+| 4 | 黛蓝 `211,222,234` | 秋杏 `246,224,196` | 青瓷 `207,227,220` |
+
+**封面构成（自上而下）：**
+
+| 层 | 实现 | 说明 |
+|----|------|------|
+| 书壳 | `border-radius: 6px 10px 8px 6px` + `rotate(var(--tilt))` | 不对称圆角 + 微倾斜，模拟手工装帧 |
+| 书脊 | `.book-card::before` 左缘 7px 渐变内阴影 | 模拟装订厚度 |
+| 纸底 | 45° `repeating-linear-gradient` + `--paper-deep` | 纸纤维 |
+| 色晕 | `.cover-wash` 三层 `radial-gradient` | 水彩洇染 |
+| 颗粒 | `.cover-wash::after` → `--grain` | 宣纸质感 |
+| 内框线 | `.cover-frame` `inset: 12px`，`rgba(74,59,50,.10)` | 扉页装饰框 |
+| 小图标 | 内联 SVG，`stroke-width: 1.2`，`opacity: .32` | 枝芽/飞鸟/山峦/水波/云纹，按 `index % 5` 循环 |
+| 书名 | 楷体 + `clamp(30px, 15cqw, 68px)` + `letter-spacing: .12em` | 封面唯一文字内容 |
+
+**书架网格：**
+
+```css
+grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+gap: clamp(28px, 4vw, 44px);
+perspective: 1600px;
+```
+
+| 断点 | 列数 |
+|------|------|
+| `< 480px` | 1 列，`--tilt: 0deg` |
+| `480–820px` | 2 列 |
+| `≥ 820px` | `auto-fill` 自适应，上限 `max-w-1280px` |
+
+**交互：**
+
+- hover / focus-visible：`rotate(0deg) translateY(-10px)` + 投影加深；色晕 `scale(1.05) saturate(1.18)`；图标 `translateY(-3px)`
+- 过渡：`transform .45s cubic-bezier(.22,1.2,.36,1)`
+- focus-visible：`outline: 2px dashed var(--crayon-orange); outline-offset: 6px`
+- `prefers-reduced-motion: reduce` 下关闭全部过渡与位移
+
+**无障碍：** 封面标题为真实文本（可被搜索引擎与读屏器读取）；`<a>` 上标注 `aria-label="翻开画册《…》"`；卡片下方可见的 `h2` 改为 `.sr-only` 以保留文档大纲，仅留小字 meta（机型 · 日期）。
+
 ### PhotoSwipe Caption
 
 自定义 lightbox caption 样式：

@@ -4,12 +4,14 @@ const PROJECT_ROOT = path.resolve(__dirname, "../../../");
 const GENERATOR_DIR = path.resolve(__dirname, "../../");
 const WEB_DIR = path.join(PROJECT_ROOT, "web");
 const PHOTO_WEB_DIR = path.join(WEB_DIR, "photography");
+const PICTURES_WEB_DIR = path.join(WEB_DIR, "pictures");
 
 module.exports = {
   PROJECT_ROOT,
   GENERATOR_DIR,
   WEB_DIR,
   PHOTO_WEB_DIR,
+  PICTURES_WEB_DIR,
   IMAGES_DIR: path.join(PHOTO_WEB_DIR, "images"), // This is just a base, actual images go into album folders
   CONFIG_DIR: path.join(WEB_DIR, "config"),
   FONTS_DIR: path.join(WEB_DIR, "assets/fonts"),

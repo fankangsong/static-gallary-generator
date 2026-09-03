@@ -17,6 +17,7 @@ function loadConfig() {
     defaultAuthor: rawConfig.common.defaultAuthor,
     gallery: rawConfig.gallery,
     site: rawConfig.site,
+    pictures: rawConfig.pictures || {},
     blog: rawConfig.site.blog // Alias for easier access
   };
 
@@ -25,6 +26,13 @@ function loadConfig() {
   const normalizedRaw = normalizePath(rawPhotosDir);
   // Resolve relative to project root now
   config.gallery.absolutePhotosDir = path.resolve(PROJECT_ROOT, normalizedRaw);
+
+  // Resolve Pictures (绘本) Source Dir
+  const rawPicturesDir = config.pictures.sourceDir || "../pictures";
+  config.pictures.absoluteSourceDir = path.resolve(
+    PROJECT_ROOT,
+    normalizePath(rawPicturesDir)
+  );
 
   return config;
 }
