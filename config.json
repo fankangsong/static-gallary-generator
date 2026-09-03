@@ -88,6 +88,11 @@
       "indexTemplate": "blog/index",
       "title": "随笔",
       "description": "随笔"
+    },
+    "travel": {
+      "kmlUrl": "https://www.google.com/maps/d/kml?forcekml=1&mid=1ITNU4y9FSrODmHp-Kt6CTbt7uA0",
+      "snapshotPath": "data-source/travel.kml",
+      "outputPath": "assets/travel/markers.json"
     }
   }
 }

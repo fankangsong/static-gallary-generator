@@ -11,6 +11,62 @@
         src: url('/assets/fonts/travel/<%= WEBSITE_FONT.name %>.ttf') format('truetype');
         font-display: block;
       }
+
+      /* 地球舞台入场动画 */
+      #globe-stage {
+        animation: stage-in .9s cubic-bezier(.22, .61, .36, 1) both;
+      }
+
+      @keyframes stage-in {
+        from {
+          opacity: 0;
+          transform: translateY(24px) scale(.985);
+        }
+
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      /* 光点信息浮层过渡 */
+      #globe-popup {
+        opacity: 0;
+        transform: translate(-50%, 14px);
+        transition: opacity .4s ease, transform .4s ease;
+        pointer-events: none;
+      }
+
+      #globe-popup.is-visible {
+        opacity: 1;
+        transform: translate(-50%, 0);
+        pointer-events: auto;
+      }
+
+      /* 足迹图钉（经典地图定位针） */
+      .travel-pin {
+        width: 44px;
+        height: 48px;
+        cursor: pointer;
+        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .15));
+        transition: opacity .4s ease;
+      }
+
+      .travel-pin svg {
+        display: block;
+        pointer-events: none;
+        transition: transform .15s ease;
+        transform-origin: center bottom;
+      }
+
+      .travel-pin:hover svg {
+        transform: scale(1.2);
+      }
+
+      .travel-pin.is-behind {
+        opacity: 0;
+        pointer-events: none;
+      }
     </style>
 </head>
 
@@ -33,22 +89,180 @@
           <p>旅行拓展见识，记录沉淀认知。</p>
         </div>
 
-        <div class="w-full h-[300px] border-0 text-center flex items-center justify-center" id="loading">
-          <div class="flex items-center justify-center space-x-2">
+        <!-- 3D 矢量地球舞台（透明背景） -->
+        <div id="globe-stage" class="relative w-full h-[400px] md:h-[600px] rounded-2xl overflow-hidden">
+          <div id="globe" class="w-full h-full"></div>
 
-            <p>加载地图...</p>
+          <!-- 加载态 -->
+          <div id="loading" class="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 bg-[#F9F9F9]">
+            <span class="block w-1.5 h-1.5 rounded-full bg-[#DB4436] animate-pulse"></span>
+            <p class="text-xs text-gray-400 tracking-[0.3em]">正在展开地球</p>
+          </div>
+
+          <!-- 失败态 -->
+          <div id="globe-error"
+            class="hidden absolute inset-0 z-30 flex flex-col items-center justify-center gap-5 bg-[#F9F9F9]">
+            <p class="text-sm text-gray-600 tracking-widest">足迹数据加载失败，请稍后重试</p>
+            <button id="globe-retry"
+              class="px-6 py-2 rounded-full border border-[#DB4436]/60 text-[#DB4436] text-sm tracking-widest hover:bg-[#DB4436] hover:text-white transition-colors duration-300">重新加载</button>
+          </div>
+
+          <!-- 光点信息浮层（浅色玻璃质感） -->
+          <div id="globe-popup"
+            class="absolute z-30 left-1/2 bottom-6 max-w-[90%] sm:max-w-sm rounded-xl border border-gray-200/80 bg-white/80 backdrop-blur-md px-6 py-4 text-center shadow-xl shadow-gray-900/10">
+            <h3 id="popup-name"
+              style="font-family: '<%= WEBSITE_FONT.name %>', 'PingFang SC', 'Microsoft YaHei', serif;"
+              class="text-lg md:text-xl font-semibold text-gray-900 tracking-wide"></h3>
+            <p id="popup-desc" class="mt-1.5 text-xs md:text-sm text-gray-500 leading-relaxed"></p>
           </div>
         </div>
-        <iframe title="google maps" id="google-map" class="google-map w-full h-[600px] border-0"
-          src="https://www.google.com/maps/d/embed?mid=1ITNU4y9FSrODmHp-Kt6CTbt7uA0" onload="completeLoading()"
-          onerror="onMapError"></iframe>
+
+        <p class="mt-6 text-center text-sm text-gray-500 tracking-widest">已在地球上标记 <span id="marker-count"
+            class="text-[#DB4436]">0</span> 处足迹</p>
       </section>
     </main>
 
+    <script src="/assets/js/travel/globe.gl.min.js" defer></script>
     <script>
-      function completeLoading() {
-        document.getElementById('loading').style.display = 'none';
-      }
+      document.addEventListener('DOMContentLoaded', function () {
+        var stage = document.getElementById('globe-stage');
+        var globeEl = document.getElementById('globe');
+        var loadingEl = document.getElementById('loading');
+        var errorEl = document.getElementById('globe-error');
+        var popupEl = document.getElementById('globe-popup');
+
+        document.getElementById('globe-retry').addEventListener('click', function () {
+          window.location.reload();
+        });
+
+        function showError() {
+          loadingEl.style.display = 'none';
+          errorEl.classList.remove('hidden');
+        }
+
+        function fetchJson(url) {
+          return fetch(url).then(function (res) {
+            if (!res.ok) throw new Error('HTTP ' + res.status + ' for ' + url);
+            return res.json();
+          });
+        }
+
+        function escapeHtml(s) {
+          return String(s == null ? '' : s)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        function showPopup(point) {
+          document.getElementById('popup-name').textContent = point.name || '';
+          var desc = document.getElementById('popup-desc');
+          desc.textContent = point.description || '';
+          desc.style.display = point.description ? '' : 'none';
+          popupEl.classList.add('is-visible');
+        }
+
+        function hidePopup() {
+          popupEl.classList.remove('is-visible');
+        }
+
+        Promise.all([
+          fetchJson('/assets/travel/markers.json'),
+          fetchJson('/assets/data/travel/countries.geojson'),
+        ])
+          .then(function (data) {
+            var markers = data[0];
+            var countries = data[1];
+            if (!Array.isArray(markers) || !markers.length) throw new Error('empty markers');
+            if (!countries || !countries.features) throw new Error('invalid countries geojson');
+
+            document.getElementById('marker-count').textContent = markers.length;
+
+            var globe = new Globe(globeEl)
+              .width(stage.clientWidth)
+              .height(stage.clientHeight)
+              .backgroundColor('rgba(0,0,0,0)')
+              .showAtmosphere(false)
+              // 矢量国界：白色陆地 + 细灰描边（剔除南极洲，保持极简）
+              .polygonsData(countries.features.filter(function (f) {
+                return f.properties.ISO_A2 !== 'AQ';
+              }))
+              .polygonAltitude(0.012)
+              .polygonCapColor(function () { return 'rgba(0,0,0,0)'; })
+              .polygonSideColor(function () { return 'rgba(0,0,0,0)'; })
+              .polygonStrokeColor(function () { return '#f1f1f1'; })
+              .polygonLabel(function (d) { return escapeHtml(d.properties.ADMIN); })
+              // 足迹图钉（HTML 覆盖层，globe.gl 自动处理球背遮挡）
+              .htmlElementsData(markers)
+              .htmlLat(function (d) { return d.lat; })
+              .htmlLng(function (d) { return d.lng; })
+              .htmlAltitude(0.01)
+              .htmlElement(function (d) {
+                var el = document.createElement('div');
+                el.className = 'travel-pin';
+                el.title = d.name || '';
+                // 经典定位针：红头白芯 + 针尖朝下，针尖即锚点（元素中心）
+                el.innerHTML =
+                  '<svg width="44" height="48" viewBox="0 0 22 24">' +
+                  '<circle cx="11" cy="7.4" r="4.6" fill="#DB4436"/>' +
+                  '<path d="M7.4 10 L14.6 10 L11 12.2 Z" fill="#DB4436"/>' +
+                  '<circle cx="11" cy="7.4" r="1.6" fill="#FFFFFF"/>' +
+                  '</svg>';
+                el.addEventListener('click', function (ev) {
+                  ev.stopPropagation();
+                  globe.pointOfView({ lat: d.lat, lng: d.lng, altitude: 1.3 }, 800);
+                  showPopup(d);
+                });
+                return el;
+              })
+              .htmlElementVisibilityModifier(function (el, isVisible) {
+                el.classList.toggle('is-behind', !isVisible);
+              })
+              .onGlobeReady(function () {
+                loadingEl.style.display = 'none';
+              });
+
+            // 纯白哑光球体
+            var mat = globe.globeMaterial();
+            mat.color.set('#FFFFFF');
+            mat.shininess = 0;
+
+            // 国家悬停高亮（淡灰晕染）
+            globe.onPolygonHover(function (polygon) {
+              globe.polygonCapColor(function (d) {
+                return d === polygon ? 'rgba(51,51,51,0.08)' : 'rgba(0,0,0,0)';
+              });
+            });
+
+            // 初始视角：所有标记点的质心
+            var n = markers.length;
+            var lat = 0, lng = 0;
+            markers.forEach(function (m) { lat += m.lat; lng += m.lng; });
+            globe.pointOfView({ lat: lat / n, lng: lng / n, altitude: 2.4 }, 0);
+
+            // 自动旋转；用户交互后暂停，闲置 5 秒恢复
+            var controls = globe.controls();
+            controls.autoRotate = true;
+            controls.autoRotateSpeed = 0.4;
+            var resumeTimer = null;
+            controls.addEventListener('start', function () {
+              controls.autoRotate = false;
+              if (resumeTimer) clearTimeout(resumeTimer);
+              hidePopup();
+            });
+            controls.addEventListener('end', function () {
+              resumeTimer = setTimeout(function () { controls.autoRotate = true; }, 5000);
+            });
+
+            // 视口自适应
+            window.addEventListener('resize', function () {
+              globe.width(stage.clientWidth).height(stage.clientHeight);
+            });
+          })
+          .catch(function (err) {
+            console.error('[travel-globe]', err);
+            showError();
+          });
+      });
     </script>
 
     <%- include('/partials/footer') %>
