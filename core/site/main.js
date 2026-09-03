@@ -8,6 +8,7 @@ const dataManager = require("../gallery/lib/data-manager");
 const { buildBlog } = require("./lib/blog-builder");
 const pageGenerator = require("./lib/page-generator");
 const sitemapGenerator = require("./lib/sitemap-generator");
+const travelDataBuilder = require("./lib/travel-data-builder");
 
 async function run(args) {
   logger.log(`🚀 Starting site (blog) build...`);
@@ -29,6 +30,9 @@ async function run(args) {
 
   const initialText = "";
   const { posts } = await buildBlog(initialText, albums);
+
+  // Generate travel markers data (for the 3D globe on travel page)
+  await travelDataBuilder.run();
 
   // Generate pages (index, travel, 404, etc.)
   await pageGenerator.generate();
