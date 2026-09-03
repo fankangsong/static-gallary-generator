@@ -50,7 +50,8 @@
       { "text": "随笔", "url": "/blog/" },
       { "text": "摄影", "url": "/photography/" },
       { "text": "跑步", "url": "/running/" },
-      { "text": "旅行", "url": "/travel/" }
+      { "text": "旅行", "url": "/travel/" },
+      { "text": "香香的画", "url": "/pictures/" }
     ],
     "pages": [
       {

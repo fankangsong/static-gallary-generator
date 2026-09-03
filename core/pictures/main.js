@@ -14,6 +14,16 @@ const LOGO_ASSET = path.resolve(
   __dirname,
   "../../docs/logo/logo-xiangxiang-hero.svg"
 );
+const FOOTER_NAV_PLACEHOLDER = "<!-- FOOTER_NAV -->";
+const PICTURES_URL = "/pictures/";
+
+function escHtml(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
 
 /**
  * build:pictures 流水线：扫描 → 缩略图 → data.json → 页面/资源拷贝。
@@ -62,8 +72,20 @@ async function run() {
   fs.writeFileSync(dataPath, JSON.stringify(data, null, 2));
   logger.success(`Saved data to ${dataPath}`);
 
-  // 3. 书架页面与静态资源
-  fs.copyFileSync(BOOKSHELF_TEMPLATE, path.join(PICTURES_WEB_DIR, "index.html"));
+  // 3. 书架页面（构建期注入页脚导航）与静态资源
+  let bookshelfHtml = fs.readFileSync(BOOKSHELF_TEMPLATE, "utf-8");
+  const navHtml = (config.site.nav || [])
+    .filter((l) => l && l.text && l.url && l.url !== PICTURES_URL)
+    .map((l) => `<a href="${escHtml(l.url)}">${escHtml(l.text)}</a>`)
+    .join("");
+  if (!bookshelfHtml.includes(FOOTER_NAV_PLACEHOLDER)) {
+    logger.warn(
+      "Footer nav placeholder not found in bookshelf template:",
+      FOOTER_NAV_PLACEHOLDER
+    );
+  }
+  bookshelfHtml = bookshelfHtml.replace(FOOTER_NAV_PLACEHOLDER, navHtml);
+  fs.writeFileSync(path.join(PICTURES_WEB_DIR, "index.html"), bookshelfHtml);
   const assetsDir = path.join(PICTURES_WEB_DIR, "assets");
   if (!fs.existsSync(assetsDir)) {
     fs.mkdirSync(assetsDir, { recursive: true });
