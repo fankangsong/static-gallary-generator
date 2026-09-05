@@ -4,6 +4,7 @@ const { logger } = require("./common/lib/utils");
 const galleryMain = require("./gallery/main");
 const siteMain = require("./site/main");
 const picturesMain = require("./pictures/main");
+const travelMain = require("./travel/main");
 
 async function clearBuild() {
   logger.log("🧹 Clearing generated files...");
@@ -37,12 +38,15 @@ async function main() {
     case "build:pictures":
       await picturesMain.run(args);
       break;
+    case "update:travel":
+      await travelMain.run(args);
+      break;
     case "clear":
       await clearBuild();
       break;
     default:
       logger.error(
-        "Unknown command. Available: index:gallary, build:gallary, build:site, build:pictures, clear",
+        "Unknown command. Available: index:gallary, build:gallary, build:site, build:pictures, update:travel, clear",
       );
       process.exit(1);
   }

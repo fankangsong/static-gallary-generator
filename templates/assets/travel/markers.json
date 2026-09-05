@@ -1,0 +1,680 @@
+[
+  {
+    "name": "五台山",
+    "description": "中国山西省忻州市五台县205省道",
+    "lat": 39.007616,
+    "lng": 113.596271
+  },
+  {
+    "name": "悬空寺",
+    "description": "Datong, Shanxi, China",
+    "lat": 39.661922,
+    "lng": 113.71719
+  },
+  {
+    "name": "Taiyuan",
+    "description": "Shanxi, China",
+    "lat": 37.87059,
+    "lng": 112.548879
+  },
+  {
+    "name": "Yungang Grottoes",
+    "description": "Datong, Shanxi, China",
+    "lat": 40.112926,
+    "lng": 113.13492
+  },
+  {
+    "name": "Pingyao Ancient City",
+    "description": "Pingyao, Jinzhong, Shanxi, China",
+    "lat": 37.210791,
+    "lng": 112.181779
+  },
+  {
+    "name": "Qiao Family Courtyard",
+    "description": "Xichang Street, Qixian, Jinzhong, Shanxi, China",
+    "lat": 37.407076,
+    "lng": 112.433645
+  },
+  {
+    "name": "佛宫寺释迦塔",
+    "description": "Shuozhou, Shanxi, China",
+    "lat": 39.564908,
+    "lng": 113.188867
+  },
+  {
+    "name": "阳朔县",
+    "description": "",
+    "lat": 24.778481,
+    "lng": 110.496593
+  },
+  {
+    "name": "开平碉楼群",
+    "description": "",
+    "lat": 22.36073,
+    "lng": 112.586078
+  },
+  {
+    "name": "台北101大楼停车场",
+    "description": "",
+    "lat": 25.033493,
+    "lng": 121.564102
+  },
+  {
+    "name": "野柳地质公园",
+    "description": "",
+    "lat": 25.207203,
+    "lng": 121.690895
+  },
+  {
+    "name": "观海路",
+    "description": "",
+    "lat": 25.183252,
+    "lng": 121.413981
+  },
+  {
+    "name": "淡水区",
+    "description": "",
+    "lat": 25.1895736,
+    "lng": 121.4570447
+  },
+  {
+    "name": "河岸留言西门红楼展演馆",
+    "description": "",
+    "lat": 25.042033,
+    "lng": 121.506575
+  },
+  {
+    "name": "诚品书店",
+    "description": "",
+    "lat": 25.03945,
+    "lng": 121.565818
+  },
+  {
+    "name": "九份老街",
+    "description": "",
+    "lat": 25.108701,
+    "lng": 121.844296
+  },
+  {
+    "name": "台北市立美术馆",
+    "description": "",
+    "lat": 25.072167,
+    "lng": 121.524229
+  },
+  {
+    "name": "华山文化园区",
+    "description": "",
+    "lat": 25.043626,
+    "lng": 121.529054
+  },
+  {
+    "name": "艋舺祖師廟",
+    "description": "",
+    "lat": 25.040222,
+    "lng": 121.502604
+  },
+  {
+    "name": "国立故宫博物院",
+    "description": "",
+    "lat": 25.102219,
+    "lng": 121.548618
+  },
+  {
+    "name": "桂林",
+    "description": "",
+    "lat": 25.273566,
+    "lng": 110.290195
+  },
+  {
+    "name": "惠州大亚湾三角洲岛俱乐部",
+    "description": "",
+    "lat": 22.625999,
+    "lng": 114.73546
+  },
+  {
+    "name": "中山",
+    "description": "",
+    "lat": 22.516686,
+    "lng": 113.392795
+  },
+  {
+    "name": "虎门",
+    "description": "",
+    "lat": 22.86037,
+    "lng": 113.673128
+  },
+  {
+    "name": "Tanah Lot Temple",
+    "description": "",
+    "lat": -8.620526,
+    "lng": 115.086121
+  },
+  {
+    "name": "藍點灣景别墅",
+    "description": "",
+    "lat": -8.815102,
+    "lng": 115.08887
+  },
+  {
+    "name": "枝江市",
+    "description": "",
+    "lat": 30.42594,
+    "lng": 111.760531
+  },
+  {
+    "name": "保康县",
+    "description": "",
+    "lat": 31.87831,
+    "lng": 111.261309
+  },
+  {
+    "name": "武汉",
+    "description": "",
+    "lat": 30.593099,
+    "lng": 114.305393
+  },
+  {
+    "name": "海洋公园",
+    "description": "",
+    "lat": 22.232982,
+    "lng": 114.170469
+  },
+  {
+    "name": "大鹏",
+    "description": "",
+    "lat": 22.59693,
+    "lng": 114.475022
+  },
+  {
+    "name": "鼓浪屿",
+    "description": "",
+    "lat": 24.4475,
+    "lng": 118.0619444
+  },
+  {
+    "name": "情侣北路",
+    "description": "",
+    "lat": 22.3517852,
+    "lng": 113.6104871
+  },
+  {
+    "name": "珠海长隆海洋王国",
+    "description": "",
+    "lat": 22.1010051,
+    "lng": 113.5324243
+  },
+  {
+    "name": "蜈支洲",
+    "description": "",
+    "lat": 18.312495,
+    "lng": 109.76599
+  },
+  {
+    "name": "双月湾观景点",
+    "description": "",
+    "lat": 22.563999,
+    "lng": 114.90494
+  },
+  {
+    "name": "拙政园",
+    "description": "",
+    "lat": 31.324224,
+    "lng": 120.62997
+  },
+  {
+    "name": "寒山寺佛教图书馆",
+    "description": "",
+    "lat": 31.31073,
+    "lng": 120.568669
+  },
+  {
+    "name": "虎丘山斜塔",
+    "description": "",
+    "lat": 31.3380047,
+    "lng": 120.5762085
+  },
+  {
+    "name": "西湖",
+    "description": "",
+    "lat": 30.2479326,
+    "lng": 120.1502699
+  },
+  {
+    "name": "杭州滨江银泰喜来登大酒店",
+    "description": "",
+    "lat": 30.2077163,
+    "lng": 120.1965973
+  },
+  {
+    "name": "浙江大学西溪校区（南门）",
+    "description": "",
+    "lat": 30.271804,
+    "lng": 120.1408609
+  },
+  {
+    "name": "外滩",
+    "description": "",
+    "lat": 31.2419109,
+    "lng": 121.4898903
+  },
+  {
+    "name": "银科大厦",
+    "description": "",
+    "lat": 39.981499,
+    "lng": 116.306344
+  },
+  {
+    "name": "松山湖",
+    "description": "",
+    "lat": 22.889404,
+    "lng": 113.880469
+  },
+  {
+    "name": "惠州黑排角",
+    "description": "",
+    "lat": 22.6626506,
+    "lng": 114.9470191
+  },
+  {
+    "name": "交河驿",
+    "description": "",
+    "lat": 42.99597,
+    "lng": 89.12268
+  },
+  {
+    "name": "天池",
+    "description": "",
+    "lat": 43.887985,
+    "lng": 88.1364591
+  },
+  {
+    "name": "乌鲁木齐市",
+    "description": "",
+    "lat": 43.8266299,
+    "lng": 87.61688
+  },
+  {
+    "name": "点 50",
+    "description": "",
+    "lat": 43.0226374,
+    "lng": 84.1615175
+  },
+  {
+    "name": "巴音布鲁克",
+    "description": "",
+    "lat": 43.0258724,
+    "lng": 84.199336
+  },
+  {
+    "name": "新疆 和静县",
+    "description": "",
+    "lat": 42.3102447,
+    "lng": 86.3921779
+  },
+  {
+    "name": "那拉提镇",
+    "description": "",
+    "lat": 43.3102464,
+    "lng": 84.1660689
+  },
+  {
+    "name": "八卦城",
+    "description": "",
+    "lat": 43.2137843,
+    "lng": 81.8369302
+  },
+  {
+    "name": "琼库什台村",
+    "description": "",
+    "lat": 42.921034,
+    "lng": 82.198785
+  },
+  {
+    "name": "赛里木湖",
+    "description": "",
+    "lat": 44.60327,
+    "lng": 81.30572
+  },
+  {
+    "name": "伊宁市 伊利河",
+    "description": "",
+    "lat": 43.8845938,
+    "lng": 81.2983511
+  },
+  {
+    "name": "开都河边",
+    "description": "",
+    "lat": 43.0748962,
+    "lng": 84.7802791
+  },
+  {
+    "name": "八卦城摩天轮",
+    "description": "",
+    "lat": 43.2115034,
+    "lng": 81.8154713
+  },
+  {
+    "name": "天山天池缆车终点",
+    "description": "",
+    "lat": 43.8657005,
+    "lng": 88.1015455
+  },
+  {
+    "name": "星光大道",
+    "description": "",
+    "lat": 22.2930046,
+    "lng": 114.1741517
+  },
+  {
+    "name": "Mong Kok",
+    "description": "",
+    "lat": 22.319253,
+    "lng": 114.169355
+  },
+  {
+    "name": "湾仔码头",
+    "description": "",
+    "lat": 22.283249,
+    "lng": 114.1762999
+  },
+  {
+    "name": "Central Star Ferry Pier",
+    "description": "",
+    "lat": 22.2862443,
+    "lng": 114.1614272
+  },
+  {
+    "name": "Hong Kong Observation Wheel",
+    "description": "",
+    "lat": 22.2852859,
+    "lng": 114.1617221
+  },
+  {
+    "name": "香港杜莎夫人蜡像馆",
+    "description": "",
+    "lat": 22.2711973,
+    "lng": 114.1497382
+  },
+  {
+    "name": "深圳天文台",
+    "description": "",
+    "lat": 22.4823885,
+    "lng": 114.5562228
+  },
+  {
+    "name": "深圳大鹏西涌",
+    "description": "",
+    "lat": 22.4778954,
+    "lng": 114.558288
+  },
+  {
+    "name": "惠州云台营地",
+    "description": "在这里露营",
+    "lat": 23.2912596,
+    "lng": 114.1178498
+  },
+  {
+    "name": "福州国家森林公园",
+    "description": "",
+    "lat": 26.1504633,
+    "lng": 119.2874965
+  },
+  {
+    "name": "中國雲頂",
+    "description": "",
+    "lat": 25.749619,
+    "lng": 118.974626
+  },
+  {
+    "name": "椰風寨",
+    "description": "",
+    "lat": 24.447641,
+    "lng": 118.169335
+  },
+  {
+    "name": "三坵田碼頭觀光車站",
+    "description": "",
+    "lat": 24.44926,
+    "lng": 118.06903
+  },
+  {
+    "name": "Rasa Rasa 回味",
+    "description": "",
+    "lat": 5.4140518,
+    "lng": 100.3406259
+  },
+  {
+    "name": "自行车壁画",
+    "description": "",
+    "lat": 5.4146713,
+    "lng": 100.3386365
+  },
+  {
+    "name": "蓝屋",
+    "description": "",
+    "lat": 5.421506,
+    "lng": 100.3348862
+  },
+  {
+    "name": "娘惹博物馆",
+    "description": "",
+    "lat": 5.4178939,
+    "lng": 100.3412332
+  },
+  {
+    "name": "The FOUNDERS Hutton",
+    "description": "",
+    "lat": 5.4194747,
+    "lng": 100.3308408
+  },
+  {
+    "name": "Makan Pagi by Fizzy Cafe",
+    "description": "",
+    "lat": 5.4166863,
+    "lng": 100.330639
+  },
+  {
+    "name": "Little India Arch ( குட்டி இந்தியா நுழைவாயில்/Gerbang India Kecil)",
+    "description": "",
+    "lat": 5.4161756,
+    "lng": 100.3404884
+  },
+  {
+    "name": "土库街消防局",
+    "description": "",
+    "lat": 5.4152177,
+    "lng": 100.3396108
+  },
+  {
+    "name": "槟城小云顶泰式餐厅",
+    "description": "",
+    "lat": 5.3092214,
+    "lng": 100.2210165
+  },
+  {
+    "name": "都巴丁宜沙滩",
+    "description": "这里有焰火表演",
+    "lat": 5.4706449,
+    "lng": 100.243124
+  },
+  {
+    "name": "升旗山云端走道",
+    "description": "",
+    "lat": 5.4235809,
+    "lng": 100.2696725
+  },
+  {
+    "name": "QuayWest",
+    "description": "",
+    "lat": 5.3433279,
+    "lng": 100.3110401
+  },
+  {
+    "name": "皇后湾广场",
+    "description": "",
+    "lat": 5.333134,
+    "lng": 100.3069786
+  },
+  {
+    "name": "槟城机场麦当劳",
+    "description": "",
+    "lat": 5.2936373,
+    "lng": 100.2661687
+  },
+  {
+    "name": "星耀樟宜",
+    "description": "",
+    "lat": 1.3602094,
+    "lng": 103.9897598
+  },
+  {
+    "name": "新加坡环球影城旋转地球地标",
+    "description": "",
+    "lat": 1.2566325,
+    "lng": 103.821243
+  },
+  {
+    "name": "变形金刚3D终极对决",
+    "description": "",
+    "lat": 1.2542193,
+    "lng": 103.8212299
+  },
+  {
+    "name": "太空堡垒 双轨过山车",
+    "description": "",
+    "lat": 1.2533948,
+    "lng": 103.8217418
+  },
+  {
+    "name": "怡丰城",
+    "description": "",
+    "lat": 1.2647139,
+    "lng": 103.8231658
+  },
+  {
+    "name": "Travelodge Harbourfront",
+    "description": "",
+    "lat": 1.2661751,
+    "lng": 103.823774
+  },
+  {
+    "name": "鱼尾狮公园",
+    "description": "",
+    "lat": 1.2867892,
+    "lng": 103.8545014
+  },
+  {
+    "name": "新加坡国家美术馆",
+    "description": "",
+    "lat": 1.2902217,
+    "lng": 103.8515167
+  },
+  {
+    "name": "滨海湾金沙酒店",
+    "description": "",
+    "lat": 1.2837575,
+    "lng": 103.8591065
+  },
+  {
+    "name": "Immersion of Mahatma Gandhi's ashes",
+    "description": "",
+    "lat": 1.2837517,
+    "lng": 103.8538845
+  },
+  {
+    "name": "圣安德烈教堂",
+    "description": "",
+    "lat": 1.2923914,
+    "lng": 103.8522543
+  },
+  {
+    "name": "贊義礼堂",
+    "description": "",
+    "lat": 1.2952004,
+    "lng": 103.8518801
+  },
+  {
+    "name": "旧禧街警察局",
+    "description": "",
+    "lat": 1.2908679,
+    "lng": 103.8483008
+  },
+  {
+    "name": "土生文化馆",
+    "description": "",
+    "lat": 1.2943669,
+    "lng": 103.8490391
+  },
+  {
+    "name": "Hotel Grand Pacific",
+    "description": "",
+    "lat": 1.2974,
+    "lng": 103.8528
+  },
+  {
+    "name": "圣约瑟夫教堂",
+    "description": "",
+    "lat": 1.2984116,
+    "lng": 103.8530476
+  },
+  {
+    "name": "松發肉骨茶",
+    "description": "",
+    "lat": 1.2890099,
+    "lng": 103.8476983
+  },
+  {
+    "name": "福康宁公园",
+    "description": "",
+    "lat": 1.2943876,
+    "lng": 103.8458033
+  },
+  {
+    "name": "Maxwell Food Centre",
+    "description": "",
+    "lat": 1.2803361,
+    "lng": 103.844767
+  },
+  {
+    "name": "南浔古镇百间楼",
+    "description": "",
+    "lat": 30.8843062,
+    "lng": 120.4253705
+  },
+  {
+    "name": "甲子镇",
+    "description": "",
+    "lat": 22.8795411,
+    "lng": 116.077665
+  },
+  {
+    "name": "汕头小公园",
+    "description": "",
+    "lat": 23.3578885,
+    "lng": 116.6694339
+  },
+  {
+    "name": "汕头码头",
+    "description": "",
+    "lat": 23.3535503,
+    "lng": 116.6810215
+  },
+  {
+    "name": "汕头-石炮台公园",
+    "description": "",
+    "lat": 23.3549926,
+    "lng": 116.6946562
+  },
+  {
+    "name": "汕头观音庙",
+    "description": "",
+    "lat": 23.3578899,
+    "lng": 116.6717836
+  },
+  {
+    "name": "汕头消防史馆",
+    "description": "",
+    "lat": 23.3579108,
+    "lng": 116.6722007
+  }
+]
