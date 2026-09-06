@@ -70,7 +70,7 @@
     </style>
 </head>
 
-<body class="bg-[#F9F9F9] text-gray-900 antialiased min-h-screen flex flex-col">
+<body class="bg-[#F7F4ED] text-gray-900 antialiased min-h-screen flex flex-col">
 
   <%- include('/partials/site_nav') %>
 
@@ -94,14 +94,14 @@
           <div id="globe" class="w-full h-full"></div>
 
           <!-- 加载态 -->
-          <div id="loading" class="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 bg-[#F9F9F9]">
+          <div id="loading" class="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 bg-[#F7F4ED]">
             <span class="block w-1.5 h-1.5 rounded-full bg-[#DB4436] animate-pulse"></span>
             <p class="text-xs text-gray-400 tracking-[0.3em]">正在展开地球</p>
           </div>
 
           <!-- 失败态 -->
           <div id="globe-error"
-            class="hidden absolute inset-0 z-30 flex flex-col items-center justify-center gap-5 bg-[#F9F9F9]">
+            class="hidden absolute inset-0 z-30 flex flex-col items-center justify-center gap-5 bg-[#F7F4ED]">
             <p class="text-sm text-gray-600 tracking-widest">足迹数据加载失败，请稍后重试</p>
             <button id="globe-retry"
               class="px-6 py-2 rounded-full border border-[#DB4436]/60 text-[#DB4436] text-sm tracking-widest hover:bg-[#DB4436] hover:text-white transition-colors duration-300">重新加载</button>
@@ -182,14 +182,14 @@
               .height(stage.clientHeight)
               .backgroundColor('rgba(0,0,0,0)')
               .showAtmosphere(false)
-              // 矢量国界：白色陆地 + 细灰描边（剔除南极洲，保持极简）
+              // 矢量国界：亚麻灰陆地 + 暖灰褐描边（剔除南极洲，保持极简）
               .polygonsData(countries.features.filter(function (f) {
                 return f.properties.ISO_A2 !== 'AQ';
               }))
               .polygonAltitude(0.012)
-              .polygonCapColor(function () { return 'rgba(0,0,0,0)'; })
-              .polygonSideColor(function () { return 'rgba(0,0,0,0)'; })
-              .polygonStrokeColor(function () { return '#f1f1f1'; })
+              .polygonCapColor(function () { return '#E4DECF'; })
+              .polygonSideColor(function () { return '#D5CCB8'; })
+              .polygonStrokeColor(function () { return '#B8AF9B'; })
               .polygonLabel(function (d) { return escapeHtml(d.properties.ADMIN); })
               // 足迹图钉（HTML 覆盖层，globe.gl 自动处理球背遮挡）
               .htmlElementsData(markers)
@@ -221,15 +221,25 @@
                 loadingEl.style.display = 'none';
               });
 
-            // 纯白哑光球体
+            // 暖米白哑光球体
             var mat = globe.globeMaterial();
-            mat.color.set('#FFFFFF');
+            mat.color.set('#F2EEE6');
             mat.shininess = 0;
 
-            // 国家悬停高亮（淡灰晕染）
+            // 光照调暖：默认环境光是冷灰色，会把暗部压灰；改为暖白并弱化方向光
+            globe.lights().forEach(function (light) {
+              if (light.type === 'AmbientLight') {
+                light.color.set('#FFF9F0');
+              } else if (light.type === 'DirectionalLight') {
+                light.color.set('#FFF3E2');
+                light.intensity = Math.PI * 0.35;
+              }
+            });
+
+            // 国家悬停高亮（暖灰晕染，未悬停保持基础陆色）
             globe.onPolygonHover(function (polygon) {
               globe.polygonCapColor(function (d) {
-                return d === polygon ? 'rgba(51,51,51,0.08)' : 'rgba(0,0,0,0)';
+                return d === polygon ? 'rgba(184,175,155,0.55)' : '#E4DECF';
               });
             });
 
