@@ -5,12 +5,21 @@ const {
   WEB_DIR,
   TEMP_DIR,
   DATA_JSON_NAME,
+  PROJECT_ROOT,
 } = require("./constants");
+const config = require("./config");
 const { logger } = require("./utils");
 
 class ResourceManager {
   copyResources(options = {}) {
     const { silent = false } = options;
+    // 源字体仅作为 fontmin 子集化的输入，子集产物由 FontManager 直接写入 web/，
+    // 因此拷贝 assets 时必须排除源字体（33MB+），否则会被原样发布到产物中
+    const excludedFiles = new Set();
+    if (config.website.font && config.website.font.source) {
+      excludedFiles.add(path.resolve(PROJECT_ROOT, config.website.font.source));
+    }
+
     // 1. Copy items from SRC_DIR_LIST Recursively
     const copyRecursive = (src, dest) => {
       if (!fs.existsSync(src)) return;
@@ -25,6 +34,10 @@ class ResourceManager {
           copyRecursive(srcPath, destPath);
         }
       } else {
+        if (excludedFiles.has(path.resolve(src))) {
+          logger.info(`Skipped excluded file: ${path.basename(src)}`);
+          return;
+        }
         const parentDir = path.dirname(dest);
         if (!fs.existsSync(parentDir))
           fs.mkdirSync(parentDir, { recursive: true });
