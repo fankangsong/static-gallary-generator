@@ -177,7 +177,10 @@
 
             document.getElementById('marker-count').textContent = markers.length;
 
-            var globe = new Globe(globeEl)
+            // rendererConfig：保留抗锯齿，同时提示浏览器优先使用高性能 GPU
+            var globe = new Globe(globeEl, {
+              rendererConfig: { antialias: true, powerPreference: 'high-performance' }
+            })
               .width(stage.clientWidth)
               .height(stage.clientHeight)
               .backgroundColor('rgba(0,0,0,0)')
@@ -220,6 +223,10 @@
               .onGlobeReady(function () {
                 loadingEl.style.display = 'none';
               });
+
+            // 渲染分辨率上限：高 DPI 屏最多按 1.5 倍渲染，降低 GPU 像素负载
+            // （globe.width/height 内部 setSize 不会重置 pixelRatio，设置一次即可）
+            globe.renderer().setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
 
             // 暖米白哑光球体
             var mat = globe.globeMaterial();
