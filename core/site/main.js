@@ -9,6 +9,7 @@ const { buildBlog } = require("./lib/blog-builder");
 const pageGenerator = require("./lib/page-generator");
 const sitemapGenerator = require("./lib/sitemap-generator");
 const travelDataBuilder = require("./lib/travel-data-builder");
+const styleManager = require("../common/lib/style-manager");
 
 async function run(args) {
   logger.log(`🚀 Starting site (blog) build...`);
@@ -39,6 +40,9 @@ async function run(args) {
 
   // Generate Sitemap
   sitemapGenerator.generate(albums, posts);
+
+  // 生成静态 Tailwind CSS（H2）：放在页面生成之后，以便扫描 web/**/*.html 捕获全部类名
+  await styleManager.build();
 
   logger.success("Site build complete!");
 }

@@ -5,6 +5,7 @@ const galleryMain = require("./gallery/main");
 const siteMain = require("./site/main");
 const picturesMain = require("./pictures/main");
 const travelMain = require("./travel/main");
+const styleManager = require("./common/lib/style-manager");
 
 async function clearBuild() {
   logger.log("🧹 Clearing generated files...");
@@ -41,12 +42,15 @@ async function main() {
     case "update:travel":
       await travelMain.run(args);
       break;
+    case "build:css":
+      await styleManager.build();
+      break;
     case "clear":
       await clearBuild();
       break;
     default:
       logger.error(
-        "Unknown command. Available: index:gallary, build:gallary, build:site, build:pictures, update:travel, clear",
+        "Unknown command. Available: index:gallary, build:gallary, build:site, build:pictures, update:travel, build:css, clear",
       );
       process.exit(1);
   }

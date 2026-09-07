@@ -1,0 +1,4 @@
+/* Tailwind 输入样式（H2）：由 core/common/lib/style-manager.js 在构建期编译为 web/assets/css/tailwind.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

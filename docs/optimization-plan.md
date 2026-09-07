@@ -25,6 +25,7 @@
 - **现状**：`templates/assets/js/vendor/tailwindcss.js` 实测 499KB，是 Tailwind 的浏览器内编译器。所有相册页、站点页都在加载它，运行时才生成样式
 - **危害**：首屏 FOUC、500KB 无效 JS、无法被浏览器缓存优化，Tailwind 官方明确禁止生产环境使用 Play CDN
 - **建议**：改用 Tailwind CLI / 构建期扫描模板生成静态 CSS（站点模板中已有大量 prose-\* 类，可配合 `@tailwindcss/typography`）
+- **状态**：✅ 已完成（2026-09-07），详见「五、分期实施路线 → 第三期」的 H2 实际完成范围
 
 ### H3. data.json 历史加载逻辑被注释 → 手工元数据丢失 + EXIF 重复全量扫描
 
@@ -226,11 +227,29 @@ let existingData = [];
 
 ### 第三期：前端体验
 
-| 项      | 内容                                                      | 涉及文件                          |
-| ------- | --------------------------------------------------------- | --------------------------------- |
-| H2      | 替换 Tailwind Play CDN 为构建期 CSS                       | 2 个 head.ejs + 新增构建步骤      |
-| H8      | 封面改用缩略图 + lazy + CLS 防护；highlight.js 按语言裁剪 | `data-manager.js`、多个模板       |
-| H1 补充 | 字体子集输出转 woff2                                      | `core/common/lib/font-manager.js` |
+| 项      | 内容                                                      | 涉及文件                                                     | 状态                    |
+| ------- | --------------------------------------------------------- | ------------------------------------------------------------ | ----------------------- |
+| H2      | 替换 Tailwind Play CDN 为构建期 CSS                       | 2 个 head.ejs、`core/common/lib/style-manager.js`、`tailwind.config.js` | ✅ 已完成（2026-09-07） |
+| H8      | 封面改用缩略图 + lazy + CLS 防护；highlight.js 按语言裁剪 | `data-manager.js`、多个模板                                  |                         |
+| H1 补充 | 字体子集输出转 woff2                                      | `core/common/lib/font-manager.js`                            |                         |
+
+**H2 实际完成范围**：
+
+- 依赖：`tailwindcss@3.4.17`（与 Play CDN vendor 包内实测版本号一致，保证视觉零差异）、`@tailwindcss/typography`（`prose-*` 类必需）、`postcss`、`autoprefixer`，均为 devDependencies
+- 新增 `core/common/lib/style-manager.js`：以 PostCSS JS API 在构建进程内编译（不依赖 CLI 二进制路径，跨平台稳定），输出 `web/assets/css/tailwind.css`，实测 **75.8 KB / 约 1s**，相比 488KB 的 Play CDN 大幅缩减且可被浏览器长期缓存
+- 扫描范围（`tailwind.config.js` 的 content）：`templates/**/*.html`、`templates/**/*.ejs`、`templates/assets/js/*.js`、`core/**/*.js`、`web/**/*.html`；刻意排除 `templates/assets/js/vendor/**` 与 `assets/data/**`（globe.gl 1.88MB、highlight.js、原 Play CDN 等大文件）
+- 扫描 `web/**/*.html` 的原因：博客源文件在仓库外的 `../blog-post`，只有扫描已生成页面才能捕获 markdown 正文内联 HTML 用到的类名
+- 新增 `styles/tailwind.css` 作为输入样式。放在 `styles/` 而非 `templates/assets/css/`，是因为 `resource-manager.js` 会把 `templates/assets` 整棵拷进 `web/` 产物
+- 流水线接入：`core/gallery/main.js`、`core/site/main.js` 在页面生成完成后调用；新增 `build:css` 命令（`core/main.js` + `package.json` script）
+- 两个 `head.ejs` 第 9 行的 `<script>` 改为 `<link rel="stylesheet" href="/assets/css/tailwind.css">`，位置保持在 `common.css` 之后，与 Play CDN 注入样式的层叠顺序一致
+- 删除 `templates/assets/js/vendor/tailwindcss.js`（488KB）
+- 测试：`test-tailwind-css.js`（9 组用例：无 CDN 残留、vendor 已删、head 引入顺序、产物体积、preflight/prose/任意值类覆盖、产物页面无 CDN；带断言且失败退出码非 0）
+
+**已知限制**：
+
+- 每次构建全量重扫（约 1s），未做增量缓存——避免新文章的类名被漏扫
+- 产物未压缩（后续可加 `cssnano`，预计可再省 40%+）
+- 层叠顺序变化风险已评估为低：各模板内联 `<style>` 均为 `@font-face`、id 选择器或自定义类，不与 Tailwind 工具类同级竞争
 
 **预期收益**：首屏体验显著改善，FOUC 消除
 
@@ -257,3 +276,4 @@ let existingData = [];
 2. `pnpm preview` 本地检查输出
 3. 对比 `web/` 产物体积变化
 4. 相册/站点页面可见变更时截图记录
+5. 运行对应测试脚本（如 `node test-h3-incremental.js`、`node test-tailwind-css.js`）

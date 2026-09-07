@@ -13,6 +13,7 @@ const imageProcessor = require("./lib/image-processor");
 const htmlGenerator = require("./lib/html-generator");
 const fontManager = require("../common/lib/font-manager");
 const resourceManager = require("../common/lib/resource-manager");
+const styleManager = require("../common/lib/style-manager");
 
 async function run(args) {
   const command = args[0];
@@ -92,6 +93,9 @@ async function run(args) {
   }
 
   htmlGenerator.generateIndexHtml(albums);
+
+  // 生成静态 Tailwind CSS（H2）：放在页面生成之后，以便扫描 web/**/*.html 捕获全部类名
+  await styleManager.build();
 
   const navLinks = config.site.nav || [];
   const navText = navLinks.map((l) => l.text).join("");

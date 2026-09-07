@@ -8,6 +8,7 @@
     "index:gallary": "node core/main.js index:gallary",
     "build:gallary": "node core/main.js build:gallary",
     "build:site": "node core/main.js build:site",
+    "build:css": "node core/main.js build:css",
     "build:pictures": "node core/main.js build:pictures",
     "update:travel": "node core/main.js update:travel",
     "build": "pnpm index:gallary && pnpm build:gallary && pnpm build:site && pnpm build:pictures && pnpm update:travel && pnpm upload",
@@ -17,9 +18,13 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@tailwindcss/typography": "^0.5.20",
+    "autoprefixer": "^10.5.5",
     "download": "^8.0.0",
     "fontmin": "^1.1.1",
+    "postcss": "^8.5.6",
     "sharp": "^0.34.5",
+    "tailwindcss": "3.4.17",
     "vite": "^4.5.14"
   },
   "dependencies": {

@@ -12,6 +12,8 @@
 | `core/common/` | 共享工具函数、常量与类库 |
 | `templates/` | HTML 模板（EJS）及共享资源（CSS、JS、字体） |
 | `config.json` | 站点全局配置：标题、导航、页面定义、图片处理参数 |
+| `tailwind.config.js` | Tailwind 扫描范围与插件配置（`prose-*` 依赖 `@tailwindcss/typography`） |
+| `styles/tailwind.css` | Tailwind 输入样式；放此处以免被资源拷贝步骤发布到 `web/` |
 | `docs/` | 项目文档（`design-guide.md`） |
 | `data-source/` | 预留的源数据目录（当前为空） |
 | `web/` | **生成产物** — 静态站点文件（已被 git 忽略；请勿直接编辑） |
@@ -27,6 +29,7 @@
 | `pnpm index:gallary` | 仅生成相册索引页 |
 | `pnpm build:gallary` | 处理照片并生成相册 HTML 页面 |
 | `pnpm build:site` | 从 EJS 模板渲染站点页面（首页、博客、旅行、404） |
+| `pnpm build:css` | 仅构建静态 Tailwind CSS → `web/assets/css/tailwind.css`（相册与站点构建末尾也会自动执行） |
 | `pnpm clear` | 移除生成的 `web/` 和 `core/.temp/` 目录 |
 
 完整重建请运行 `pnpm build`。构建后使用 `pnpm preview` 在本地检查输出结果。
@@ -48,12 +51,16 @@
 
 - [`test-template-renderer.js`](test-template-renderer.js) — 测试 EJS 模板渲染流水线
 - [`test-comprehensive.js`](test-comprehensive.js) — 构建系统的综合性集成测试
+- [`test-h3-incremental.js`](test-h3-incremental.js) — 相册增量扫描与 EXIF 缓存测试
+- [`test-tailwind-css.js`](test-tailwind-css.js) — 静态 Tailwind CSS 构建测试（无 Play CDN 残留、类名覆盖、产物体积）
 
 直接运行：
 
 ```bash
 node test-template-renderer.js
 node test-comprehensive.js
+node test-h3-incremental.js
+node test-tailwind-css.js
 ```
 
 修改模板渲染或核心构建逻辑时，请以同级脚本的形式新增测试。
