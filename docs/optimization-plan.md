@@ -198,7 +198,7 @@ let existingData = [];
 | 项  | 内容                                     | 涉及文件                                                          | 状态                    |
 | --- | ---------------------------------------- | ----------------------------------------------------------------- | ----------------------- |
 | H1  | 排除源字体拷贝                           | `core/common/lib/resource-manager.js`                             | ✅ 已完成（2026-09-07） |
-| H7  | preload 类型修正（或配合 woff2）         | 8 个模板文件                                                      |
+| H7  | preload 类型修正（或配合 woff2）         | 8 个模板文件                                                      | ✅ 已完成（2026-09-07） |
 | H5  | 删除 build 中的 upload 步骤 + 修复退出码 | `package.json`、`core/main.js`                                    |
 | M7  | 404 文案 bug、footer 非法属性            | `templates/site/404.html`、`templates/common/partials/footer.ejs` |
 
