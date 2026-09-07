@@ -22,5 +22,6 @@ module.exports = {
   SITE_TEMPLATES_DIR: path.join(PROJECT_ROOT, "templates/site"),
   ASSETS_DIR: path.join(PROJECT_ROOT, "templates/assets"),
   DATA_JSON_NAME: "data.json",
+  EXIF_CACHE_NAME: "exif-cache.json",
   NAV_JSON_NAME: "nav.json",
 };

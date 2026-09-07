@@ -19,13 +19,15 @@ async function run(args) {
   const isInitMode = command === "index:gallary";
 
   if (isInitMode) {
+    const force = args.includes("--force");
+    if (force) logger.log(`Force mode: ignoring existing data.json and EXIF cache.`);
     logger.log(`🚀 Starting gallery initialization...`);
     if (!fs.existsSync(IMAGES_DIR))
       fs.mkdirSync(IMAGES_DIR, { recursive: true });
     if (!fs.existsSync(CONFIG_DIR))
       fs.mkdirSync(CONFIG_DIR, { recursive: true });
 
-    await dataManager.scanAlbums();
+    await dataManager.scanAlbums(force);
     dataManager.saveGlobalData();
     logger.success("Init complete. data.json generated with file index.");
     return;

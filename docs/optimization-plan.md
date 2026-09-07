@@ -206,11 +206,21 @@ let existingData = [];
 
 ### 第二期：构建性能（并行化 & 缓存）
 
-| 项  | 内容                                                     | 涉及文件                                 |
-| --- | -------------------------------------------------------- | ---------------------------------------- |
-| H4  | 图片并行化（p-limit）+ 合并 metadata 读取 + 缓存加 mtime | `core/gallery/lib/image-processor.js` 等 |
-| H3  | data.json 增量恢复 + EXIF 按 mtime 缓存                  | `core/gallery/lib/data-manager.js`       |
-| H6  | 博客字体子集合并为共享一份                               | `core/site/lib/blog-manager.js`          |
+| 项  | 内容                                                     | 涉及文件                                                                                   | 状态                    |
+| --- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------ | ----------------------- |
+| H4  | 图片并行化（p-limit）+ 合并 metadata 读取 + 缓存加 mtime | `core/gallery/lib/image-processor.js` 等                                                   | 部分完成（mtime 已加）  |
+| H3  | data.json 增量恢复 + EXIF 按 mtime 缓存                  | `core/gallery/lib/data-manager.js`                                                         | ✅ 已完成（2026-09-07） |
+| H6  | 博客字体子集合并为共享一份                               | `core/site/lib/blog-manager.js`                                                            |                         |
+
+**H3 实际完成范围**（超出原计划的部分已与用户确认）：
+
+- 恢复 `scanAlbums()` 对 `core/.temp/data.json` 的增量加载（`data-manager.js:110-118`）
+- EXIF 按 mtime 缓存：`core/.temp/exif-cache.json`，key 为相对路径 + mtime 失效（`image-processor.js:11-71`），扫描结束时一次写盘并按 `_seenKeys` 剪枝已删除照片
+- **新增** meta.json 元数据源：源目录 `photography/<相册>/meta.json` 作为手工元数据来源，优先级 **meta.json > 已有 data.json > 自动推导**（白名单字段：id/title/author/description/template/date/cover；description 数组原样保留，详情页模板已支持逐行渲染）
+- **新增** `--force` 参数：`node core/main.js index:gallary --force` 忽略 data.json 与 EXIF 缓存全量重建
+- 测试：`test-h3-incremental.js`（7 组用例，meta 合并/缓存命中/mtime 失效/增量保留/force/JSON 损坏容错/相册删除清理）
+
+**已知限制**：相册索引页 `templates/gallary/index_template.html` 用 `<%= album.description %>` 直接渲染，meta.json 的多行数组 description 会被 toString 为逗号连接（详情页模板不受影响）。当前 meta.json 均为单元素数组，实际无影响。
 
 **预期收益**：构建速度大幅提升，手工元数据不再丢失
 

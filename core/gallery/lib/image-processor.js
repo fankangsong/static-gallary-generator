@@ -3,11 +3,73 @@ const path = require("path");
 const sharp = require("sharp");
 const ExifReader = require("exifreader");
 const config = require("../../common/lib/config");
+const { TEMP_DIR, EXIF_CACHE_NAME } = require("../../common/lib/constants");
 const { logger } = require("../../common/lib/utils");
 
+const EXIF_CACHE_PATH = path.join(TEMP_DIR, EXIF_CACHE_NAME);
+
 class ImageProcessor {
-  // New method for Init Phase: Extract EXIF only
+  constructor() {
+    this._exifCache = { version: 1, entries: {} };
+    this._seenKeys = new Set();
+  }
+
+  // Load EXIF cache from disk into memory (once per scan).
+  // force=true 或缓存损坏时以空缓存起步（降级为全量读取）。
+  loadExifCache(force = false) {
+    this._exifCache = { version: 1, entries: {} };
+    this._seenKeys = new Set();
+    if (force || !fs.existsSync(EXIF_CACHE_PATH)) return;
+    try {
+      const parsed = JSON.parse(fs.readFileSync(EXIF_CACHE_PATH, "utf-8"));
+      if (parsed && parsed.version === 1 && typeof parsed.entries === "object") {
+        this._exifCache = parsed;
+      } else {
+        logger.warn("exif-cache.json has unexpected format, starting fresh.");
+      }
+    } catch (e) {
+      logger.warn("Failed to parse exif-cache.json, starting fresh:", e.message);
+    }
+  }
+
+  // Flush cache back to disk once per scan, pruning entries not seen this run.
+  flushExifCache() {
+    const pruned = { version: 1, entries: {} };
+    for (const key of this._seenKeys) {
+      if (this._exifCache.entries[key]) {
+        pruned.entries[key] = this._exifCache.entries[key];
+      }
+    }
+    try {
+      if (!fs.existsSync(TEMP_DIR)) fs.mkdirSync(TEMP_DIR, { recursive: true });
+      fs.writeFileSync(EXIF_CACHE_PATH, JSON.stringify(pruned));
+      logger.success(
+        `Saved EXIF cache (${Object.keys(pruned.entries).length} entries)`
+      );
+    } catch (e) {
+      logger.warn("Failed to write exif-cache.json:", e.message);
+    }
+  }
+
+  // New method for Init Phase: Extract EXIF only (with mtime-based cache)
   async getExif(filePath) {
+    const key = path
+      .relative(config.gallery.absolutePhotosDir, filePath)
+      .split(path.sep)
+      .join("/");
+    let mtime = null;
+    try {
+      mtime = fs.statSync(filePath).mtimeMs;
+    } catch (e) {
+      // 读不到 stat（如文件扫描间隙被删）则跳过缓存直接全量读
+    }
+
+    const cached = mtime !== null ? this._exifCache.entries[key] : null;
+    if (cached && cached.mtime === mtime) {
+      this._seenKeys.add(key);
+      return cached.exif;
+    }
+
     let exifData = {};
     try {
       const tags = await ExifReader.load(filePath);
@@ -38,6 +100,10 @@ class ImageProcessor {
         `    ⚠️ Failed to read EXIF for ${path.basename(filePath)}:`,
         e.message
       );
+    }
+    if (mtime !== null) {
+      this._exifCache.entries[key] = { mtime, exif: exifData };
+      this._seenKeys.add(key);
     }
     return exifData;
   }

@@ -12,6 +12,17 @@ let CONTENT_DEFAULT = ``;
 
 const DATA_JSON_PATH = path.join(TEMP_DIR, DATA_JSON_NAME);
 
+// meta.json 中允许覆盖相册条目的字段白名单
+const META_FIELDS = [
+  "id",
+  "title",
+  "author",
+  "description",
+  "template",
+  "date",
+  "cover",
+];
+
 class DataManager {
   constructor() {
     this.albums = [];
@@ -59,24 +70,55 @@ class DataManager {
     return { html: contentHtml, markdown };
   }
 
+  // 读取相册源目录中的手工元数据 meta.json（优先级最高）。
+  // 不存在/损坏/非对象时返回 null，回落到已有 data.json 或自动推导。
+  readAlbumMeta(albumPath) {
+    const metaPath = path.join(albumPath, "meta.json");
+    if (!fs.existsSync(metaPath)) return null;
+    try {
+      const raw = JSON.parse(fs.readFileSync(metaPath, "utf-8"));
+      if (typeof raw !== "object" || raw === null || Array.isArray(raw)) {
+        logger.warn(`Invalid meta.json (not an object), ignored: ${metaPath}`);
+        return null;
+      }
+      const meta = {};
+      for (const key of META_FIELDS) {
+        const value = raw[key];
+        // 跳过空值；空数组视为未提供；description 数组原样保留（模板已支持逐行渲染）
+        if (value === undefined || value === null || value === "") continue;
+        if (Array.isArray(value) && value.length === 0) continue;
+        meta[key] = value;
+      }
+      return Object.keys(meta).length > 0 ? meta : null;
+    } catch (e) {
+      logger.warn(`Failed to parse meta.json, ignored: ${metaPath}`, e.message);
+      return null;
+    }
+  }
+
   // Init Phase: Scan directory, update data.json (Source of Truth)
-  async scanAlbums() {
+  async scanAlbums(force = false) {
     const photosDir = config.gallery.absolutePhotosDir;
     if (!fs.existsSync(photosDir)) {
       logger.error("Photos directory not found:", photosDir);
       return [];
     }
 
+    // 0. Load EXIF cache (force 时重置为全量重读)
+    imageProcessor.loadExifCache(force);
+
     // 1. Load existing data (Persistent)
     let existingData = [];
-    // Force refresh: Do not load existing data
-    // if (fs.existsSync(DATA_JSON_PATH)) {
-    //   try {
-    //     existingData = JSON.parse(fs.readFileSync(DATA_JSON_PATH, "utf-8"));
-    //   } catch (e) {
-    //     logger.warn("Failed to parse existing data.json, starting fresh.", e);
-    //   }
-    // }
+    if (!force && fs.existsSync(DATA_JSON_PATH)) {
+      try {
+        existingData = JSON.parse(fs.readFileSync(DATA_JSON_PATH, "utf-8"));
+      } catch (e) {
+        logger.warn(
+          "Failed to parse existing data.json, starting fresh:",
+          e.message
+        );
+      }
+    }
 
     const albumDirs = fs.readdirSync(photosDir);
     const newAlbumsData = [];
@@ -114,6 +156,13 @@ class DataManager {
         };
       } else {
         logger.info(`Updating album: ${albumDirName}`);
+      }
+
+      // Apply meta.json (overrides existing data.json; auto-derivation below only fills gaps)
+      const meta = this.readAlbumMeta(albumPath);
+      if (meta) {
+        Object.assign(albumEntry, meta);
+        logger.info(`Applied meta.json for: ${albumDirName}`);
       }
 
       // Always rescan files and update index
@@ -189,11 +238,8 @@ class DataManager {
           }
 
           // Deduce Description
-          // Only update description if it is default or empty
-          if (
-            !albumEntry.description ||
-            albumEntry.description === config.defaultDescription
-          ) {
+          // Only update description if it is empty (config has no defaultDescription field)
+          if (!albumEntry.description) {
             let desc = "";
             let dateStr = "";
             let deviceStr = "";
@@ -268,6 +314,7 @@ class DataManager {
     }
 
     this.albums = newAlbumsData;
+    imageProcessor.flushExifCache();
     return newAlbumsData;
   }
 
