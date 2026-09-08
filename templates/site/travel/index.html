@@ -3,15 +3,8 @@
 
 <head>
   <%- include('/partials/head') %>
-    <link rel="preload" href="/assets/fonts/travel/<%= WEBSITE_FONT.name %>.ttf" as="font" type="font/ttf"
-      crossorigin>
+  <%- include('/partials/font', { fontDir: 'travel' }) %>
     <style>
-      @font-face {
-        font-family: '<%= WEBSITE_FONT.name %>';
-        src: url('/assets/fonts/travel/<%= WEBSITE_FONT.name %>.ttf') format('truetype');
-        font-display: block;
-      }
-
       /* 地球舞台入场动画 */
       #globe-stage {
         animation: stage-in .9s cubic-bezier(.22, .61, .36, 1) both;

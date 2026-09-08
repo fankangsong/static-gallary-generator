@@ -3,15 +3,9 @@
 
 <head>
     <%- include('/partials/head') %>
-        <link rel="preload" href="/assets/fonts/gallary/<%= WEBSITE_FONT.name %>.ttf" as="font" type="font/ttf"
-            crossorigin>
+    <%- include('/partials/photoswipe') %>
+    <%- include('/partials/font', { fontDir: 'gallary' }) %>
         <style>
-            @font-face {
-                font-family: '<%= WEBSITE_FONT.name %>';
-                src: url('/assets/fonts/gallary/<%= WEBSITE_FONT.name %>.ttf') format('truetype');
-                font-display: block;
-            }
-
             .site-nav-bar a {
                 color: #2c2c2c;
             }

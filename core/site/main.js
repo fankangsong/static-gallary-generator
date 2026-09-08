@@ -8,7 +8,7 @@ const dataManager = require("../gallery/lib/data-manager");
 const { buildBlog } = require("./lib/blog-builder");
 const pageGenerator = require("./lib/page-generator");
 const sitemapGenerator = require("./lib/sitemap-generator");
-const travelDataBuilder = require("./lib/travel-data-builder");
+const { buildMarkers } = require("../travel/build-markers");
 const styleManager = require("../common/lib/style-manager");
 
 async function run(args) {
@@ -33,7 +33,8 @@ async function run(args) {
   const { posts } = await buildBlog(initialText, albums);
 
   // Generate travel markers data (for the 3D globe on travel page)
-  await travelDataBuilder.run();
+  // M1：复用 core/travel 的唯一实现（在线优先 → 快照回退 → 写 web/assets/travel/markers.json）
+  await buildMarkers();
 
   // Generate pages (index, travel, 404, etc.)
   await pageGenerator.generate();

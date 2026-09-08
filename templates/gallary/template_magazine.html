@@ -3,14 +3,9 @@
 
 <head>
   <%- include('/partials/head') %>
-    <link rel="preload" href="/assets/fonts/gallary/<%= WEBSITE_FONT.name %>.ttf" as="font" type="font/ttf"
-      crossorigin>
+  <%- include('/partials/photoswipe') %>
+  <%- include('/partials/font', { fontDir: 'gallary', fontDisplay: 'auto' }) %>
     <style>
-      @font-face {
-        font-family: '<%= WEBSITE_FONT.name %>';
-        src: url('/assets/fonts/gallary/<%= WEBSITE_FONT.name %>.ttf') format('truetype');
-      }
-
       /* Magazine Header Style */
       .magazine-header {
         position: relative;

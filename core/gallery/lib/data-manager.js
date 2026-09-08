@@ -2,10 +2,9 @@ const fs = require("fs");
 const path = require("path");
 const { marked } = require("marked");
 const sanitizeHtml = require("sanitize-html");
-const pinyin = require("pinyin").default;
 const config = require("../../common/lib/config");
 const { DATA_JSON_NAME, TEMP_DIR } = require("../../common/lib/constants");
-const { logger, getDescription } = require("../../common/lib/utils");
+const { logger, getDescription, slugifyName } = require("../../common/lib/utils");
 const imageProcessor = require("./image-processor");
 
 let CONTENT_DEFAULT = ``;
@@ -133,17 +132,11 @@ class DataManager {
       if (!albumEntry) {
         // Create new entry
         logger.info(`New album detected: ${albumDirName}`);
-        let generatedId = albumDirName;
-        if (/[\u4e00-\u9fa5]/.test(albumDirName)) {
-          generatedId = pinyin(albumDirName, {
-            style: pinyin.STYLE_NORMAL,
-            segment: true,
-          })
-            .flat()
-            .join("-")
-            .toLowerCase()
-            .replace(/-+/g, "-");
-        }
+        // 非中文目录名保持原样，中文转拼音——沿用既有 id 规则，避免已发布链接失效
+        const generatedId = slugifyName(albumDirName, {
+          normalize: false,
+          fallback: albumDirName,
+        });
 
         albumEntry = {
           id: generatedId,

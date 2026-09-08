@@ -7,14 +7,7 @@
 
     <!-- highlight.js theme -->
     <link rel="stylesheet" href="/assets/css/atom-one-dark.min.css">
-    <link rel="preload" href="./fonts/<%= WEBSITE_FONT.name %>.ttf" as="font" type="font/ttf" crossorigin>
-    <style>
-      @font-face {
-        font-family: "<%= WEBSITE_FONT.name %>";
-        src: url("./fonts/<%= WEBSITE_FONT.name %>.ttf") format("truetype");
-        font-display: block;
-      }
-    </style>
+    <%- include('/partials/font', { fontPath: './fonts' }) %>
 
 </head>
 

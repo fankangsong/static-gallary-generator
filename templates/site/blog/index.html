@@ -3,14 +3,7 @@
 
 <head>
   <%- include('/partials/head') %>
-    <link rel="preload" href="/assets/fonts/site/<%= WEBSITE_FONT.name %>.ttf" as="font" type="font/ttf" crossorigin>
-    <style>
-      @font-face {
-        font-family: '<%= WEBSITE_FONT.name %>';
-        src: url('/assets/fonts/site/<%= WEBSITE_FONT.name %>.ttf') format('truetype');
-        font-display: block;
-      }
-    </style>
+  <%- include('/partials/font', { fontDir: 'site' }) %>
 </head>
 
 <body class="bg-[#F9F9F9] text-gray-900 antialiased min-h-screen flex flex-col">

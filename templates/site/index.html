@@ -3,15 +3,8 @@
 
 <head>
     <%- include('/partials/head') %>
-        <link rel="preload" href="/assets/fonts/index/<%= WEBSITE_FONT.name %>.ttf" as="font" type="font/ttf"
-            crossorigin>
+    <%- include('/partials/font', { fontDir: 'index' }) %>
         <style>
-            @font-face {
-                font-family: 'KingHwaOldSong';
-                src: url('/assets/fonts/index/<%= WEBSITE_FONT.name %>.ttf') format('truetype');
-                font-display: block;
-            }
-
             body {
                 background-color: #fdfbf7;
                 color: #2c2c2c;

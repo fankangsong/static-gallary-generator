@@ -1,6 +1,7 @@
 # 项目优化分析报告
 
 > 生成日期：2026-09-07
+> 最后更新：2026-09-08（已同步至提交 `168eff4`）
 > 状态：待分期实施
 > 说明：本文档为静态站点生成器的全面优化分析，按影响程度分级，文末附分期实施路线。所有问题均附文件路径与行号。
 
@@ -10,12 +11,20 @@
 
 ### H1. 33MB 完整源字体被原样拷贝进 web/ 产物
 
-- **位置**：`core/common/lib/resource-manager.js:35`（`resources = [{ src: ASSETS_DIR, dest: web/assets }]` 无任何排除规则，`copyRecursive` 递归拷贝全部）
-- **现状**：`web/assets/fonts/京華老宋体v3.0.ttf` = 33,259,644 字节（33MB）被原样发布上线；`web/` 总体积 63MB 中该文件占一半
+- **状态**：✅ 已完成（2026-09-07，提交 `876e064`）
+- **位置**：修复后见 `core/common/lib/resource-manager.js:16-21`（构造排除集合）与 `:37-40`（拷贝前命中即跳过）；修复前为 `resource-manager.js:35` 的 `resources = [{ src: ASSETS_DIR, dest: web/assets }]`，`copyRecursive` 递归拷贝全部且无任何排除规则
+- **现状**（以下为**修复前的快照**，仅作问题留档）：`web/assets/fonts/京華老宋体v3.0.ttf` = 33,259,644 字节（33MB）被原样发布上线；`web/` 总体积 63MB 中该文件占一半
 - **问题**：该源字体只是 fontmin 子集化的**输入**，不应出现在产物中
 - **建议**：
-  - 拷贝时排除 `fonts/京華老宋体*.ttf`
-  - 顺带把子集输出转为 woff2（Fontmin 支持 ttf2woff2 插件），体积可再省约 50%
+  - 拷贝时排除 `fonts/京華老宋体*.ttf` —— ✅ 已实施
+  - 顺带把子集输出转为 woff2（Fontmin 支持 ttf2woff2 插件），体积可再省约 50% —— 未开始，转入第三期「H1 补充」
+
+**修复方式**（`876e064`，仅改 `core/common/lib/resource-manager.js` +13 行）：
+
+- `copyResources()` 内按 `config.website.font.source`（当前为 `templates/assets/fonts/京華老宋体v3.0.ttf`）构造 `excludedFiles` 集合，`path.resolve` 归一后比对，命中则跳过并输出 `Skipped excluded file: ...`
+- 排除路径取自 `config.json`，换源字体无需改代码
+- 子集产物仍由 `FontManager` 直接写入 `web/`（`core/common/lib/font-manager.js`），不受排除影响
+- 复核（2026-09-08）：`web/assets/fonts/` 下已无 33MB 源字体，仅剩各页面子集 —— `site` 0.50MB、`gallary` 0.20MB、`index` 0.06MB、`travel` 0.05MB、`error` 0.03MB
 
 ### H2. 生产页面使用 Tailwind Play CDN（运行时 JIT 编译）
 
@@ -73,7 +82,8 @@ let existingData = [];
 
 ### H7. 所有 preload 声明的类型与实际文件不符（preload 全部无效）
 
-- **位置**（7 处，`type="font/woff2"` 但实际输出是 `.ttf`）：
+- **状态**：✅ 已完成（2026-09-07，提交 `a6a0704`）：8 个模板的 `type="font/woff2"` 统一改为 `type="font/ttf"`，与子集产物实际格式一致（`core/common/lib/font-manager.js:16` 输出 `${name}.ttf`）；全仓库已无 `font/woff2` 残留
+- **位置**（以下为**修复前的快照**，仅作问题留档；8 处均为 `type="font/woff2"` 但实际输出是 `.ttf`）：
   - `templates/gallary/template.html:6`
   - `templates/gallary/template_magazine.html:6`
   - `templates/gallary/index_template.html:6`
@@ -84,6 +94,12 @@ let existingData = [];
   - `templates/site/travel/index.html:6`
 - **危害**：浏览器会因 MIME 不匹配拒绝使用 preload 资源并告警，`<link rel=preload>` 完全白做（还可能造成字体二次下载）
 - **建议**：统一改为 `type="font/ttf"`，或直接输出 woff2
+
+**遗留（H7 之外，与字体 preload 相关）**：
+
+- H1 补充（字体子集转 woff2）未开始；一旦转为 woff2，这 8 处 preload 类型需同步改回 `font/woff2`（见「五、分期实施路线 → 第三期」）
+- `templates/site/blog/post.html:10` 仍用相对路径 `./fonts/<%= WEBSITE_FONT.name %>.ttf`，其余 7 处均为 `/assets/fonts/...` 绝对路径；文章 URL 层级变化时有 404 风险，属一致性问题，不在 H7 范围内
+- M2 子项：`@font-face` + preload 片段在这 8 个模板中仍内联重复，未抽成 partial（`docs/optimization-plan.md:117`）
 
 ### H8. 前端大资源未优化
 
@@ -107,13 +123,26 @@ let existingData = [];
 - 抓取逻辑同样重复：`core/travel/main.js:12-42`（fetch + NetworkLink 跟进）与 `core/site/lib/travel-data-builder.js:86-189`（代理 CONNECT + 直连 fetch + 快照回退）
 - 两个命令（`update:travel` 与 `build:site` 内嵌调用）输出同名 `assets/travel/markers.json`，但一个 pretty-print（`travel/main.js:57`）、一个 compact（`travel-data-builder.js:236`）
 - **建议**：合并为 `core/travel` 单一实现，`build:site` 只复用其产物
+- **状态**：✅ 已完成（2026-09-08，工作区待提交）
+
+**修复方式**（合并后单一链路，详见 `core/travel/build-markers.js`）：
+
+- 解析统一到 `core/travel/lib/kml-parser.js`：保留宽松正则（支持带属性 `<Placemark id="...">` 与带属性标签）+ `stripHtml` + `&nbsp;`；字符引用由 `fromCharCode` 改为 `fromCodePoint`（修正 emoji 等增补平面字符被截断），无效码点回退空串
+- 抓取统一到新建 `core/travel/lib/kml-fetcher.js`：代理 CONNECT + 直连 fetch + 15s 超时 + `<kml` 内容校验 + NetworkLink 壳跟进（原 `travel/main.js:27-42` 能力保留）
+- 新建 `core/travel/build-markers.js`：`buildMarkers({ source, outputPath, snapshotPath })` = 在线优先 → 刷新快照 `data-source/travel.kml` → 失败回退快照 → 解析 → 写 `web/<outputPath>` **compact** 单文件
+- `core/travel/main.js`（`update:travel`）与 `core/site/main.js`（`build:site` 内嵌）均改为调用 `buildMarkers()`；删除 `core/site/lib/travel-data-builder.js`
+- **删除 `templates/assets/travel/markers.json`（13KB pretty 死产物）**：此前 `build:site` 先 `copyResources` 拷它进 `web/`、随后又被覆盖 → `update:travel` 结果无效。现在 `web/assets/travel/markers.json` 是唯一产物（9.2KB compact），双写覆盖 bug 根除
+- 行为变化：travel 弹窗 description 由「HTML 源码」变「纯文本」（`travel/index.html` 用 `textContent` 渲染，此前会露出 `<a>` 标签源码，属改进）
+- 测试：新增 `test-travel-markers.js`（离线，6 组断言：真实快照解析 / 合成 KML 行为 / 本地 KML 构建 / 快照回退 / 双失败返回 null / 文件布局），`node test-travel-markers.js` 通过
 
 ### M2. 其他重复代码
 
-- 拼音 slug 逻辑两份：`core/gallery/lib/data-manager.js:94-104` 与 `core/common/lib/utils.js:22-41`（`slugifyDirName`，pictures 已用后者，gallery 未复用）
-- 两个 image-processor：`core/gallery/lib/image-processor.js` 与 `core/pictures/lib/image-processor.js`（缩略图逻辑几乎一致，配置项命名却不同：`config.gallery.thumbnail` vs `config.pictures.thumbnail`）
-- 两个 head partial 近乎相同：`templates/gallary/partials/head.ejs` vs `templates/site/partials/head.ejs`
-- `@font-face` + preload 片段在 8 个模板里内联重复（见 H7 列表），应抽成一个 partial
+- **状态**：✅ 已完成（2026-09-08，工作区待提交），4 个子项分级处理：
+- 拼音 slug 两份 → `core/common/lib/utils.js` 新增 `slugifyName(name, { normalize, fallback })`，`slugifyDirName` 改为其包装；`data-manager.js` 改用 `slugifyName(..., { normalize: false, fallback: albumDirName })` **保持相册 id 逐字节不变**（验证：重构前后 `pnpm index:gallary` 的 `data.json` id 完全一致：`汕头=shan-tou`、`香港-深圳=xiang-gang-shen-zhen`）
+- 两个 image-processor → 仅抽公共缩略图函数 `core/common/lib/image-utils.js` 的 `generateThumbnail()`（含 `DEFAULT_THUMBNAIL` 兜底与参数归一化），gallery/pictures 两处调用；**不合并两个模块**（gallery 另含 large 图与 EXIF 缓存，职责不同）。验证：删除全部 35 张缩略图后重建，`35/35` 全部经 `generateThumbnail` 重新生成
+- 两个 head partial → 统一为 `templates/common/partials/head.ejs`（基础 head）+ `templates/common/partials/photoswipe.ejs`（相册专用 PhotoSwipe 资源），删除 gallary/site 两份旧 head；3 个相册模板在 head 后补 `include('/partials/photoswipe')`。注意 EJS root 顺序：`template-renderer.js` 的 `rootDirs` 含 `COMMON_TEMPLATES_DIR`，删除旧文件后 site/gallary 模板的 `include('/partials/head')` 均回落到 common 版，PhotoSwipe 只出现在相册页
+- 8 处 `@font-face` + preload 内联重复 → 统一为 `templates/common/partials/font.ejs`，参数 `fontDir`（`gallary`/`index`/`site`/`error`/`travel`）/ `fontPath`（post 页 `./fonts` 相对路径）/ `fontDisplay`（相册内页沿用 `swap`，magazine 沿用默认 `auto`，其余 `block`）；9 处替换完成（含 `seed.html` 的损坏表达式顺手修复，见 M7）；font-family 统一用 `<%= WEBSITE_FONT.name %>`（`site/index.html` 的硬编码 `'KingHwaOldSong'` 消除）
+- 顺带：`test-tailwind-css.js`、`test-comprehensive.js` 中对旧 head 路径的断言/引用已同步更新
 
 ### M3. 博客正文未做 sanitize（与相册不一致）
 
@@ -202,10 +231,10 @@ let existingData = [];
 
 | 项  | 内容                                     | 涉及文件                                                          | 状态                    |
 | --- | ---------------------------------------- | ----------------------------------------------------------------- | ----------------------- |
-| H1  | 排除源字体拷贝                           | `core/common/lib/resource-manager.js`                             | ✅ 已完成（2026-09-07） |
-| H7  | preload 类型修正（或配合 woff2）         | 8 个模板文件                                                      | ✅ 已完成（2026-09-07） |
-| H5  | 删除 build 中的 upload 步骤 + 修复退出码 | `package.json`、`core/main.js`                                    |
-| M7  | 404 文案 bug、footer 非法属性            | `templates/site/404.html`、`templates/common/partials/footer.ejs` |
+| H1  | 排除源字体拷贝                           | `core/common/lib/resource-manager.js`                             | ✅ 已完成（2026-09-07，`876e064`） |
+| H7  | preload 类型修正（或配合 woff2）         | 8 个模板文件                                                      | ✅ 已完成（2026-09-07，`a6a0704`） |
+| H5  | 删除 build 中的 upload 步骤 + 修复退出码 | `package.json`、`core/main.js`                                    | 未开始（已复核：`package.json:14` 仍含 `pnpm upload`；`core/main.js:59` 仍未设 `process.exitCode`） |
+| M7  | 404 文案 bug、footer 非法属性            | `templates/site/404.html`、`templates/common/partials/footer.ejs` | 未开始（已复核：`404.html:24` 仍为「页面不要再或已移除」；`footer.ejs:5` 仍有非法 `alt`） |
 
 **预期收益**：产物 -33MB，preload 生效，构建不再必然失败，CI 可感知错误
 
@@ -213,9 +242,9 @@ let existingData = [];
 
 | 项  | 内容                                                     | 涉及文件                                                                                   | 状态                    |
 | --- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------ | ----------------------- |
-| H4  | 图片并行化（p-limit）+ 合并 metadata 读取 + 缓存加 mtime | `core/gallery/lib/image-processor.js` 等                                                   | ✅ 已完成（2026-09-08） |
-| H3  | data.json 增量恢复 + EXIF 按 mtime 缓存                  | `core/gallery/lib/data-manager.js`                                                         | ✅ 已完成（2026-09-07） |
-| H6  | 博客字体子集合并为共享一份                               | `core/site/lib/blog-manager.js`                                                            |                         |
+| H4  | 图片并行化（p-limit）+ 合并 metadata 读取 + 缓存加 mtime | `core/gallery/lib/image-processor.js` 等                                                   | ✅ 已完成（2026-09-08，`168eff4`） |
+| H3  | data.json 增量恢复 + EXIF 按 mtime 缓存                  | `core/gallery/lib/data-manager.js`                                                         | ✅ 已完成（2026-09-07，`9c6681c`） |
+| H6  | 博客字体子集合并为共享一份                               | `core/site/lib/blog-manager.js`                                                            | 未开始（已复核：`blog-manager.js:93-109` 仍按文章生成独立子集） |
 
 **H3 实际完成范围**（超出原计划的部分已与用户确认）：
 
@@ -253,9 +282,11 @@ let existingData = [];
 
 | 项      | 内容                                                      | 涉及文件                                                     | 状态                    |
 | ------- | --------------------------------------------------------- | ------------------------------------------------------------ | ----------------------- |
-| H2      | 替换 Tailwind Play CDN 为构建期 CSS                       | 2 个 head.ejs、`core/common/lib/style-manager.js`、`tailwind.config.js` | ✅ 已完成（2026-09-07） |
-| H8      | 封面改用缩略图 + lazy + CLS 防护；highlight.js 按语言裁剪 | `data-manager.js`、多个模板                                  |                         |
-| H1 补充 | 字体子集输出转 woff2                                      | `core/common/lib/font-manager.js`                            |                         |
+| H2      | 替换 Tailwind Play CDN 为构建期 CSS                       | 2 个 head.ejs、`core/common/lib/style-manager.js`、`tailwind.config.js` | ✅ 已完成（2026-09-07，`83c78d8`） |
+| H8      | 封面改用缩略图 + lazy + CLS 防护；highlight.js 按语言裁剪 | `data-manager.js`、多个模板                                  | 未开始（已复核：`travel/index.html:170` 仍首屏 fetch geojson、`blog/index.html:58` 封面无 lazy、`post.html:63` 仍整包 highlight.js） |
+| H1 补充 | 字体子集输出转 woff2                                      | `core/common/lib/font-manager.js`                            | 未开始（H7 已按现状把 preload 类型改为 `font/ttf`，未转 woff2） |
+
+**关联提交说明**：`3a3d805`（2026-09-07，fix(travel): 优化 3D 地球渲染性能）做了**运行时渲染**优化——渲染分辨率上限（高 DPI 屏最多 1.5 倍）、开启抗锯齿、优先高性能 GPU。它**不覆盖** H8 的资源体积 / 按需加载 / 懒加载项，因此 H8 仍记为未开始。
 
 **H2 实际完成范围**：
 
@@ -279,16 +310,45 @@ let existingData = [];
 
 ### 第四期：工程健康（重构 & 安全 & 测试）
 
-| 项  | 内容                                              | 涉及文件                                               |
-| --- | ------------------------------------------------- | ------------------------------------------------------ |
-| M1  | 合并两套 KML 解析与抓取实现                       | `core/travel/`、`core/site/lib/travel-data-builder.js` |
-| M2  | 合并两个 image-processor、拼音 slug、head partial | gallery/pictures/common                                |
-| M3  | 博客正文统一 sanitizeHtml                         | `core/site/lib/blog-manager.js`                        |
-| M5  | 停止暴露 data.json；清理死代码（M6）              | `resource-manager.js`、`blog-builder.js` 等            |
-| L1  | 测试改造：带断言 + 隔离输出目录；为核心模块补测试 | 根目录测试脚本                                         |
-| L2  | package.json 清理                                 | `package.json`                                         |
+| 项  | 内容                                              | 涉及文件                                               | 状态 |
+| --- | ------------------------------------------------- | ------------------------------------------------------ | --- |
+| M1  | 合并两套 KML 解析与抓取实现                       | `core/travel/`、`core/site/lib/travel-data-builder.js` | ✅ 已完成（2026-09-08，工作区待提交），详见「二」M1 修复方式 |
+| M2  | 合并两个 image-processor、拼音 slug、head partial | gallery/pictures/common                                | ✅ 已完成（2026-09-08，工作区待提交）：slug 抽 `slugifyName`、缩略图抽 `generateThumbnail`（不合并模块）、head/font 抽 common partial，详见「二」M2 |
+| M3  | 博客正文统一 sanitizeHtml                         | `core/site/lib/blog-manager.js`                        | 未开始 |
+| M5  | 停止暴露 data.json；清理死代码（M6）              | `resource-manager.js`、`blog-builder.js` 等            | 未开始 |
+| L1  | 测试改造：带断言 + 隔离输出目录；为核心模块补测试 | 根目录测试脚本                                         | 部分推进：新增 `test-travel-markers.js`（带断言、离线、失败非 0 退出码） |
+| L2  | package.json 清理                                 | `package.json`                                         | 未开始 |
 
 **预期收益**：可维护性与安全性提升
+
+> 第四期剩余未开始：M3 博客正文仍直出 `marked.parse()`（`blog-manager.js:60`）、M5 仍把 `.temp/data.json` 拷进 `web/config/`。M1/M2 已完成，遗留项见「未完成条目及复核结论」。
+
+---
+
+## 附：条目 ↔ 提交索引
+
+| 条目 | 提交 | 日期 | 内容 |
+| --- | --- | --- | --- |
+| H1 | `876e064` | 2026-09-07 | 排除 33MB 源字体进入产物 |
+| H7 | `a6a0704` | 2026-09-07 | 8 个模板的 preload 类型改为 `font/ttf` |
+| H3 | `9c6681c` | 2026-09-07 | EXIF mtime 缓存 + meta.json 元数据 + `--force` |
+| H2 | `83c78d8` | 2026-09-07 | Play CDN → 构建期 Tailwind CSS（488KB JS → 75.8KB CSS） |
+| H4 | `168eff4` | 2026-09-08 | 图片处理并发化 + 冗余 Sharp 调用合并 + mtime 脏缓存修复 |
+| M1 / M2 | 待提交 | 2026-09-08 | KML 合并为 `core/travel/build-markers.js` 单一实现（双写覆盖 bug 根除）+ `slugifyName`/`generateThumbnail` 公共化 + head/font 抽 common partial；新增 `test-travel-markers.js` |
+| （非条目） | `3a3d805` | 2026-09-07 | 3D 地球运行时渲染优化（pixelRatio 上限 1.5 / 抗锯齿 / 高性能 GPU） |
+
+未完成条目及复核结论（2026-09-08）：
+
+| 条目 | 复核结论 |
+| --- | --- |
+| H5 | `package.json:14` 仍含 `pnpm upload`；`core/main.js:59` 捕获异常后未设 `process.exitCode` |
+| H6 | `core/site/lib/blog-manager.js:93-109` 仍按文章生成各自字体子集 |
+| H8 | `travel/index.html:170` 仍首屏 fetch geojson；`blog/index.html:58` 封面无 `loading="lazy"`；`post.html:63` 仍整包加载 highlight.js |
+| H1 补充 | 字体子集仍输出 `.ttf`，未转 woff2 |
+| （H7 衍生） | ✅ 已随 M2-d 解决：8 处字体片段统一为 `templates/common/partials/font.ejs`，`post.html` 经 `fontPath: './fonts'` 参数显式声明相对路径 |
+| M7 | `404.html:24` 文案仍为「页面不要再或已移除」；`footer.ejs:5` 的 `<a>` 上仍有非法 `alt`，且为 `http://` 硬编码。~~`seed.html:10` 损坏表达式~~、~~`site/index.html:10` 硬编码 font-family~~ 两子项已随 M2-d 解决 |
+| M1 / M2 | ✅ 已完成（2026-09-08，工作区待提交），详见「二」对应条目 |
+| M3 / M5 / L2 | 均未开始（详见第四期） |
 
 ---
 

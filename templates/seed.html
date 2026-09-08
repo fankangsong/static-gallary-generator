@@ -3,12 +3,7 @@
 
 <head>
   <%- include('/partials/head') %>
-    <style>
-      @font-face {
-        font-family: '<%= WEBSITE_FONT.name %>';
-        src: url('<%= "/assets/fonts/ + WEBSITE_FONT.name + ".ttf" %>') format('truetype');
-      }
-    </style>
+  <%- include('/partials/font', { fontDir: 'index' }) %>
 </head>
 
 <body class="bg-[#F9F9F9] text-gray-900 antialiased min-h-screen flex flex-col">

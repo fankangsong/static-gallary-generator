@@ -47,9 +47,9 @@ check("vendor/tailwindcss.js 已删除", () => {
   assert.ok(!fs.existsSync(vendor), `文件仍存在：${vendor}`);
 });
 
-// 2. 两个 head.ejs 引入静态 CSS
-check("两个 head.ejs 引入 /assets/css/tailwind.css 且位于 common.css 之后", () => {
-  for (const rel of ["templates/gallary/partials/head.ejs", "templates/site/partials/head.ejs"]) {
+// 2. 统一后的 head.ejs 引入静态 CSS（M2-c：两份旧 head 已合并为 common/partials/head.ejs）
+check("common head.ejs 引入 /assets/css/tailwind.css 且位于 common.css 之后", () => {
+  for (const rel of ["templates/common/partials/head.ejs"]) {
     const file = path.join(constants.PROJECT_ROOT, rel);
     const content = fs.readFileSync(file, "utf-8");
     assert.ok(

@@ -6,8 +6,11 @@ async function comprehensiveTest() {
   console.log("=== Comprehensive Template Renderer Tests ===\n");
 
   console.log("Test 1: Render EJS partial file");
-  const ejsResult = templateRenderer.render("gallary/partials/head.ejs", {
+  // M2-c：head partial 已统一到 templates/common/partials/head.ejs
+  const ejsResult = templateRenderer.render("common/partials/head.ejs", {
     WEBSITE_FONT: { name: "test-font" },
+    TITLE: "Test",
+    DESCRIPTION: "Test",
   }, {
     save: false,
   });

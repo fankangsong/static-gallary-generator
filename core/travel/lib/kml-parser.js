@@ -4,9 +4,17 @@
  */
 
 function decodeEntities(str) {
+  // fromCodePoint 可正确处理增补平面字符（>0xFFFF，如 emoji）；无效码点回退空串
+  const fromCodePoint = (num) => {
+    try {
+      return String.fromCodePoint(num);
+    } catch (e) {
+      return "";
+    }
+  };
   return String(str)
-    .replace(/&#x([0-9a-fA-F]+);/g, (_, code) => String.fromCharCode(parseInt(code, 16)))
-    .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(Number(code)))
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, code) => fromCodePoint(parseInt(code, 16)))
+    .replace(/&#(\d+);/g, (_, code) => fromCodePoint(parseInt(code, 10)))
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
     .replace(/&quot;/g, '"')

@@ -3,14 +3,7 @@
 
 <head>
   <%- include('/partials/head') %>
-    <link rel="preload" href="/assets/fonts/error/<%= WEBSITE_FONT.name %>.ttf" as="font" type="font/ttf" crossorigin>
-    <style>
-      @font-face {
-        font-family: '<%= WEBSITE_FONT.name %>';
-        src: url('/assets/fonts/error/<%= WEBSITE_FONT.name %>.ttf') format('truetype');
-        font-display: block;
-      }
-    </style>
+  <%- include('/partials/font', { fontDir: 'error' }) %>
 </head>
 
 <body class="bg-white text-gray-900 flex flex-col min-h-screen">

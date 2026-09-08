@@ -1,0 +1,23 @@
+<% /*
+  站点字体子集声明（@font-face + preload），供全站模板复用。
+
+  参数（通过 include 传入，均为可选）：
+    fontDir     字体子集所在目录名（相对 /assets/fonts/），默认 "site"
+    fontPath    完整路径前缀，优先于 fontDir；博客文章页用 "./fonts" 这类相对路径
+    fontDisplay font-display 取值，默认 "block"（相册内页传 "swap" 以沿用原策略）
+*/ %>
+<%
+  const fontName = (locals.WEBSITE_FONT && locals.WEBSITE_FONT.name) || "KingHwaOldSong";
+  const fontDir = locals.fontDir || "site";
+  const fontPath = locals.fontPath || null;
+  const fontDisplay = locals.fontDisplay || "block";
+  const fontHref = (fontPath || "/assets/fonts/" + fontDir) + "/" + fontName + ".ttf";
+%>
+<link rel="preload" href="<%= fontHref %>" as="font" type="font/ttf" crossorigin>
+<style>
+  @font-face {
+    font-family: '<%= fontName %>';
+    src: url('<%= fontHref %>') format('truetype');
+    font-display: <%= fontDisplay %>;
+  }
+</style>

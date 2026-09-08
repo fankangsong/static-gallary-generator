@@ -3,17 +3,9 @@
 
 <head>
   <%- include('/partials/head') %>
-    <link rel="preload" href="/assets/fonts/gallary/<%= WEBSITE_FONT.name %>.ttf" as="font" type="font/ttf"
-      crossorigin>
+  <%- include('/partials/photoswipe') %>
+  <%- include('/partials/font', { fontDir: 'gallary', fontDisplay: 'swap' }) %>
     <style>
-      @font-face {
-        font-family: '<%= WEBSITE_FONT.name %>';
-        src: url('/assets/fonts/gallary/<%= WEBSITE_FONT.name %>.ttf') format('truetype');
-        font-weight: normal;
-        font-style: normal;
-        font-display: swap;
-      }
-
       #mobile-menu-btn svg {
         stroke: #1a1a1a;
       }

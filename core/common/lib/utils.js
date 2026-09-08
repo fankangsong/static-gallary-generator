@@ -17,28 +17,53 @@ function normalizePath(p) {
 }
 
 /**
- * 目录名 → URL 安全的 ASCII slug（与 gallery data-manager 的 pinyin 惯例一致）。
- * 中文转小写拼音连字符；非单词字符转连字符；空结果回退为 "book"。
+ * 名称 → 拼音 slug 的公共实现（gallery 相册与 pictures 绘本共用）。
+ *
+ * 中文一律转小写拼音连字符；`normalize` 决定是否进一步把结果收敛为 URL 安全的
+ * ASCII。gallery 必须保持非中文目录名的原始写法（相册 id 一旦变化，已发布链接
+ * 就会失效），因此传 `normalize: false`。
+ *
+ * @param {string} name 原始名称
+ * @param {{normalize?: boolean, fallback?: string}} [options]
+ * @returns {string}
  */
-function slugifyDirName(dirName) {
-  let slug = String(dirName);
+function slugifyName(name, options = {}) {
+  const { normalize = true, fallback = "book" } = options;
+  let slug = String(name);
+  let converted = false;
+
   if (/[\u4e00-\u9fa5]/.test(slug)) {
     try {
       slug = pinyin(slug, { style: pinyin.STYLE_NORMAL, segment: true })
         .flat()
         .join("-")
         .toLowerCase();
+      converted = true;
     } catch (e) {
-      logger.warn(`Failed to pinyin for "${dirName}", keep original.`, e.message);
+      logger.warn(`Failed to pinyin for "${name}", keep original.`, e.message);
     }
   }
-  slug = slug
-    .trim()
-    .replace(/[^\w-]+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "")
-    .toLowerCase();
-  return slug || "book";
+
+  if (normalize) {
+    slug = slug
+      .trim()
+      .replace(/[^\w-]+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "")
+      .toLowerCase();
+  } else if (converted) {
+    // 仅合并拼音产生的重复连字符，其余字符保持原样
+    slug = slug.replace(/-+/g, "-");
+  }
+
+  return slug || fallback;
+}
+
+/**
+ * 目录名 → URL 安全的 ASCII slug（绘本使用；空结果回退为 "book"）。
+ */
+function slugifyDirName(dirName) {
+  return slugifyName(dirName, { normalize: true, fallback: "book" });
 }
 
 /**
@@ -87,6 +112,7 @@ module.exports = {
   logger,
   normalizePath,
   getDescription,
+  slugifyName,
   slugifyDirName,
   needsRegeneration,
 };

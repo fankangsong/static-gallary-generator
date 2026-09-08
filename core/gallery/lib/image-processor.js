@@ -6,6 +6,7 @@ const config = require("../../common/lib/config");
 const { TEMP_DIR, EXIF_CACHE_NAME } = require("../../common/lib/constants");
 const { logger, needsRegeneration } = require("../../common/lib/utils");
 const { mapWithConcurrency } = require("../../common/lib/concurrency");
+const { generateThumbnail } = require("../../common/lib/image-utils");
 
 const EXIF_CACHE_PATH = path.join(TEMP_DIR, EXIF_CACHE_NAME);
 
@@ -156,13 +157,11 @@ class ImageProcessor {
       // 1. Generate Thumbnail
       // 旧实现仅判断 existsSync，源图更新后不会重生成（脏缓存），改为比较 mtime
       if (needsRegeneration(filePath, thumbPath)) {
-        await sharp(filePath)
-          .rotate()
-          .resize(config.gallery.thumbnail.width, config.gallery.thumbnail.height, {
-            fit: config.gallery.thumbnail.fit,
-          })
-          .toFormat("jpeg", { quality: config.gallery.thumbnail.quality })
-          .toFile(thumbPath);
+        await generateThumbnail({
+          srcPath: filePath,
+          destPath: thumbPath,
+          options: config.gallery.thumbnail,
+        });
         logger.log(`    🖼️`, ` Generated thumbnail: ${thumbFilename}`);
       }
 

@@ -1,9 +1,9 @@
 const fs = require("fs");
 const path = require("path");
-const sharp = require("sharp");
 const config = require("../../common/lib/config");
 const { logger, needsRegeneration } = require("../../common/lib/utils");
 const { mapWithConcurrency } = require("../../common/lib/concurrency");
+const { generateThumbnail } = require("../../common/lib/image-utils");
 
 const DEFAULT_THUMBNAIL = {
   width: 800,
@@ -52,11 +52,11 @@ async function processBookImages(book, bookImagesOutDir) {
       try {
         // 旧实现仅判断 existsSync，源图更新后不会重生成（脏缓存），改为比较 mtime
         if (needsRegeneration(file.sourcePath, thumbPath)) {
-          await sharp(file.sourcePath)
-            .rotate()
-            .resize(opts.width, opts.height, { fit: opts.fit })
-            .toFormat("jpeg", { quality: opts.quality })
-            .toFile(thumbPath);
+          await generateThumbnail({
+            srcPath: file.sourcePath,
+            destPath: thumbPath,
+            options: opts,
+          });
           logger.log(
             `    🖼️`,
             ` Generated thumbnail: ${book.id}/${thumbFilename}`,
