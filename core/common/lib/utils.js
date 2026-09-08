@@ -1,3 +1,4 @@
+const fs = require("fs");
 const path = require("path");
 const pinyin = require("pinyin").default;
 
@@ -40,6 +41,36 @@ function slugifyDirName(dirName) {
   return slug || "book";
 }
 
+/**
+ * 判断产物是否需要重新生成（H4：修复只看 existsSync 造成的脏缓存）
+ *
+ * 判定规则（任一命中即重新生成）：
+ * - 产物不存在
+ * - 任一 stat 失败（保守起见重新生成）
+ * - 源图 mtime 新于产物 mtime
+ *
+ * 已知限制：修改 config 的 quality / 尺寸不会触发重生成，需手工清理产物。
+ *
+ * @param {string} srcPath 源文件
+ * @param {string} destPath 产物文件
+ * @returns {boolean}
+ */
+function needsRegeneration(srcPath, destPath) {
+  let srcStat;
+  let destStat;
+  try {
+    srcStat = fs.statSync(srcPath);
+  } catch (e) {
+    return true;
+  }
+  try {
+    destStat = fs.statSync(destPath);
+  } catch (e) {
+    return true;
+  }
+  return srcStat.mtimeMs > destStat.mtimeMs;
+}
+
 function getDescription(deviceStr, dateStr) {
   let desc = "";
   if (deviceStr && dateStr) {
@@ -57,4 +88,5 @@ module.exports = {
   normalizePath,
   getDescription,
   slugifyDirName,
+  needsRegeneration,
 };

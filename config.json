@@ -32,7 +32,8 @@
       "maxSize": 3000,
       "quality": 60,
       "fit": "inside"
-    }
+    },
+    "concurrency": 4
   },
   "pictures": {
     "sourceDir": "../daughter-pictures",
@@ -42,7 +43,8 @@
       "height": 800,
       "quality": 80,
       "fit": "inside"
-    }
+    },
+    "concurrency": 4
   },
   "site": {
     "nav": [

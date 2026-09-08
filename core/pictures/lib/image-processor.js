@@ -2,7 +2,8 @@ const fs = require("fs");
 const path = require("path");
 const sharp = require("sharp");
 const config = require("../../common/lib/config");
-const { logger } = require("../../common/lib/utils");
+const { logger, needsRegeneration } = require("../../common/lib/utils");
+const { mapWithConcurrency } = require("../../common/lib/concurrency");
 
 const DEFAULT_THUMBNAIL = {
   width: 800,
@@ -11,8 +12,18 @@ const DEFAULT_THUMBNAIL = {
   fit: "inside",
 };
 
+// 图片处理并发度（H4）。config 无 schema 校验（L4），必须兜底。
+const DEFAULT_CONCURRENCY = 4;
+
 function thumbnailOptions() {
   return config.pictures.thumbnail || DEFAULT_THUMBNAIL;
+}
+
+function picturesConcurrency() {
+  const value = config.pictures && config.pictures.concurrency;
+  return Number.isFinite(value) && value >= 1
+    ? Math.floor(value)
+    : DEFAULT_CONCURRENCY;
 }
 
 /**
@@ -29,30 +40,40 @@ async function processBookImages(book, bookImagesOutDir) {
     fs.mkdirSync(bookImagesOutDir, { recursive: true });
   }
 
-  const results = [];
-  for (const file of book.files) {
-    const base = path.parse(file.filename).name;
-    const thumbFilename = `thumb_${base}.jpg`;
-    const thumbPath = path.join(bookImagesOutDir, thumbFilename);
+  // 并发执行（H4），按输入顺序回填结果；单图失败仍仅告警跳过
+  const slots = await mapWithConcurrency(
+    book.files || [],
+    picturesConcurrency(),
+    async (file) => {
+      const base = path.parse(file.filename).name;
+      const thumbFilename = `thumb_${base}.jpg`;
+      const thumbPath = path.join(bookImagesOutDir, thumbFilename);
 
-    try {
-      if (!fs.existsSync(thumbPath)) {
-        await sharp(file.sourcePath)
-          .rotate()
-          .resize(opts.width, opts.height, { fit: opts.fit })
-          .toFormat("jpeg", { quality: opts.quality })
-          .toFile(thumbPath);
-        logger.log(`    🖼️`, ` Generated thumbnail: ${book.id}/${thumbFilename}`);
+      try {
+        // 旧实现仅判断 existsSync，源图更新后不会重生成（脏缓存），改为比较 mtime
+        if (needsRegeneration(file.sourcePath, thumbPath)) {
+          await sharp(file.sourcePath)
+            .rotate()
+            .resize(opts.width, opts.height, { fit: opts.fit })
+            .toFormat("jpeg", { quality: opts.quality })
+            .toFile(thumbPath);
+          logger.log(
+            `    🖼️`,
+            ` Generated thumbnail: ${book.id}/${thumbFilename}`,
+          );
+        }
+        return { filename: file.filename, thumbFilename };
+      } catch (e) {
+        logger.warn(
+          `Failed to process ${file.sourcePath}, skipped:`,
+          e.message,
+        );
+        return null;
       }
-      results.push({ filename: file.filename, thumbFilename });
-    } catch (e) {
-      logger.warn(
-        `Failed to process ${file.sourcePath}, skipped:`,
-        e.message
-      );
-    }
-  }
-  return results;
+    },
+  );
+
+  return slots.filter(Boolean);
 }
 
 module.exports = { processBookImages };

@@ -29,7 +29,10 @@
 
 ### H3. data.json 历史加载逻辑被注释 → 手工元数据丢失 + EXIF 重复全量扫描
 
+- **状态**：✅ 已完成（2026-09-07，提交 `9c6681c`），详见「五、分期实施路线 → 第二期」的 H3 实际完成范围
 - **位置**：`core/gallery/lib/data-manager.js:71-79`
+
+> ⚠️ 以下「现状」与行号为**修复前的快照**，仅作问题留档；当前代码已不存在该段注释逻辑。
 
 ```js
 let existingData = [];
@@ -43,7 +46,8 @@ let existingData = [];
 
 ### H4. Sharp 图片处理完全串行 + 冗余调用
 
-- **位置**：
+- **状态**：✅ 已完成（2026-09-08），详见「五、分期实施路线 → 第二期」的 H4 实际完成范围
+- **位置**（以下行号为**修复前的快照**，仅作问题留档）：
   - `core/gallery/lib/image-processor.js:141-152`（`for...of` + `await processFile`，逐张处理）
   - `core/gallery/main.js:57`（相册与相册之间也是串行）
   - `core/pictures/lib/image-processor.js:33-54`（绘本缩略图同样串行）
@@ -209,7 +213,7 @@ let existingData = [];
 
 | 项  | 内容                                                     | 涉及文件                                                                                   | 状态                    |
 | --- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------ | ----------------------- |
-| H4  | 图片并行化（p-limit）+ 合并 metadata 读取 + 缓存加 mtime | `core/gallery/lib/image-processor.js` 等                                                   | 部分完成（mtime 已加）  |
+| H4  | 图片并行化（p-limit）+ 合并 metadata 读取 + 缓存加 mtime | `core/gallery/lib/image-processor.js` 等                                                   | ✅ 已完成（2026-09-08） |
 | H3  | data.json 增量恢复 + EXIF 按 mtime 缓存                  | `core/gallery/lib/data-manager.js`                                                         | ✅ 已完成（2026-09-07） |
 | H6  | 博客字体子集合并为共享一份                               | `core/site/lib/blog-manager.js`                                                            |                         |
 
@@ -222,6 +226,26 @@ let existingData = [];
 - 测试：`test-h3-incremental.js`（7 组用例，meta 合并/缓存命中/mtime 失效/增量保留/force/JSON 损坏容错/相册删除清理）
 
 **已知限制**：相册索引页 `templates/gallary/index_template.html` 用 `<%= album.description %>` 直接渲染，meta.json 的多行数组 description 会被 toString 为逗号连接（详情页模板不受影响）。当前 meta.json 均为单元素数组，实际无影响。
+
+**H4 实际完成范围**（与用户确认：仅文件级并发、零依赖实现、mtime 比较修脏缓存）：
+
+- 新增 `core/common/lib/concurrency.js`：`mapWithConcurrency(items, limit, worker)`，**不引入 p-limit**（其较新版本为 ESM-only，且够用的能力不值得加依赖）；结果数组顺序与入参一致，`limit` 非法（<1/非数字）回落为串行
+- 新增 `core/common/lib/utils.js → needsRegeneration(src, dest)`：产物缺失 / 任一 stat 失败 / 源图 mtime 新于产物 → 重新生成。gallery 与 pictures 共用
+- `core/gallery/lib/image-processor.js`：
+  - 摊平 (group, file) 为任务列表并发执行，结果按 `groupIdx/fileIdx` 回填，**分组结构与组内顺序与串行时完全一致**；并发前预创建全部输出目录以避免 mkdir 竞态
+  - 缩略图与 large 图的 `!fs.existsSync(...)` 改为 `needsRegeneration(...)`，源图更新后会自动重生成（脏缓存修复）
+  - **合并 metadata 读取**：重新生成时改用 `toFile()` 返回值里的 `width/height`，删除原先无条件执行的第 4 次 `sharp(largePath).metadata()`；仅命中缓存时才读一次产物尺寸
+- `core/pictures/lib/image-processor.js`：同样并发化 + `needsRegeneration`，保留「单图失败仅告警跳过」与返回顺序
+- `config.json` 新增 `gallery.concurrency: 4`、`pictures.concurrency: 4`（缺省回落 4；配置无 schema 校验，代码内已兜底）
+- 测试：`test-h4-image-concurrency.js`（12 组用例，含并发顺序/limit 上限/非法 limit 回落/mtime 三种情形/真实 Sharp 集成/缓存命中不重建/源图更新后重建/绘本并发；产物写系统临时目录，不污染 `web/`）
+
+**H4 实测数据**：8 张 2000×1500 图片，`concurrency=1` 930 ms → `concurrency=4` 385 ms，**加速 2.42x**（libvips 自身已多线程，文件级并发 4 为推荐上限）。
+
+**已知限制**：
+
+- 相册之间的循环（`core/gallery/main.js:60`）**刻意保持串行**：同时解码数固定为并发度，内存可控；相册级并行可作为后续扩展点
+- mtime 方案无法感知 config 变更：改 `thumbnail/large` 的 quality 或尺寸不会触发重生成，需手工清理 `web/` 产物
+- 图片小于 `maxSize` 仍强制重编码 JPEG q60、PNG 转 JPEG 未 `flatten`，属 **L5** 范围，本次未处理
 
 **预期收益**：构建速度大幅提升，手工元数据不再丢失
 

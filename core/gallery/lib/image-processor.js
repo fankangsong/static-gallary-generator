@@ -4,9 +4,21 @@ const sharp = require("sharp");
 const ExifReader = require("exifreader");
 const config = require("../../common/lib/config");
 const { TEMP_DIR, EXIF_CACHE_NAME } = require("../../common/lib/constants");
-const { logger } = require("../../common/lib/utils");
+const { logger, needsRegeneration } = require("../../common/lib/utils");
+const { mapWithConcurrency } = require("../../common/lib/concurrency");
 
 const EXIF_CACHE_PATH = path.join(TEMP_DIR, EXIF_CACHE_NAME);
+
+// 图片处理并发度（H4）。config 无 schema 校验（L4），必须兜底；
+// 非法值交给 mapWithConcurrency 回落为串行。
+const DEFAULT_CONCURRENCY = 4;
+
+function galleryConcurrency() {
+  const value = config.gallery && config.gallery.concurrency;
+  return Number.isFinite(value) && value >= 1
+    ? Math.floor(value)
+    : DEFAULT_CONCURRENCY;
+}
 
 class ImageProcessor {
   constructor() {
@@ -142,7 +154,8 @@ class ImageProcessor {
         : webRelativeBase;
 
       // 1. Generate Thumbnail
-      if (!fs.existsSync(thumbPath)) {
+      // 旧实现仅判断 existsSync，源图更新后不会重生成（脏缓存），改为比较 mtime
+      if (needsRegeneration(filePath, thumbPath)) {
         await sharp(filePath)
           .rotate()
           .resize(config.gallery.thumbnail.width, config.gallery.thumbnail.height, {
@@ -155,15 +168,16 @@ class ImageProcessor {
 
       // 2. Generate Large Image
       let width, height;
-      if (!fs.existsSync(largePath)) {
+      if (needsRegeneration(filePath, largePath)) {
         const image = sharp(filePath).rotate();
         const metadata = await image.metadata();
+        let info;
 
         if (
           metadata.width > config.gallery.large.maxSize ||
           metadata.height > config.gallery.large.maxSize
         ) {
-          await image
+          info = await image
             .resize(config.gallery.large.maxSize, config.gallery.large.maxSize, {
               fit: config.gallery.large.fit,
               withoutEnlargement: true,
@@ -172,21 +186,25 @@ class ImageProcessor {
             .toFile(largePath);
           logger.log(`    🖼️`, ` Generated large image: ${largeFilename}`);
         } else {
-          await image
+          info = await image
             .toFormat("jpeg", { quality: config.gallery.large.quality })
             .toFile(largePath);
           logger.log(`    🖼️`, ` Processed large image: ${largeFilename}`);
         }
-      }
 
-      // Read dimensions (Build phase enriches dimensions)
-      try {
-        const largeImageMeta = await sharp(largePath).metadata();
-        width = largeImageMeta.width;
-        height = largeImageMeta.height;
-      } catch (e) {
-        logger.error(`    ❌ Failed to read metadata for ${largePath}`, e);
-        return null;
+        // toFile() 的返回值已含输出尺寸，无需再对输出文件做一次 metadata 读取
+        width = info.width;
+        height = info.height;
+      } else {
+        // 命中缓存：尺寸只能从产物读取，这是唯一无法避免的一次读取
+        try {
+          const largeImageMeta = await sharp(largePath).metadata();
+          width = largeImageMeta.width;
+          height = largeImageMeta.height;
+        } catch (e) {
+          logger.error(`    ❌ Failed to read metadata for ${largePath}`, e);
+          return null;
+        }
       }
 
       return {
@@ -201,23 +219,40 @@ class ImageProcessor {
       };
     };
 
-    const newGroups = [];
+    const groups = album.groups || [];
 
-    // Iterate over groups from Index
-    for (const group of album.groups) {
-      const processedImages = [];
-      for (const fileEntry of group.files) {
-        // fileEntry is { filename: '...', exif: {...} }
-        const result = await processFile(fileEntry, group.name);
-        if (result) processedImages.push(result);
-      }
-      newGroups.push({
-        name: group.name,
-        images: processedImages,
+    // 摊平 (group, file) 为任务列表（H4：并发执行，取代原来的双层串行循环）
+    const tasks = [];
+    groups.forEach((group, groupIdx) => {
+      (group.files || []).forEach((fileEntry, fileIdx) => {
+        tasks.push({ groupIdx, fileIdx, groupName: group.name, fileEntry });
       });
+    });
+
+    // 并发前预创建全部输出目录，避免并发 mkdir 竞态
+    const outDirs = new Set([albumImagesOutDir]);
+    for (const task of tasks) {
+      if (task.groupName) outDirs.add(path.join(albumImagesOutDir, task.groupName));
+    }
+    for (const dir of outDirs) {
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
     }
 
-    return newGroups;
+    // 结果按 groupIdx / fileIdx 回填，保证分组结构与组内顺序与串行时完全一致
+    const slots = groups.map((group) => new Array((group.files || []).length));
+
+    await mapWithConcurrency(tasks, galleryConcurrency(), async (task) => {
+      // fileEntry is { filename: '...', exif: {...} }
+      slots[task.groupIdx][task.fileIdx] = await processFile(
+        task.fileEntry,
+        task.groupName,
+      );
+    });
+
+    return groups.map((group, i) => ({
+      name: group.name,
+      images: slots[i].filter(Boolean),
+    }));
   }
 }
 

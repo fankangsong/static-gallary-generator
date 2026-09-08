@@ -53,6 +53,7 @@
 - [`test-comprehensive.js`](test-comprehensive.js) — 构建系统的综合性集成测试
 - [`test-h3-incremental.js`](test-h3-incremental.js) — 相册增量扫描与 EXIF 缓存测试
 - [`test-tailwind-css.js`](test-tailwind-css.js) — 静态 Tailwind CSS 构建测试（无 Play CDN 残留、类名覆盖、产物体积）
+- [`test-h4-image-concurrency.js`](test-h4-image-concurrency.js) — 图片处理并发与增量缓存测试（顺序一致性、并发上限、mtime 脏缓存修复）
 
 直接运行：
 
@@ -61,6 +62,7 @@ node test-template-renderer.js
 node test-comprehensive.js
 node test-h3-incremental.js
 node test-tailwind-css.js
+node test-h4-image-concurrency.js
 ```
 
 修改模板渲染或核心构建逻辑时，请以同级脚本的形式新增测试。
