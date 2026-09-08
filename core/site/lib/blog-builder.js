@@ -1,36 +1,23 @@
-const fs = require("fs");
-const path = require("path");
-const config = require("../../common/lib/config");
 const blogManager = require("./blog-manager");
 const htmlGenerator = require("./html-generator");
-const { CONFIG_DIR } = require("../../common/lib/constants");
 const { logger } = require("../../common/lib/utils");
 
-async function buildBlog(allText, albums) {
+/**
+ * 构建博客：处理文章 + 生成文章页与博客索引页。
+ * M6-d：移除无人消费的 allText 拼接与死 navItems（原 nav.json 写入已被注释）。
+ */
+async function buildBlog() {
   logger.log("Processing Blog...");
 
   const posts = await blogManager.process();
 
   for (const post of posts) {
     htmlGenerator.generatePostHtml(post);
-    allText += post.title + post.summary;
   }
 
   htmlGenerator.generateBlogIndexHtml(posts);
 
-  const navItems = albums.map((a) => ({ title: a.title, link: a.link }));
-  navItems.push({
-    title: config.site.blog?.title,
-    link: "blog/index.html",
-  });
-
-  // const navJsonPath = path.join(CONFIG_DIR, "nav.json");
-  // fs.writeFileSync(navJsonPath, JSON.stringify(navItems, null, 2));
-  // logger.success(`Generated nav.json with ${navItems.length} items`);
-
-  albums.forEach((a) => (allText += a.title));
-
-  return { allText, posts };
+  return { posts };
 }
 
 module.exports = {

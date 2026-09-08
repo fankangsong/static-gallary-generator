@@ -34,8 +34,14 @@ async function initGallery(configPath) {
     initNavbarEffect();
   } catch (error) {
     console.error("Error loading gallery:", error);
-    document.body.innerHTML =
-      '<div class="text-center py-20">Error loading gallery data.</div>';
+    // 非破坏性降级：构建期已静态渲染的画廊仍可浏览，仅在顶部提示数据加载失败
+    const banner = document.createElement("div");
+    banner.setAttribute("role", "alert");
+    // 内联样式：此文件被 Tailwind 扫描，新增 class 字符串会改变产物 CSS
+    banner.style.cssText =
+      "position:fixed;top:0;left:0;right:0;z-index:9999;padding:10px 16px;text-align:center;background:#7f1d1d;color:#fff;font-size:13px;";
+    banner.textContent = "部分画廊数据加载失败，请刷新重试。";
+    document.body.insertAdjacentElement("afterbegin", banner);
   }
 }
 
@@ -50,19 +56,20 @@ async function renderNavigation(configPath) {
     // Clear existing
     mobileNavLinksContainer.innerHTML = "";
 
-    // Get current filename to set active state
-    const currentPath = window.location.pathname;
-    const currentFile =
-      currentPath.substring(currentPath.lastIndexOf("/") + 1) || "nature.html";
+    // Get current album id from URL to set active state.
+    // pathname 形如 /photography/<album-id>/...；相册索引页（/photography/）无 id，不高亮任何项
+    const pathSegments = window.location.pathname.split("/").filter(Boolean);
+    const photographyIdx = pathSegments.indexOf("photography");
+    const currentAlbumId =
+      photographyIdx !== -1 && pathSegments[photographyIdx + 1]
+        ? pathSegments[photographyIdx + 1]
+        : null;
 
     navItems.forEach((item) => {
-      let isActive = false;
-      if (item.link === currentFile) isActive = true;
-      if (
-        item.link === "nature.html" &&
-        (currentFile === "" || currentFile === "index.html")
-      )
-        isActive = true;
+      // nav.json 的 link 形如 ../<album-id>/，提取目标相册 id 与当前 id 比较
+      const itemAlbumId = item.link.split("/").filter(Boolean).pop() || null;
+      const isActive =
+        currentAlbumId !== null && itemAlbumId === currentAlbumId;
 
       const link = document.createElement("a");
       link.href = item.link;

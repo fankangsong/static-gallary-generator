@@ -2,7 +2,6 @@ const fs = require("fs");
 const path = require("path");
 const config = require("../common/lib/config");
 const {
-  IMAGES_DIR,
   WEB_DIR,
   CONFIG_DIR,
   PHOTO_WEB_DIR,
@@ -23,8 +22,6 @@ async function run(args) {
     const force = args.includes("--force");
     if (force) logger.log(`Force mode: ignoring existing data.json and EXIF cache.`);
     logger.log(`🚀 Starting gallery initialization...`);
-    if (!fs.existsSync(IMAGES_DIR))
-      fs.mkdirSync(IMAGES_DIR, { recursive: true });
     if (!fs.existsSync(CONFIG_DIR))
       fs.mkdirSync(CONFIG_DIR, { recursive: true });
 
@@ -36,7 +33,6 @@ async function run(args) {
 
   logger.log(`🚀 Starting gallery build...`);
   // Ensure output directories
-  if (!fs.existsSync(IMAGES_DIR)) fs.mkdirSync(IMAGES_DIR, { recursive: true });
   if (!fs.existsSync(CONFIG_DIR)) fs.mkdirSync(CONFIG_DIR, { recursive: true });
   if (!fs.existsSync(WEB_DIR)) fs.mkdirSync(WEB_DIR, { recursive: true });
 

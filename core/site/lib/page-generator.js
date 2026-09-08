@@ -49,32 +49,10 @@ class PageGenerator {
     // 3. Strip all HTML tags to get text content
     let contentText = text.replace(/<[^>]*>/g, " ");
 
-    // 4. Remove all whitespace, newlines, and non-Chinese characters (optional, but requested to clean up)
-    // The user specifically mentioned removing class names, punctuation, etc.
-    // Ideally we just want Chinese characters for the font subsetter.
-    // But fontManager.generateSubset usually handles unique char extraction.
-    // If we want to clean up the "fullText" log or input, we can do it here.
-    // However, the font subsetter needs *all* characters that need to be rendered in that font.
-    // If the font is a Chinese font, it likely only cares about Chinese chars + maybe punctuation.
-    // Let's implement a cleaner that keeps Chinese, English, Numbers and Punctuation but removes HTML attributes residue if any.
-    // Actually, simple strip tags might leave "class="foo"".
-    // The previous regex `text.replace(/<[^>]*>/g, " ")` is good but doesn't remove attributes if the tag is malformed or split?
-    // No, standard regex handles standard tags.
-    // The user's example shows "class="w-24..."". This implies some tags weren't stripped correctly or
-    // the text content had things that look like attributes?
-    // Wait, `replace(/<[^>]*>/g, " ")` should remove `<div class="...">`.
-    // If the user sees `class=...` in the output, it means the regex failed or the input wasn't a valid tag.
-    // OR, it might be EJS tags? `<% ... %>`
-
-    // Remove EJS tags
+    // 4. Remove EJS tags
     contentText = contentText.replace(/<%[\s\S]*?%>/g, "");
 
-    // To be safe and clean, let's just extract Chinese characters if the goal is ONLY Chinese font subsetting.
-    // If the font includes English, we need English too.
-    // Assuming the font is "KingHwaOldSong", it's likely a primary Chinese font.
-    // The user said: "其中有class、中英文混合，标点符号、空格、换行符，这些都要剔除掉。" -> "Remove class, mixed English, punctuation, spaces, newlines".
-    // This strongly implies we ONLY want Chinese characters.
-
+    // 5. 最终仅保留中文字符：本函数的产物只作为中文衬线字体（KingHwaOldSong）子集化的输入
     const chineseOnly = (contentText + attributeText).match(/[\u4e00-\u9fa5]/g);
     return chineseOnly ? chineseOnly.join("") : "";
   }

@@ -162,11 +162,16 @@ let existingData = [];
 
 ### M6. 遗留死代码 / 硬编码
 
-- `templates/assets/js/gallery.js:56,62-65`：硬编码 `"nature.html"`（本项目不存在该页面），active 态判断逻辑已失效
-- `gallery.js:37`：fetch 失败时 `document.body.innerHTML = ...` 整页替换，过于粗暴
-- `core/common/lib/constants.js:15`：`IMAGES_DIR` 注释自己说明已过时（"actual images go into album folders"），但 `core/gallery/main.js:23,36` 仍在 mkdir 它
-- `core/site/main.js:31`：`const initialText = ""` 传入 `buildBlog`，返回的 `allText` 被解构丢弃（只取 `posts`）——`core/site/lib/blog-builder.js:16-17,31-33` 的 allText 拼接全是死代码
-- `core/site/lib/page-generator.js:26-80`：`extractTextFromHtml` 内约 40 行自我讨论式注释（"Wait, ... The user said ..."），应清理
+- **状态**：✅ 已完成（2026-09-08，工作区待提交），复核发现比原记录更严重：
+
+**修复方式**（全部为内部重构，产物仅 `py-20` 类退出 CSS——其唯一消费者就是被删的错误横幅，全仓已无使用）：
+
+- gallery.js 硬编码 → **active 高亮原为 100% 失效**（复核发现）：nav.json 的 link 是 `../<id>/` 形式而判断用文件名相等，永不相等。改为从 `location.pathname` 提取当前相册 id（`/photography/<id>/...`），与 link 提取的 id 比较；索引页不高亮（数据驱动，无"首页"项）；删除 `|| "nature.html"` 与 nature.html 特判
+- fetch 失败整页替换 → 改为非破坏性降级：`console.error` + 顶部一次性提示条（内联样式，避免新增 className 影响 Tailwind 产物），静态渲染的画廊保持可浏览
+- `IMAGES_DIR` 死目录 → 删除常量与 `gallery/main.js` 两处 mkdir；验证：删除旧目录后重建不再生成，`nav.json` 哈希不变
+- site 侧 allText 死代码链 → `buildBlog(allText, albums)` 收敛为 `buildBlog()`，删除 allText 拼接与死 navItems（同时覆盖 M5 的 nav.json 死代码，M5 剩余部分另计）；同步 `core/site/main.js`。对照保留：`gallery/main.js` 的 allText 是字体子集活输入，未动
+- `page-generator.js` 约 26 行 "Wait.../The user said..." 讨论式注释 → 压缩为逐步骤简短注释，逻辑零改动
+- 验证：`node --check` 通过；`pnpm build:gallary`/`build:site` 通过；`test-tailwind-css.js`（9 项）/`test-h4`（12 项）/`test-h3`/`test-travel-markers.js` 全部通过；tailwind.css 75.8 → 75.7 KB
 
 ### M7. 模板细节问题
 
@@ -315,7 +320,7 @@ let existingData = [];
 | M1  | 合并两套 KML 解析与抓取实现                       | `core/travel/`、`core/site/lib/travel-data-builder.js` | ✅ 已完成（2026-09-08，工作区待提交），详见「二」M1 修复方式 |
 | M2  | 合并两个 image-processor、拼音 slug、head partial | gallery/pictures/common                                | ✅ 已完成（2026-09-08，工作区待提交）：slug 抽 `slugifyName`、缩略图抽 `generateThumbnail`（不合并模块）、head/font 抽 common partial，详见「二」M2 |
 | M3  | 博客正文统一 sanitizeHtml                         | `core/site/lib/blog-manager.js`                        | 未开始 |
-| M5  | 停止暴露 data.json；清理死代码（M6）              | `resource-manager.js`、`blog-builder.js` 等            | 未开始 |
+| M5  | 停止暴露 data.json；清理死代码（M6）              | `resource-manager.js`、`blog-builder.js` 等            | M6 部分已完成（2026-09-08，blog-builder 死代码已清）；停止暴露 data.json 未开始 |
 | L1  | 测试改造：带断言 + 隔离输出目录；为核心模块补测试 | 根目录测试脚本                                         | 部分推进：新增 `test-travel-markers.js`（带断言、离线、失败非 0 退出码） |
 | L2  | package.json 清理                                 | `package.json`                                         | 未开始 |
 
@@ -335,6 +340,7 @@ let existingData = [];
 | H2 | `83c78d8` | 2026-09-07 | Play CDN → 构建期 Tailwind CSS（488KB JS → 75.8KB CSS） |
 | H4 | `168eff4` | 2026-09-08 | 图片处理并发化 + 冗余 Sharp 调用合并 + mtime 脏缓存修复 |
 | M1 / M2 | 待提交 | 2026-09-08 | KML 合并为 `core/travel/build-markers.js` 单一实现（双写覆盖 bug 根除）+ `slugifyName`/`generateThumbnail` 公共化 + head/font 抽 common partial；新增 `test-travel-markers.js` |
+| M6 | 待提交 | 2026-09-08 | 移动菜单 active 按 pathname 相册 id 匹配（修复 100% 失效）+ 错误降级改非破坏性提示条 + IMAGES_DIR/site allText 死代码/讨论式注释清理 |
 | （非条目） | `3a3d805` | 2026-09-07 | 3D 地球运行时渲染优化（pixelRatio 上限 1.5 / 抗锯齿 / 高性能 GPU） |
 
 未完成条目及复核结论（2026-09-08）：

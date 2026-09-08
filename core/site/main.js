@@ -29,8 +29,7 @@ async function run(args) {
     );
   }
 
-  const initialText = "";
-  const { posts } = await buildBlog(initialText, albums);
+  const { posts } = await buildBlog();
 
   // Generate travel markers data (for the 3D globe on travel page)
   // M1：复用 core/travel 的唯一实现（在线优先 → 快照回退 → 写 web/assets/travel/markers.json）

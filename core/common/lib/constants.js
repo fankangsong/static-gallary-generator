@@ -12,7 +12,6 @@ module.exports = {
   WEB_DIR,
   PHOTO_WEB_DIR,
   PICTURES_WEB_DIR,
-  IMAGES_DIR: path.join(PHOTO_WEB_DIR, "images"), // This is just a base, actual images go into album folders
   CONFIG_DIR: path.join(WEB_DIR, "config"),
   FONTS_DIR: path.join(WEB_DIR, "assets/fonts"),
   TEMP_DIR: path.join(GENERATOR_DIR, ".temp"),
