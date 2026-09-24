@@ -44,7 +44,8 @@ data-source/timeline/org/
 ## 3. 与构建的衔接
 
 ```bash
-# 命令都在站点仓库根执行；$SKILL = 本 skill 所在目录（仓库内即 skills/telegram-to-timeline）
+# 命令都在站点仓库根执行。$SKILL = 本 skill 所在目录，按实际安装位置改这一行：
+#   仓库内 skills/telegram-to-timeline ｜ Hermes ~/.hermes/skills/telegram-to-timeline ｜ CodeBuddy ~/.codebuddy/skills/telegram-to-timeline
 SKILL=skills/telegram-to-timeline
 
 # 1. 导入（默认写 <cwd>/data-source/timeline/org）

@@ -37,8 +37,8 @@ description: Use when Telegram messages (text, photos, location — usually rela
 5. **交给构建**（在站点仓库根）：`pnpm build:timeline && pnpm build:home`。
 
 ```bash
-# 命令都在站点仓库根执行。$SKILL = 本 skill 所在目录 —— 仓库内即 skills/telegram-to-timeline，
-# 装在别处（如 ~/.codebuddy/skills/telegram-to-timeline）就换成它的绝对路径；路径不必写死。
+# 命令都在站点仓库根执行。$SKILL = 本 skill 所在目录，按实际安装位置改这一行：
+#   仓库内 skills/telegram-to-timeline ｜ Hermes ~/.hermes/skills/telegram-to-timeline ｜ CodeBuddy ~/.codebuddy/skills/telegram-to-timeline
 SKILL=skills/telegram-to-timeline
 
 # 干跑（推荐先做）
