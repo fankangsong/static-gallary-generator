@@ -10,10 +10,11 @@
  * 聚合规则：同一会话 + 同一发送者，且「同一 media_group_id」或「相邻消息间隔 ≤ --window 秒」
  * 的消息合成一条记录；目录名取该组第一条消息的时间（YYYY-MM-DD HHmm）。
  *
- * 用法：
- *   node scripts/import.mjs --file=updates.json [--org=<dir>] [--dry-run]
- *   node scripts/import.mjs --url=https://hermes.example/api/updates --token=$HERMES_TOKEN
- *   cat updates.json | node scripts/import.mjs
+ * 用法（$SKILL = 本 skill 的目录，见 ../SKILL.md；可在任意目录执行，
+ *       `--help` 会按当前目录打印实际脚本路径）：
+ *   node $SKILL/scripts/import.mjs --file=updates.json [--org=<dir>] [--dry-run]
+ *   node $SKILL/scripts/import.mjs --url=https://hermes.example/api/updates --token=$HERMES_TOKEN
+ *   cat updates.json | node $SKILL/scripts/import.mjs
  *
  * 详见 ../SKILL.md、../references/input-format.md、../references/org-format.md
  */
@@ -22,10 +23,19 @@ import fs from "node:fs";
 import fsp from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
+import { fileURLToPath } from "node:url";
 
 const DEFAULT_WINDOW = 60; // 秒：同一"次发送"的时间窗口（相册、配文、位置常差几秒）
 const DEFAULT_EXT = ".jpg";
 const IMAGE_EXT = new Set([".jpg", ".jpeg", ".png", ".webp", ".gif"]);
+
+/* 用法里打印的脚本路径：按当前目录相对化，不写死 skill 的安装位置
+   （skill 可能在仓库的 skills/ 下，也可能装在 ~/.codebuddy/skills/） */
+const SELF = (() => {
+  const abs = fileURLToPath(import.meta.url);
+  const rel = path.relative(process.cwd(), abs);
+  return rel && !rel.startsWith("..") ? rel : abs;
+})();
 
 function parseArgs(argv) {
   const opts = {
@@ -76,9 +86,9 @@ function parseArgs(argv) {
 
 function usage() {
   console.log(`用法：
-  node scripts/import.mjs --file=<updates.json> [选项]
-  node scripts/import.mjs --url=<endpoint> [选项]
-  cat updates.json | node scripts/import.mjs [选项]
+  node ${SELF} --file=<updates.json> [选项]
+  node ${SELF} --url=<endpoint> [选项]
+  cat updates.json | node ${SELF} [选项]
 
 选项：
   --org=<dir>        输出目录（默认 <cwd>/data-source/timeline/org）

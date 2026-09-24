@@ -44,8 +44,11 @@ data-source/timeline/org/
 ## 3. 与构建的衔接
 
 ```bash
+# 命令都在站点仓库根执行；$SKILL = 本 skill 所在目录（仓库内即 skills/telegram-to-timeline）
+SKILL=skills/telegram-to-timeline
+
 # 1. 导入（默认写 <cwd>/data-source/timeline/org）
-node ~/.codebuddy/skills/telegram-to-timeline/scripts/import.mjs --file=updates.json
+node $SKILL/scripts/import.mjs --file=updates.json
 
 # 2. 生成数据源（会整份重写 data-source/timeline.json）
 pnpm build:timeline

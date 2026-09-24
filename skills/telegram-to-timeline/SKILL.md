@@ -30,23 +30,25 @@ description: Use when Telegram messages (text, photos, location — usually rela
 1. **确认输入来源**（三选一，缺省从 stdin 读）：
    - `--file=<updates.json>`：Hermes 落盘的更新文件
    - `--url=<endpoint>`：Hermes 的 HTTP 接口（默认 GET，可 `--method=POST`、`--token=`、`--header=k:v`）
-   - `cat updates.json | node scripts/import.mjs`
+   - 管道：`cat updates.json | node $SKILL/scripts/import.mjs`
 2. **先干跑**：加 `--dry-run` 确认聚合结果与目录名（不会下载图片、不写任何文件）。
 3. **正式导入**：去掉 `--dry-run`。默认写到 `<cwd>/data-source/timeline/org`，用 `--org=<dir>` 改。
 4. **复核产出**：抽查 `content.md`（正文分段、坐标顺序、地址行）与图片编号。
 5. **交给构建**（在站点仓库根）：`pnpm build:timeline && pnpm build:home`。
 
 ```bash
-SKILL=~/.codebuddy/skills/telegram-to-timeline
+# 命令都在站点仓库根执行。$SKILL = 本 skill 所在目录 —— 仓库内即 skills/telegram-to-timeline，
+# 装在别处（如 ~/.codebuddy/skills/telegram-to-timeline）就换成它的绝对路径；路径不必写死。
+SKILL=skills/telegram-to-timeline
 
 # 干跑（推荐先做）
 node $SKILL/scripts/import.mjs --file=updates.json --tz=Asia/Shanghai --dry-run
 
-# 正式导入
+# 正式导入（默认写 <cwd>/data-source/timeline/org）
 node $SKILL/scripts/import.mjs --file=updates.json --tz=Asia/Shanghai
 
-# 冒烟测试（用自带示例数据，不需要网络）
-node $SKILL/scripts/import.mjs --file=$SKILL/assets/sample-updates.json --org=/tmp/org --tz=Asia/Shanghai --dry-run
+# 冒烟测试（用自带示例数据，不需要网络；dry-run 不写任何文件）
+node $SKILL/scripts/import.mjs --file=$SKILL/assets/sample-updates.json --org=./.tmp-org --tz=Asia/Shanghai --dry-run
 ```
 
 ## 参数
