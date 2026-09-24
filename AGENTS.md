@@ -6,7 +6,7 @@
 
 | 路径 | 用途 |
 |---|---|
-| `core/main.js` | CLI 入口；分发 `index:gallary`、`build:gallary`、`build:site`（别名 `build:blog`）、`clear` 命令 |
+| `core/main.js` | CLI 入口；分发 `index:gallary`、`build:gallary`、`build:site`（别名 `build:blog`）、`build:home`、`build:timeline`、`clear` 命令 |
 | `core/gallery/` | 相册生成：扫描照片、通过 Sharp 生成缩略图、渲染相册索引页 |
 | `core/site/` | 站点页面生成：以 EJS 渲染模板，通过 Marked 处理博客文章 |
 | `core/common/` | 共享工具函数、常量与类库 |
@@ -15,7 +15,7 @@
 | `tailwind.config.js` | Tailwind 扫描范围与插件配置（`prose-*` 依赖 `@tailwindcss/typography`） |
 | `styles/tailwind.css` | Tailwind 输入样式；放此处以免被资源拷贝步骤发布到 `web/` |
 | `docs/` | 项目文档（`design-guide.md`） |
-| `data-source/` | 预留的源数据目录（当前为空） |
+| `data-source/` | 手写源数据目录（时间轴素材 `timeline/org/`、KML 快照等；已被 git 忽略） |
 | `web/` | **生成产物** — 静态站点文件（已被 git 忽略；请勿直接编辑） |
 | `vite.config.js` | Vite 开发服务器配置；在 3000 端口服务 `web/` 目录 |
 
@@ -29,6 +29,8 @@
 | `pnpm index:gallary` | 仅生成相册索引页 |
 | `pnpm build:gallary` | 处理照片并生成相册 HTML 页面 |
 | `pnpm build:site` | 从 EJS 模板渲染站点页面（首页、博客、旅行、404） |
+| `pnpm build:home` | 只构建首页（时间轴）：发布 `/assets/**` → 渲染 `templates/site/index.html`（内联 `data-source/timeline.json`、发布其照片、重裁 `/assets/fonts/index/`）→ 构建 tailwind.css；不碰博客、旅行 markers、sitemap 与其它静态页 |
+| `pnpm build:timeline` | 扫描 `data-source/timeline/org/<日期>/`（`content.md` + 照片）生成 `data-source/timeline.json`（首页数据源，**整份重写**，之后跑 `pnpm build:home` 生效）；`--src=<dir>` / `--out=<file>` 可改输入输出，想预览就用 `--out` 指到临时文件 |
 | `pnpm build:css` | 仅构建静态 Tailwind CSS → `web/assets/css/tailwind.css`（相册与站点构建末尾也会自动执行） |
 | `pnpm clear` | 移除生成的 `web/` 和 `core/.temp/` 目录 |
 
@@ -54,6 +56,8 @@
 - [`test-h3-incremental.js`](test-h3-incremental.js) — 相册增量扫描与 EXIF 缓存测试
 - [`test-tailwind-css.js`](test-tailwind-css.js) — 静态 Tailwind CSS 构建测试（无 Play CDN 残留、类名覆盖、产物体积）
 - [`test-h4-image-concurrency.js`](test-h4-image-concurrency.js) — 图片处理并发与增量缓存测试（顺序一致性、并发上限、mtime 脏缓存修复）
+- [`test-home-build.js`](test-home-build.js) — 首页单独构建契约测试（只渲染首页、数据内联与倒序、照片发布、字体子集体积与字形覆盖）
+- [`test-timeline-source.js`](test-timeline-source.js) — 时间轴素材解析与生成测试（md 标题/正文/位置区块、坐标写反自动交换、目录名时间、图片自然序、非日期目录跳过、`publish` 的 `ext` 过滤）
 
 直接运行：
 
@@ -63,6 +67,8 @@ node test-comprehensive.js
 node test-h3-incremental.js
 node test-tailwind-css.js
 node test-h4-image-concurrency.js
+node test-home-build.js
+node test-timeline-source.js
 ```
 
 修改模板渲染或核心构建逻辑时，请以同级脚本的形式新增测试。

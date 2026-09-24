@@ -1,0 +1,99 @@
+{
+  "_readme": "图片路径相对 timeline.html（本文件同目录）书写，约定沿用 card-stack.html 的 ../../web/ 前缀。date 用 YYYY-MM-DD，text 必填；location 与 images 可选，缺省即不渲染。images 为 0~3 张，每张 { thumb, large, caption, meta }，large 可省略（放大态复用 thumb）。",
+  "meta": {
+    "title": "时间轴",
+    "hint": "上下滚动或拖动，点击日期查看记录"
+  },
+  "records": [
+    {
+      "date": "2025-11-08",
+      "text": "第一次用胶片拍海边，一卷三十六张，回来只挑出四张能看。",
+      "location": "汕头 · 南澳岛",
+      "images": [
+        { "thumb": "../../web/photography/shan-tou/images/胶卷/thumb_R0003889.jpg", "large": "../../web/photography/shan-tou/images/胶卷/large_R0003889.jpg", "caption": "胶片 · 午后" },
+        { "thumb": "../../web/photography/shan-tou/images/胶卷/thumb_R0003897.jpg", "large": "../../web/photography/shan-tou/images/胶卷/large_R0003897.jpg", "caption": "胶片 · 屋檐" }
+      ]
+    },
+    {
+      "date": "2025-12-24",
+      "text": "平安夜的街灯比平时亮一些，行人匆匆，没有人抬头。",
+      "location": "深圳市南山区 · 海岸城",
+      "images": [
+        { "thumb": "../../web/photography/xiang-gang-shen-zhen/images/thumb_R0000111.jpg", "large": "../../web/photography/xiang-gang-shen-zhen/images/large_R0000111.jpg", "caption": "橱窗里的暖光" },
+        { "thumb": "../../web/photography/xiang-gang-shen-zhen/images/thumb_R0000112.jpg", "large": "../../web/photography/xiang-gang-shen-zhen/images/large_R0000112.jpg", "caption": "街口" }
+      ]
+    },
+    {
+      "date": "2026-01-18",
+      "text": "大梅沙的清晨，海风很凉，沙滩上只有我和一排脚印。",
+      "location": "深圳市盐田区大梅沙沙滩",
+      "images": [
+        { "thumb": "../../web/photography/shan-tou/images/thumb_12月份的大梅沙沙滩.jpg", "large": "../../web/photography/shan-tou/images/large_12月份的大梅沙沙滩.jpg", "caption": "十二月的沙滩" },
+        { "thumb": "../../web/photography/shan-tou/images/thumb_R0003893.jpg", "large": "../../web/photography/shan-tou/images/large_R0003893.jpg", "caption": "浪线" },
+        { "thumb": "../../web/photography/shan-tou/images/thumb_R0003923.jpg", "large": "../../web/photography/shan-tou/images/large_R0003923.jpg", "caption": "远处的小岛" }
+      ]
+    },
+    {
+      "date": "2026-02-14",
+      "text": "情人节的天星小轮，甲板上风很大，把围巾吹成了旗子。",
+      "location": "香港 · 尖沙咀码头",
+      "images": [
+        { "thumb": "../../web/photography/xiang-gang-shen-zhen/images/thumb_R0000030.jpg", "large": "../../web/photography/xiang-gang-shen-zhen/images/large_R0000030.jpg", "caption": "维港的清晨" },
+        { "thumb": "../../web/photography/xiang-gang-shen-zhen/images/thumb_R0000091.jpg", "large": "../../web/photography/xiang-gang-shen-zhen/images/large_R0000091.jpg", "caption": "街角的招牌" },
+        { "thumb": "../../web/photography/xiang-gang-shen-zhen/images/thumb_R0000144.jpg", "large": "../../web/photography/xiang-gang-shen-zhen/images/large_R0000144.jpg", "caption": "对岸的灯" }
+      ]
+    },
+    {
+      "date": "2026-03-21",
+      "text": "春分，公园里的第一株木棉开了，树下落了一地红色。",
+      "location": null,
+      "images": [
+        { "thumb": "../../web/photography/shan-tou/images/thumb_R0004077.jpg", "large": "../../web/photography/shan-tou/images/large_R0004077.jpg", "caption": "树影" },
+        { "thumb": "../../web/photography/shan-tou/images/thumb_R0004079.jpg", "large": "../../web/photography/shan-tou/images/large_R0004079.jpg", "caption": "落花" }
+      ]
+    },
+    {
+      "date": "2026-05-05",
+      "text": "立夏，胶卷洗出来了，颜色比记忆里淡一点，反而更像那天的光。",
+      "location": "汕头市金平区",
+      "images": [
+        { "thumb": "../../web/photography/shan-tou/images/胶卷/thumb_R0003891.jpg", "large": "../../web/photography/shan-tou/images/胶卷/large_R0003891.jpg", "caption": "胶片 · 巷口" },
+        { "thumb": "../../web/photography/shan-tou/images/胶卷/thumb_R0003899.jpg", "large": "../../web/photography/shan-tou/images/胶卷/large_R0003899.jpg", "caption": "胶片 · 窗" }
+      ]
+    },
+    {
+      "date": "2026-06-18",
+      "text": "暴雨前的维港，云压得很低，光从缝里漏下来一条。",
+      "location": "香港 · 中环码头",
+      "images": [
+        { "thumb": "../../web/photography/xiang-gang-shen-zhen/images/thumb_R0000032.jpg", "large": "../../web/photography/xiang-gang-shen-zhen/images/large_R0000032.jpg", "caption": "低云" },
+        { "thumb": "../../web/photography/xiang-gang-shen-zhen/images/thumb_R0000036.jpg", "large": "../../web/photography/xiang-gang-shen-zhen/images/large_R0000036.jpg", "caption": "码头的栏杆" },
+        { "thumb": "../../web/photography/xiang-gang-shen-zhen/images/thumb_R0000039.jpg", "large": "../../web/photography/xiang-gang-shen-zhen/images/large_R0000039.jpg", "caption": "雨前的街" }
+      ]
+    },
+    {
+      "date": "2026-08-02",
+      "text": "海边露营，星星很多，一颗都没拍下来，只顾着看了。",
+      "location": "惠州市 · 双月湾",
+      "images": []
+    },
+    {
+      "date": "2026-09-09",
+      "text": "开学第一天的校门口，比想象中安静。",
+      "location": "深圳市福田区",
+      "images": [
+        { "thumb": "../../web/photography/shan-tou/images/thumb_R0004243.jpg", "large": "../../web/photography/shan-tou/images/large_R0004243.jpg", "caption": "午后的光" }
+      ]
+    },
+    {
+      "date": "2026-09-23",
+      "text": "今天去了大梅沙，大海真美。",
+      "location": "深圳市盐田区大梅沙沙滩",
+      "images": [
+        { "thumb": "../../web/photography/shan-tou/images/thumb_R0000007.jpg", "large": "../../web/photography/shan-tou/images/large_R0000007.jpg", "caption": "海边的第一缕光" },
+        { "thumb": "../../web/photography/shan-tou/images/thumb_R0004206.jpg", "large": "../../web/photography/shan-tou/images/large_R0004206.jpg", "caption": "浪打上礁石" },
+        { "thumb": "../../web/photography/shan-tou/images/thumb_R0004350.jpg", "large": "../../web/photography/shan-tou/images/large_R0004350.jpg", "caption": "傍晚的沙滩" }
+      ]
+    }
+  ]
+}

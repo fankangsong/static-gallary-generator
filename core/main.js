@@ -3,8 +3,10 @@ const path = require("path");
 const { logger } = require("./common/lib/utils");
 const galleryMain = require("./gallery/main");
 const siteMain = require("./site/main");
+const homeMain = require("./site/home");
 const picturesMain = require("./pictures/main");
 const travelMain = require("./travel/main");
+const timelineMain = require("./timeline/main");
 const styleManager = require("./common/lib/style-manager");
 
 async function clearBuild() {
@@ -36,11 +38,17 @@ async function main() {
     case "build:blog":
       await siteMain.run(args);
       break;
+    case "build:home":
+      await homeMain.run();
+      break;
     case "build:pictures":
       await picturesMain.run(args);
       break;
     case "update:travel":
       await travelMain.run(args);
+      break;
+    case "build:timeline":
+      await timelineMain.run(args);
       break;
     case "build:css":
       await styleManager.build();
@@ -50,7 +58,7 @@ async function main() {
       break;
     default:
       logger.error(
-        "Unknown command. Available: index:gallary, build:gallary, build:site, build:pictures, update:travel, build:css, clear",
+        "Unknown command. Available: index:gallary, build:gallary, build:site, build:home, build:timeline, build:pictures, update:travel, build:css, clear",
       );
       process.exit(1);
   }

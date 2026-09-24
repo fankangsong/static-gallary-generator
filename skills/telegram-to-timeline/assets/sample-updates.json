@@ -1,0 +1,108 @@
+[
+  {
+    "update_id": 900001,
+    "message": {
+      "message_id": 101,
+      "date": 1789947000,
+      "chat": { "id": 5550001, "type": "private" },
+      "from": { "id": 7770001, "is_bot": false, "first_name": "Colin" },
+      "text": "六点出门，白堤上已经有雾。\n\n跑到断桥折返，太阳刚从保俶塔后面露头，湖面像被人抹了一遍。"
+    }
+  },
+  {
+    "update_id": 900002,
+    "message": {
+      "message_id": 102,
+      "date": 1789947240,
+      "media_group_id": "g-20260921-1",
+      "chat": { "id": 5550001, "type": "private" },
+      "from": { "id": 7770001, "is_bot": false, "first_name": "Colin" },
+      "caption": "同一个位置等了三班地铁。",
+      "photo": [{ "file": "sample/p1.jpg", "width": 900, "height": 600, "file_size": 21000 }]
+    }
+  },
+  {
+    "update_id": 900003,
+    "message": {
+      "message_id": 103,
+      "date": 1789947245,
+      "media_group_id": "g-20260921-1",
+      "chat": { "id": 5550001, "type": "private" },
+      "from": { "id": 7770001, "is_bot": false, "first_name": "Colin" },
+      "photo": [{ "file": "sample/p2.jpg", "width": 600, "height": 900, "file_size": 19000 }]
+    }
+  },
+  {
+    "update_id": 900004,
+    "message": {
+      "message_id": 104,
+      "date": 1789947250,
+      "media_group_id": "g-20260921-1",
+      "chat": { "id": 5550001, "type": "private" },
+      "from": { "id": 7770001, "is_bot": false, "first_name": "Colin" },
+      "photo": [{ "file": "sample/p3.jpg", "width": 800, "height": 800, "file_size": 20000 }]
+    }
+  },
+  {
+    "update_id": 900005,
+    "message": {
+      "message_id": 105,
+      "date": 1789947270,
+      "chat": { "id": 5550001, "type": "private" },
+      "from": { "id": 7770001, "is_bot": false, "first_name": "Colin" },
+      "text": "光圈收到 f8，快门掉到 1/60，索性把相机放在石栏上拍了一组。"
+    }
+  },
+  {
+    "update_id": 900006,
+    "message": {
+      "message_id": 106,
+      "date": 1789947275,
+      "chat": { "id": 5550001, "type": "private" },
+      "from": { "id": 9990001, "is_bot": true, "first_name": "Hermes" },
+      "text": "已记录：1 条文本、3 张图片。（这条是 bot 的回复，导入时会被忽略）"
+    }
+  },
+  {
+    "update_id": 900007,
+    "message": {
+      "message_id": 107,
+      "date": 1789947600,
+      "chat": { "id": 5550001, "type": "private" },
+      "from": { "id": 7770001, "is_bot": false, "first_name": "Colin" },
+      "location": { "latitude": 22.5431, "longitude": 114.0579 }
+    }
+  },
+  {
+    "update_id": 900008,
+    "message": {
+      "message_id": 108,
+      "date": 1789947620,
+      "chat": { "id": 5550001, "type": "private" },
+      "from": { "id": 7770001, "is_bot": false, "first_name": "Colin" },
+      "text": "下班绕路走江边，正好赶上一天里最后二十分钟的光。"
+    }
+  },
+  {
+    "message_id": 109,
+    "date_iso": "2026-09-19T09:05:00+08:00",
+    "chat_id": 5550001,
+    "from_id": 7770001,
+    "text": "相机送去保养了，最近只能用手机拍。",
+    "photos": ["sample/p3.jpg", "sample/p1.jpg"]
+  },
+  {
+    "update_id": 900010,
+    "message": {
+      "message_id": 110,
+      "date": 1789726800,
+      "chat": { "id": 5550001, "type": "private" },
+      "from": { "id": 7770001, "is_bot": false, "first_name": "Colin" },
+      "venue": {
+        "title": "大梅沙海滨公园",
+        "address": "广东省深圳市盐田区盐梅路",
+        "location": { "latitude": 22.5929, "longitude": 114.3145 }
+      }
+    }
+  }
+]

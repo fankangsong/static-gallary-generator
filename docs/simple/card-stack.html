@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>照片卡堆叠 · 交互演示</title>
+<style>
+  :root {
+    /* —— 项目绘本令牌（与 picture-books.html 同源） —— */
+    --paper: #FFF8EC;
+    --paper-deep: #F5EBD8;
+    --paper-white: #FFFDF7;
+    --ink: #4A3B32;
+    --ink-soft: #8C7A6B;
+    --edge: #E9DCC3;
+    --crayon-orange: #FF8A5C;
+    --kai: "Kaiti SC", "STKaiti", "KaiTi", "DFKai-SB", "TW-Kai", "京華老宋体", serif;
+    --sans: -apple-system, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    /* 宣纸颗粒（SVG feTurbulence 灰度噪点，平铺） */
+    --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23g)' opacity='.05'/%3E%3C/svg%3E");
+    /* 缓动：与项目交互节奏一致 */
+    --ease-spring: cubic-bezier(.22, 1.2, .36, 1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scrollbar-gutter: stable; }
+  body {
+    font-family: var(--sans);
+    font-size: 15px;
+    color: var(--ink);
+    background: var(--paper);
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  body.frozen { overflow: hidden; }
+
+  /* ===== 网格纸底 ===== */
+  .desk {
+    position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    background:
+      var(--grain),
+      radial-gradient(ellipse 120% 80% at 50% -10%, rgba(255,255,255,.6), transparent 62%),
+      radial-gradient(ellipse 140% 100% at 50% 116%, rgba(58,42,30,.09), transparent 58%),
+      repeating-linear-gradient(0deg, rgba(74,59,50,.055) 0 1px, transparent 1px 9px),
+      repeating-linear-gradient(90deg, rgba(74,59,50,.055) 0 1px, transparent 1px 9px),
+      repeating-linear-gradient(0deg, rgba(74,59,50,.085) 0 1px, transparent 1px 45px),
+      repeating-linear-gradient(90deg, rgba(74,59,50,.085) 0 1px, transparent 1px 45px),
+      var(--paper);
+  }
+
+  /* ===== 顶部标题区 ===== */
+  .masthead {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: clamp(38px, 6vw, 66px) 24px 0;
+  }
+  .eyebrow {
+    font-size: 12px; letter-spacing: .34em; text-transform: uppercase;
+    color: var(--ink-soft); margin-bottom: 12px;
+  }
+  .masthead h1 {
+    font-family: var(--kai);
+    font-size: clamp(26px, 3.6vw, 40px);
+    font-weight: 700; letter-spacing: .12em;
+    color: var(--ink);
+  }
+  .masthead .sub {
+    margin-top: 12px;
+    font-size: 14px; line-height: 1.9; letter-spacing: .06em;
+    color: var(--ink-soft);
+    max-width: 46em;
+  }
+  /* 四段状态图例 */
+  .legend {
+    list-style: none;
+    display: flex; flex-wrap: wrap; gap: 10px 12px;
+    margin-top: 22px;
+  }
+  .legend li {
+    display: flex; align-items: center; gap: 9px;
+    padding: 7px 15px 7px 8px;
+    background: var(--paper-white);
+    border: 1px dashed var(--edge);
+    border-radius: 999px;
+    font-size: 13px; letter-spacing: .04em;
+    color: var(--ink-soft);
+  }
+  .legend b {
+    display: grid; place-items: center;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: rgba(var(--wash-a, 207,227,220), .9);
+    color: var(--ink);
+    font-family: var(--kai); font-size: 13px; font-weight: 700;
+  }
+  .legend li:nth-child(1) { --wash-a: 207,227,220; }
+  .legend li:nth-child(2) { --wash-a: 246,224,196; }
+  .legend li:nth-child(3) { --wash-a: 232,216,228; }
+  .legend li:nth-child(4) { --wash-a: 211,222,234; }
+
+  /* ===== 卡堆网格 ===== */
+  .wall {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: clamp(52px, 7vw, 92px) 24px 96px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(268px, 1fr));
+    gap: clamp(34px, 5vw, 62px);
+    /* 卡片比例就位前的过渡，避免尺寸跳变 */
+    transition: opacity .42s ease;
+  }
+  .wall.pending { opacity: 0; }
+  .stack { position: relative; }
+
+  /* 卡堆舞台：卡片尺寸与散开位移都相对它计算 */
+  .stack-inner {
+    position: relative;
+    aspect-ratio: 1 / 1.16;
+  }
+
+  /* 卡片外壳：FLIP 动画的载体（放大时改为 fixed 定位）
+     —— 占满舞台只为承接 FLIP，指针一律交给命中层 */
+  .card {
+    position: absolute; inset: 0;
+    z-index: var(--z, 1);
+    border: 0; padding: 0; background: none;
+    transform-origin: 0 0;
+    pointer-events: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: opacity .32s ease;
+  }
+  .card:focus { outline: none; }
+  /* FLIP 进行中：只提升「被动画的载体」本身，缩放交给合成线程
+     （卡面自身的提升在放大态会关闭，见 .card.is-expanded .card-face） */
+  .card.is-flipping {
+    will-change: transform;
+    backface-visibility: hidden;
+  }
+
+  /* 命中层：与卡面同尺寸同位置，只跟随「散开态」，绝不参与「抽出态」
+     —— 命中几何在任一状态下恒定，hover 不会被自己触发的动画推翻（杜绝边缘抖动） */
+  .card-hit {
+    position: absolute; inset: 0;
+    margin: auto;
+    width: var(--fw, 200px);
+    height: var(--fh, 266px);
+    border-radius: 17px 19px 16px 18px;   /* 圆角参与命中检测，避免四角出现隐形可点区 */
+    pointer-events: auto;
+    transform: rotate(var(--rrot, 0deg)) translate(calc(var(--rx, 0) * var(--fw)), calc(var(--ry, 0) * var(--fh)));
+    transition: transform .42s var(--ease-spring);
+    will-change: transform;
+  }
+  /* 2px 容差环：伪元素按宿主元素参与命中，吸收边界处的亚像素抖动 */
+  .card-hit::after {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+  }
+
+  /* ===== 卡面：尺寸跟着照片比例走（--fw / --fh 由 JS 按舞台尺寸下发） ===== */
+  .card-face {
+    position: absolute; inset: 0;
+    margin: auto;                       /* 配合 inset:0 做双向居中 */
+    width: var(--fw, 200px);
+    height: var(--fh, 266px);
+    display: block;
+    pointer-events: none;               /* 只负责画；命中交给静态的 .card-hit */
+    border-radius: 17px 19px 16px 18px;
+    background:
+      var(--grain),
+      radial-gradient(ellipse 96% 78% at 50% 36%, rgba(255,255,255,.62), rgba(255,255,255,0) 76%),
+      linear-gradient(152deg, rgb(var(--wash-a)), rgb(var(--wash-b)));
+    border: 1px solid rgba(74,59,50,.12);
+    box-shadow:
+      0 2px 6px rgba(58,42,30,.10),
+      0 16px 28px -18px rgba(58,42,30,.34);
+    overflow: hidden;
+    transform: rotate(var(--rrot, 0deg)) translate(calc(var(--rx, 0) * var(--fw)), calc(var(--ry, 0) * var(--fh)));
+    transition:
+      transform .42s var(--ease-spring),
+      box-shadow .42s ease,
+      opacity .3s ease;
+    will-change: transform;
+  }
+
+  /* 照片窗口：左右各内缩 5%、下方留 11%（说明文字），
+     配合 JS 里 ar = 照片比例 × (0.84 / 0.9)，窗口比例与照片完全一致 —— 不裁切也不留白 */
+  .photo {
+    position: absolute; inset: 5% 5% 11%;
+    border-radius: 8px;
+    overflow: hidden;
+    background: rgba(var(--wash-c), .5);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.5), 0 2px 7px rgba(58,42,30,.16);
+  }
+  .photo img {
+    display: block; width: 100%; height: 100%;
+    object-fit: cover;                  /* 窗口比例 == 照片比例，cover 即精确铺满 */
+  }
+  /* 缺图降级：露出卡纸色 + 小画笔图标，不出现破图 */
+  .photo.broken { background: rgba(var(--wash-c), .85); }
+  .photo.broken img { opacity: 0; }
+  .photo.broken::after {
+    content: "";
+    position: absolute; inset: 0; margin: auto;
+    width: 34%; aspect-ratio: 1;
+    max-width: 52px;
+    background: no-repeat center / contain
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' fill='none' stroke='%238C7A6B' stroke-width='2.6' stroke-linecap='round'%3E%3Cpath d='M10 38 C 16 22, 24 14, 34 10' stroke-dasharray='5 4'/%3E%3Ccircle cx='38' cy='9' r='3.4' fill='%23FF8A5C' stroke='none'/%3E%3C/svg%3E");
+    opacity: .8;
+  }
+
+  /* 卡面说明：仅放大态显示（字号由 JS 按放大卡宽度写入 --cap-size） */
+  .card-cap {
+    position: absolute; left: 5%; right: 5%; bottom: 1%;
+    height: 11%;
+    display: flex; flex-direction: column; justify-content: center; gap: 2px;
+    font-family: var(--kai);
+    text-align: center;
+    color: var(--ink);
+    opacity: 0;
+    transition: opacity .3s ease;
+    pointer-events: none;
+  }
+  .card-cap b { font-size: var(--cap-size, 16px); font-weight: 700; letter-spacing: .1em; }
+  .card-cap i {
+    font-family: var(--sans); font-style: normal;
+    font-size: calc(var(--cap-size, 16px) * .76);
+    letter-spacing: .12em; color: var(--ink-soft);
+  }
+
+  /* ===== 状态 2：鼠标进入组件区域 → 卡片朝各自方向散开 ===== */
+  .stack-inner:hover .card-face,
+  .stack-inner:focus-within .card-face {
+    transform: rotate(var(--srot, 0deg)) translate(calc(var(--sx, 0) * var(--fw)), calc(var(--sy, 0) * var(--fh)));
+    box-shadow:
+      0 3px 8px rgba(58,42,30,.11),
+      0 20px 32px -18px rgba(58,42,30,.36);
+  }
+  /* 命中层与卡面同步散开，但到此为止 */
+  .stack-inner:hover .card-hit,
+  .stack-inner:focus-within .card-hit {
+    transform: rotate(var(--srot, 0deg)) translate(calc(var(--sx, 0) * var(--fw)), calc(var(--sy, 0) * var(--fh)));
+  }
+
+  /* ===== 状态 3：鼠标落入某张照片 → 该卡转正并向上抽出（约 18% 卡高）===== */
+  .card:hover, .card:focus-within { z-index: 90; }
+  .card:hover .card-face,
+  .card:focus-visible .card-face {
+    transform: rotate(0deg) translate(0, calc(var(--fy, 0) * var(--fh))) scale(1.04);
+    box-shadow:
+      0 8px 18px rgba(58,42,30,.16),
+      0 34px 52px -22px rgba(58,42,30,.46);
+  }
+  /* 抽出时其余卡轻轻后退（只用 opacity：filter 不可合成，会触发整层重绘） */
+  .stack-inner:hover .card:not(:hover) .card-face { opacity: .9; }
+  .stack-inner:focus-within .card:not(:focus-within) .card-face { opacity: .9; }
+
+  .card:focus-visible .card-face { outline: 2px dashed var(--crayon-orange); outline-offset: 5px; }
+
+  /* ===== 状态 4：点击 → 原地放大为单张大卡（等比放大，不拉伸） ===== */
+  .card.is-expanded {
+    position: fixed;
+    inset: auto;
+    z-index: 900;
+    opacity: 1;
+    pointer-events: auto;
+    cursor: zoom-out;
+  }
+  /* 放大态：卡面铺满卡壳，几何完全交给外壳（FLIP）驱动
+     —— 同时覆盖 :hover / :focus-visible，避免指针停在大卡上时卡面又跳回抽出位 */
+  .card.is-expanded .card-face,
+  .card.is-expanded:hover .card-face,
+  .card.is-expanded:focus-visible .card-face {
+    inset: 0;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    transform: none;
+    border-radius: 20px 22px 19px 21px;
+    /* 阴影模糊半径从 80px 收到 56px：栅格化面积少约四成，视觉几乎无差 */
+    box-shadow: 0 26px 56px -24px rgba(58,42,30,.6), 0 4px 14px rgba(58,42,30,.18);
+    will-change: auto;   /* 关掉卡面自身提升，让整卡作为一张图层缩放，避免嵌套层反复重栅格化 */
+  }
+  .card.is-expanded .card-cap { opacity: 1; transition-delay: .4s; }
+  /* 放大态整卡即命中区，关掉舞台内的命中层，避免无意义 hover */
+  .card.is-expanded .card-hit { pointer-events: none; }
+
+  /* 其余卡片退场 */
+  .stack.is-open .card:not(.is-expanded) { opacity: 0; pointer-events: none; }
+
+  /* 放大后的背景：不透明暖纸色（完全不透背景，杜绝穿透） */
+  .scrim {
+    position: fixed; inset: 0; z-index: 800;
+    background:
+      var(--grain),
+      radial-gradient(ellipse 120% 76% at 50% -14%, rgba(255,255,255,.78), transparent 62%),
+      radial-gradient(ellipse 150% 110% at 50% 118%, rgba(58,42,30,.12), transparent 58%),
+      var(--paper-deep);
+    opacity: 0; pointer-events: none;
+    transition: opacity .34s ease;
+    /* 全屏 4 层背景只栅格化一次，淡入淡出交给合成器（否则每帧重绘整屏） */
+    will-change: opacity;
+  }
+  .scrim.on { opacity: 1; pointer-events: auto; }
+
+  /* ===== 卡堆下方文字 ===== */
+  .stack-title {
+    margin-top: 20px;
+    font-family: var(--kai);
+    font-size: 19px; font-weight: 700; letter-spacing: .12em;
+    color: var(--ink);
+  }
+  .stack-note {
+    margin-top: 5px;
+    font-size: 12px; letter-spacing: .12em;
+    color: var(--ink-soft);
+  }
+
+  /* ===== 页脚 ===== */
+  .foot {
+    max-width: 1180px; margin: 0 auto;
+    padding: 0 24px 64px;
+    font-size: 12px; line-height: 2; letter-spacing: .08em;
+    color: var(--ink-soft);
+  }
+  .foot code {
+    font-family: ui-monospace, Consolas, monospace; font-size: 12px;
+    background: var(--paper-deep); padding: 2px 7px; border-radius: 4px; color: var(--ink);
+  }
+
+  /* ===== 滚动条 ===== */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,.2); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background-color: rgba(0,0,0,.4); }
+
+  /* ===== 响应式 ===== */
+  @media (max-width: 620px) {
+    .wall { grid-template-columns: 1fr; max-width: 460px; }
+    .stack-title { font-size: 17px; }
+  }
+
+  /* ===== 动效偏好：关闭位移动画，只留淡入淡出 ===== */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      transition-duration: .01ms !important;
+      animation-duration: .01ms !important;
+      animation-iteration-count: 1 !important;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="desk" aria-hidden="true"></div>
+
+<header class="masthead">
+  <p class="eyebrow">Card Stack</p>
+  <h1>照片卡堆叠</h1>
+  <p class="sub">
+    三张横竖不一的照片叠成一摞。鼠标移入组件区域先散开，落到某张上它便向上抽出、转正并置顶，
+    点击后原地放大成一张大卡（等比放大，不裁切）；再次点击大卡、点击空白处或按 Esc 均可收起。
+  </p>
+  <ol class="legend">
+    <li><b>1</b>静止 · 三张照片叠放</li>
+    <li><b>2</b>鼠标进入组件区域 · 卡片散开</li>
+    <li><b>3</b>鼠标落入某张照片 · 该卡向上抽出</li>
+    <li><b>4</b>点击照片 · 原地放大为大卡</li>
+  </ol>
+</header>
+
+<main id="wall" class="wall pending" aria-label="照片卡堆叠演示"></main>
+
+<p class="foot">
+  照片取自构建产物 <code>web/</code>；若卡面只显示色块，请先在仓库根目录执行 <code>pnpm build</code>。
+  替换照片只需修改文件顶部脚本中的 <code>STACKS</code> 配置。
+</p>
+
+<div class="scrim" id="scrim" aria-hidden="true"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  var $ = function (id) { return document.getElementById(id); };
+  var REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* 本页位于 docs/simple/，构建产物在 web/ 下：以仓库根伺服时向上两级 */
+  var BASE = "../../web/";
+
+  /* ---------- 可替换的照片配置 ----------
+     album / group 对应 web/photography/<album>/images/[<group>/]<kind>_<file>
+     group 为 null 表示该相册无分组；file 为不含 thumb_/large_ 前缀的原文件名。
+     横竖比例不限：卡片会自动按照片真实比例定尺寸。 */
+  var STACKS = [
+    {
+      title: "汕头 · 海边",
+      wash: 0,
+      note: "3 幅 · 理光 GR3 · 2026.01",
+      photos: [
+        { album: "shan-tou", group: null, file: "R0000007.jpg", caption: "海边的第一缕光", meta: "f/7.1 · 1/30 · ISO320" },
+        { album: "shan-tou", group: null, file: "R0004206.jpg", caption: "浪打上礁石", meta: "f/2.8 · 1/2000 · ISO100" },
+        { album: "shan-tou", group: null, file: "R0004350.jpg", caption: "傍晚的沙滩", meta: "f/9.0 · 1/1600 · ISO200" }
+      ]
+    },
+    {
+      title: "香港 · 深圳",
+      wash: 2,
+      note: "3 幅 · 理光 GR3 · 2024.02",
+      photos: [
+        { album: "xiang-gang-shen-zhen", group: null, file: "R0000030.jpg", caption: "维多利亚港的清晨", meta: "f/8.0 · 1/100 · ISO200" },
+        { album: "xiang-gang-shen-zhen", group: null, file: "R0000036.jpg", caption: "街角的招牌", meta: "f/8.0 · 1/80 · ISO200" },
+        { album: "xiang-gang-shen-zhen", group: null, file: "R0000091.jpg", caption: "天星小轮", meta: "f/8.0 · 1/160 · ISO200" }
+      ]
+    },
+    {
+      title: "汕头 · 胶片",
+      wash: 3,
+      note: "3 幅 · 伊尔夫 PAN200",
+      photos: [
+        { album: "shan-tou", group: "胶卷", file: "R0003889.jpg", caption: "胶片 · 午后", meta: "扫描件" },
+        { album: "shan-tou", group: "胶卷", file: "R0003897.jpg", caption: "胶片 · 屋檐", meta: "扫描件" },
+        { album: "shan-tou", group: "胶卷", file: "R0003915 1.jpg", caption: "胶片 · 归途", meta: "扫描件" }
+      ]
+    }
+  ];
+
+  /* 水彩调色板：主色 / 辅色 / 点缀，按堆序号循环（与 docs/design-guide.md 一致） */
+  var WASH = [
+    ["207,227,220", "232,216,228", "246,224,196"], /* 青瓷 */
+    ["232,216,228", "220,229,206", "211,222,234"], /* 藕荷 */
+    ["246,224,196", "207,227,220", "220,229,206"], /* 秋杏 */
+    ["220,229,206", "211,222,234", "232,216,228"], /* 苔绿 */
+    ["211,222,234", "246,224,196", "207,227,220"]  /* 黛蓝 */
+  ];
+
+  /* 与 .photo 的 inset 对应：左右各 5%、下方 11% */
+  var WIN_W = 0.9, WIN_H = 0.84;
+  /* 卡片宽度上限（占舞台宽 / 高的比例），保证长条比例也放得下 */
+  var MAX_W = 0.76, MAX_H = 0.88;
+  /* 状态 3 向上抽出的幅度（占卡片高度的比例） */
+  var LIFT = 0.18;
+
+  /* ---------- 工具 ---------- */
+
+  function esc(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+
+  /* 路径分段编码：兼容中文分组名与含空格的文件名 */
+  function url(album, group, file, kind) {
+    var parts = ["photography", album, "images"];
+    if (group) parts.push(group);
+    parts.push(kind + "_" + file);
+    return BASE + parts.map(encodeURIComponent).join("/");
+  }
+
+  /* ---------- 尺寸：比例决定卡面形状，舞台决定卡面大小 ---------- */
+
+  /* 卡片比例 = 照片比例 × (窗高比 / 窗宽比)，使照片窗口与照片同比例（零裁切零留白） */
+  function arFromPhoto(ratio) {
+    var ar = ratio * (WIN_H / WIN_W);
+    return Math.max(0.62, Math.min(1.6, ar));
+  }
+
+  function sizeStack(inner) {
+    var W = inner.clientWidth, H = inner.clientHeight;
+    if (!W || !H) return;
+    var limitW = W * MAX_W, limitH = H * MAX_H;
+    Array.prototype.forEach.call(inner.querySelectorAll(".card"), function (card) {
+      var ar = card._ar || 0.75;
+      var w = Math.min(limitW, limitH * ar);
+      card.style.setProperty("--fw", w.toFixed(1) + "px");
+      card.style.setProperty("--fh", (w / ar).toFixed(1) + "px");
+    });
+  }
+
+  function applyRatio(card, img) {
+    if (!img.naturalWidth || !img.naturalHeight || card._sized) return;
+    card._sized = true;
+    card._ar = arFromPhoto(img.naturalWidth / img.naturalHeight);
+    card.style.setProperty("--ar", card._ar.toFixed(4));
+    sizeStack(card.parentNode);
+  }
+
+  /* 大图预热：指针进入 / 键盘聚焦时就取图并解码。
+     真实使用里是「看一眼再点」，点击时大图通常已就绪，动画期间不必再做解码与重绘 */
+  function warmLarge(card) {
+    if (card._warming) return;
+    card._warming = true;
+    var img = new Image();
+    img.decoding = "async";
+    img.onload = function () {
+      card._bigReady = true;
+      /* 预热在动画结束后才就绪：这时再补换，同样不占用动画帧 */
+      if (card._swapAfter && card.classList.contains("is-expanded")) {
+        card._swapAfter = false;
+        card._img.src = card._large;
+      }
+    };
+    img.src = card._large;
+    if (img.decode) img.decode().then(function () { card._bigReady = true; }, function () {});
+  }
+
+  /* ---------- 构建卡堆 ---------- */
+
+  function buildCard(photo, i, n, onSettle) {
+    var dir = n > 1 ? i - (n - 1) / 2 : 0;   /* -1 / 0 / 1：卡片在堆里的相对位置 */
+
+    var card = document.createElement("button");
+    card.type = "button";
+    card.className = "card";
+    card.setAttribute("aria-expanded", "false");
+    card.setAttribute("aria-label", "放大照片：" + photo.caption);
+    card._ar = 0.75;
+
+    var s = card.style;
+    s.setProperty("--z", String(i + 1));
+    /* 状态 1：紧贴叠放，左右微错开并各带一点旋转（位移是无单位系数，乘以卡面宽高） */
+    s.setProperty("--rrot", (dir * 6.5).toFixed(2) + "deg");
+    s.setProperty("--rx", (dir * 0.03).toFixed(3));
+    s.setProperty("--ry", (dir * 0.015).toFixed(3));
+    /* 状态 2：朝各自方向散开 */
+    s.setProperty("--srot", (dir * 10).toFixed(2) + "deg");
+    s.setProperty("--sx", (dir * 0.18).toFixed(3));
+    s.setProperty("--sy", (dir * 0.045).toFixed(3));
+    /* 状态 3：向上抽出（负值 = 向上） */
+    s.setProperty("--fy", (-LIFT).toFixed(3));
+
+    var face = document.createElement("span");
+    face.className = "card-face";
+
+    var thumb = url(photo.album, photo.group, photo.file, "thumb");
+    var large = url(photo.album, photo.group, photo.file, "large");
+
+    var box = document.createElement("span");
+    box.className = "photo";
+
+    var img = document.createElement("img");
+    img.alt = photo.caption;
+    img.decoding = "async";
+    img.addEventListener("load", function () { applyRatio(card, img); onSettle(); });
+    img.addEventListener("error", function () {
+      /* 大图取不到：退回缩略图，不判破损；只有缩略图本身失败才降级成色块 */
+      if (img.getAttribute("src") !== thumb) {
+        card._swapAfter = false;
+        img.src = thumb;
+        return;
+      }
+      box.classList.add("broken");
+      onSettle();
+    });
+    img.src = thumb;   /* 监听器挂好再取图，避免缓存命中时漏掉首帧 */
+    box.appendChild(img);
+
+    var cap = document.createElement("span");
+    cap.className = "card-cap";
+    cap.innerHTML = "<b>" + esc(photo.caption) + "</b><i>" + esc(photo.meta || "") + "</i>";
+
+    face.appendChild(box);
+    face.appendChild(cap);
+
+    /* 静态命中层：与卡面同尺寸同位置，只随「散开」移动，不随「抽出」移动
+       —— 指针落在图片边缘或两张图交界处时，hover 不会被自己触发的动画推翻 */
+    var hit = document.createElement("span");
+    hit.className = "card-hit";
+    hit.setAttribute("aria-hidden", "true");
+
+    card.appendChild(hit);
+    card.appendChild(face);
+
+    /* 记录大图地址，供放大时切换（保持缩略图占位，避免闪白） */
+    card._large = large;
+    card._thumb = thumb;
+    card._img = img;
+
+    /* 意图预热：指针进入或键盘聚焦时就把大图取回来解码 */
+    card.addEventListener("pointerenter", function () { warmLarge(card); });
+    card.addEventListener("focus", function () { warmLarge(card); });
+
+    if (img.complete) applyRatio(card, img);
+
+    card.addEventListener("click", function (e) {
+      e.stopPropagation();
+      if (card.classList.contains("is-expanded")) collapse();
+      else expand(card);
+    });
+
+    return card;
+  }
+
+  function buildStack(config, si) {
+    var wrap = document.createElement("article");
+    wrap.className = "stack";
+
+    var w = WASH[si % WASH.length];
+    wrap.style.setProperty("--wash-a", w[0]);
+    wrap.style.setProperty("--wash-b", w[1]);
+    wrap.style.setProperty("--wash-c", w[2]);
+
+    var inner = document.createElement("div");
+    inner.className = "stack-inner";
+    inner.setAttribute("role", "group");
+    inner.setAttribute("aria-label", "《" + config.title + "》照片卡堆叠，共 " + config.photos.length + " 张");
+
+    var settled = 0;
+    function onSettle() {
+      settled++;
+      if (settled >= config.photos.length) sizeStack(inner);
+    }
+
+    config.photos.forEach(function (photo, i) {
+      inner.appendChild(buildCard(photo, i, config.photos.length, onSettle));
+    });
+
+    var title = document.createElement("h2");
+    title.className = "stack-title";
+    title.textContent = config.title;
+
+    var note = document.createElement("p");
+    note.className = "stack-note";
+    note.textContent = config.note || "";
+
+    wrap.appendChild(inner);
+    wrap.appendChild(title);
+    wrap.appendChild(note);
+    return wrap;
+  }
+
+  /* ---------- FLIP：把卡片从 first 矩形平滑推到「按当前布局量出」的卡面矩形 ---------- */
+
+  function flip(card, first) {
+    var face = card.querySelector(".card-face");
+
+    card.classList.add("is-flipping");   /* 先层化再改样式，避免首帧才做图层提升 */
+    card.style.transition = "none";
+    card.style.transformOrigin = "0 0";
+    card.style.transform = "none";   /* 先归零，避免上一次动画的残留变换污染目标矩形 */
+
+    var last = face.getBoundingClientRect();
+    var sx = last.width ? first.width / last.width : 1;
+    var sy = last.height ? first.height / last.height : 1;
+    var dx = first.left - last.left;
+    var dy = first.top - last.top;
+
+    /* 反推一个变换，使卡面视觉上停在原处，再动画归零 */
+    card.style.transform = "translate(" + dx + "px," + dy + "px) scale(" + sx + "," + sy + ")";
+    void card.offsetWidth;   /* 强制回流，让上面的逆变换先落到样式里 */
+    card.style.transition = REDUCED ? "none" : "transform .52s var(--ease-spring)";
+    card.style.transform = "none";
+  }
+
+  function clearFlip(card) {
+    card.style.transition = "";
+    card.style.transform = "";
+    card.style.transformOrigin = "";
+    /* 放大态保留提升（停在那儿时继续吃缓存图层），收起动画结束后再释放 */
+    if (!card.classList.contains("is-expanded")) card.classList.remove("is-flipping");
+  }
+
+  /* 放大态几何：沿用卡片自身的比例做等比放大，只受视口约束 */
+  function geometry(ar) {
+    var vw = window.innerWidth, vh = window.innerHeight;
+    var narrow = vw < 560;
+    var maxW = narrow ? vw * 0.9 : Math.min(880, vw * 0.86);
+    var maxH = narrow ? vh * 0.72 : Math.min(vh * 0.78, 720);
+    var w = Math.min(maxW, maxH * (ar || 0.75));
+    var h = w / (ar || 0.75);
+    return {
+      w: Math.round(w), h: Math.round(h),
+      left: Math.round((vw - w) / 2),
+      top: Math.round(Math.max(14, (vh - h) / 2))
+    };
+  }
+
+  /* ---------- 状态 4：展开 / 收起 ---------- */
+
+  var open = null;   /* { card, face, stack } */
+  var scrim = $("scrim");
+
+  function expand(card) {
+    if (open) return;
+    var face = card.querySelector(".card-face");
+    var stack = card.closest(".stack");
+    var first = face.getBoundingClientRect();
+    var g = geometry(card._ar);
+
+    card.style.left = g.left + "px";
+    card.style.top = g.top + "px";
+    card.style.width = g.w + "px";
+    card.style.height = g.h + "px";
+    card.style.setProperty("--cap-size", Math.max(15, Math.round(g.w * 0.022)) + "px");
+    card.classList.add("is-expanded");
+    card.setAttribute("aria-expanded", "true");
+    stack.classList.add("is-open");
+    scrim.classList.add("on");
+    open = { card: card, face: face, stack: stack };
+
+    /* 锁定页面滚动推迟一帧，别和动画首帧抢主线程 */
+    requestAnimationFrame(function () {
+      if (open && open.card === card) document.body.classList.add("frozen");
+    });
+
+    flip(card, first);
+
+    /* 大图已解码就直接换上（近乎零成本）；否则等动画收尾再换，避免中段解码掉帧 */
+    if (card._bigReady) {
+      card._img.src = card._large;
+    } else {
+      warmLarge(card);
+      card._swapAfter = true;
+    }
+  }
+
+  function collapse() {
+    if (!open) return;
+    var card = open.card, face = open.face, stack = open.stack;
+    open = null;
+
+    /* 放大态卡面与卡壳同框，直接量卡面即当前可见矩形 */
+    var first = face.getBoundingClientRect();
+    card.classList.remove("is-expanded");
+    card.setAttribute("aria-expanded", "false");
+    card.style.left = card.style.top = card.style.width = card.style.height = "";
+    stack.classList.remove("is-open");
+    document.body.classList.remove("frozen");
+    scrim.classList.remove("on");
+
+    flip(card, first);
+
+    /* 缩略图回退挪到动画收尾（见 transitionend），避免动画起点解码 */
+    card.focus({ preventScroll: true });
+  }
+
+  /* ---------- 事件绑定 ---------- */
+
+  scrim.addEventListener("click", collapse);
+
+  document.addEventListener("keydown", function (e) {
+    if (!open) return;
+    if (e.key === "Escape") { e.preventDefault(); collapse(); }
+  });
+
+  /* 视口变化时同步放大态几何（不重播动画） */
+  window.addEventListener("resize", function () {
+    if (!open) return;
+    var card = open.card;
+    var g = geometry(card._ar);
+    card.style.transition = "none";
+    card.style.left = g.left + "px";
+    card.style.top = g.top + "px";
+    card.style.width = g.w + "px";
+    card.style.height = g.h + "px";
+    void card.offsetWidth;
+    card.style.transition = "";
+  });
+
+  /* FLIP 动画结束后清掉内联样式，交回 CSS；换图也挪到这里，避免动画中途解码 */
+  document.addEventListener("transitionend", function (e) {
+    var el = e.target;
+    if (e.propertyName !== "transform" || !el.classList || !el.classList.contains("card")) return;
+
+    if (el.classList.contains("is-expanded")) {
+      /* 预热没赶上：动画收尾再补大图（未就绪就继续用缩略图，等 warmLarge 回补） */
+      if (el._swapAfter && el._bigReady) {
+        el._swapAfter = false;
+        el._img.src = el._large;
+      }
+    } else {
+      el._swapAfter = false;        /* 收起：作废未完成的补换 */
+      el._img.src = el._thumb;      /* 收起完成后退回缩略图 */
+    }
+    clearFlip(el);
+  });
+
+  /* ---------- 渲染 ---------- */
+
+  var wall = $("wall");
+  var inners = [];
+
+  setTimeout(reveal, 1200);   /* 兜底：无论后续步骤是否出错都要显形 */
+
+  STACKS.forEach(function (config, si) {
+    var wrap = buildStack(config, si);
+    wall.appendChild(wrap);
+    inners.push(wrap.querySelector(".stack-inner"));
+  });
+
+  /* 舞台尺寸变化时重算卡片尺寸（首帧也会触发一次） */
+  if (window.ResizeObserver) {
+    var ro = new ResizeObserver(function (entries) {
+      entries.forEach(function (entry) { sizeStack(entry.target); });
+    });
+    inners.forEach(function (inner) { ro.observe(inner); });
+  } else {
+    window.addEventListener("resize", function () {
+      inners.forEach(sizeStack);
+    });
+  }
+
+  /* 比例与尺寸就位后再显形，避免首帧尺寸跳变 */
+  function reveal() {
+    inners.forEach(sizeStack);
+    wall.classList.remove("pending");
+  }
+  if (document.readyState === "complete") setTimeout(reveal, 0);
+  else window.addEventListener("load", function () { setTimeout(reveal, 0); });
+})();
+</script>
+</body>
+</html>

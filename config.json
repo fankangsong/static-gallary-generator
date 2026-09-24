@@ -46,6 +46,11 @@
     },
     "concurrency": 4
   },
+  "timeline": {
+    "sourceDir": "data-source/timeline/org",
+    "outputFile": "data-source/timeline.json",
+    "supportedExtensions": [".jpg", ".jpeg", ".png", ".webp"]
+  },
   "site": {
     "nav": [
       { "text": "首页", "url": "/" },
@@ -53,7 +58,8 @@
       { "text": "摄影", "url": "/photography/" },
       { "text": "跑步", "url": "/running/" },
       { "text": "旅行", "url": "/travel/" },
-      { "text": "香香的画", "url": "/pictures/" }
+      { "text": "香香的画", "url": "/pictures/" },
+      { "text": "关于", "url": "/about/" }
     ],
     "pages": [
       {
@@ -61,7 +67,28 @@
         "template": "index.html",
         "output": "index.html",
         "fontOutput": "assets/fonts/index/",
-        "data": { "TITLE": "IMCOLIN.FAN", "DESCRIPTION": "" }
+        "dataFile": "data-source/timeline.json",
+        "publish": [
+          { "from": "data-source/timeline/demo", "to": "assets/timeline/demo" },
+          {
+            "from": "data-source/timeline/org",
+            "to": "assets/timeline/org",
+            "ext": [".jpg", ".jpeg", ".png", ".webp"]
+          }
+        ],
+        "data": {
+          "TITLE": "IMCOLIN.FAN · 记录",
+          "DESCRIPTION": "时间轴 · 记录",
+          "HINT": "上下滚动或拖动，点击日期查看记录",
+          "UI_TEXT": "年月日放大照片：未命名照片本记录共张照片，鼠标移入后左右移动可逐张抽出，点击放大在高德地图中查看查看的记录首页数据解析失败不是合法 JSON，修正后重新构建首页还没有记录在里补上记录后重新构建"
+        }
+      },
+      {
+        "name": "about",
+        "template": "about.html",
+        "output": "about/index.html",
+        "fontOutput": "assets/fonts/about/",
+        "data": { "TITLE": "关于", "DESCRIPTION": "关于 Colin" }
       },
       {
         "name": "travel",

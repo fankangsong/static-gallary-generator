@@ -8,9 +8,11 @@
     "index:gallary": "node core/main.js index:gallary",
     "build:gallary": "node core/main.js build:gallary",
     "build:site": "node core/main.js build:site",
+    "build:home": "node core/main.js build:home",
     "build:css": "node core/main.js build:css",
     "build:pictures": "node core/main.js build:pictures",
     "update:travel": "node core/main.js update:travel",
+    "build:timeline": "node core/main.js build:timeline",
     "build": "pnpm index:gallary && pnpm build:gallary && pnpm build:site && pnpm build:pictures && pnpm update:travel && pnpm upload",
     "upload": "bash upload.sh",
     "clear": "node core/main.js clear"

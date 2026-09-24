@@ -40,6 +40,10 @@ async function comprehensiveTest() {
   const customResult = templateRenderer.render("site/index.html", {
     WEBSITE_TITLE: "Custom Dir Test",
     WEBSITE_FONT: { name: "font" },
+    TITLE: "Custom Dir Test",
+    DESCRIPTION: "",
+    HINT: "",
+    NAV_LINKS: [],
     LINKS: [],
     QUOTES: [],
   }, {
@@ -64,6 +68,10 @@ async function comprehensiveTest() {
     const result = await templateRenderer.renderWithFont("site/index.html", {
       WEBSITE_TITLE: "Font Test",
       WEBSITE_FONT: { name: "font" },
+      TITLE: "Font Test",
+      DESCRIPTION: "",
+      HINT: "",
+      NAV_LINKS: [],
       LINKS: [],
       QUOTES: ["测试文本"],
     }, {

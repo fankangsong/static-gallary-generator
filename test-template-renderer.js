@@ -8,6 +8,10 @@ async function testTemplateRenderer() {
   const result1 = templateRenderer.render("site/index.html", {
     WEBSITE_TITLE: "Test Page",
     WEBSITE_FONT: { name: "test-font" },
+    TITLE: "Test Page",
+    DESCRIPTION: "",
+    HINT: "",
+    NAV_LINKS: [],
     LINKS: [
       { text: "首页", url: "/" },
       { text: "博客", url: "/blog" },
@@ -41,6 +45,10 @@ async function testTemplateRenderer() {
       data: { 
         WEBSITE_TITLE: "Batch Test 1", 
         WEBSITE_FONT: { name: "font" }, 
+        TITLE: "Batch Test 1",
+        DESCRIPTION: "",
+        HINT: "",
+        NAV_LINKS: [{ text: "首页", url: "/" }],
         LINKS: [{ text: "首页", url: "/" }],
         QUOTES: ["测试"],
       },

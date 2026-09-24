@@ -18,6 +18,7 @@ function loadConfig() {
     gallery: rawConfig.gallery,
     site: rawConfig.site,
     pictures: rawConfig.pictures || {},
+    timeline: rawConfig.timeline || {},
     blog: rawConfig.site.blog // Alias for easier access
   };
 

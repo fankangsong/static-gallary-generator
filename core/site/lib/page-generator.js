@@ -5,6 +5,7 @@ const {
   WEB_DIR,
   TEMPLATES_DIR,
   SITE_TEMPLATES_DIR,
+  PROJECT_ROOT,
 } = require("../../common/lib/constants");
 const templateRenderer = require("../../common/lib/template-renderer");
 const { logger } = require("../../common/lib/utils");
@@ -74,16 +75,100 @@ class PageGenerator {
     return text;
   }
 
-  async generate() {
+  // 读取页面数据源 JSON（路径相对仓库根目录，如首页的 data-source/timeline.json）
+  // —— 既作为模板渲染数据（locals.DATA_FILE），也是字体子集的取字来源
+  readDataFile(relativePath) {
+    if (!relativePath) return null;
+    const filePath = path.join(PROJECT_ROOT, relativePath);
+    if (!fs.existsSync(filePath)) {
+      logger.warn(`Data file not found, skipped: ${relativePath}`);
+      return null;
+    }
+    try {
+      return JSON.parse(fs.readFileSync(filePath, "utf-8"));
+    } catch (err) {
+      logger.error(`Failed to parse data file: ${relativePath}`, err);
+      return null;
+    }
+  }
+
+  // 发布页面依赖的静态资产：from 相对仓库根目录，to 相对 web/（如首页要用的 timeline 照片）
+  // ext：可选扩展名白名单（如 [".jpg", ".jpeg"]）。配了它，目录里其它文件（比如时间轴素材目录里
+  // 的 content.md 原文）不会被发布到站点产物；不配置则整棵目录原样拷贝（与原来的行为一致）。
+  publishAssets(publish) {
+    if (!Array.isArray(publish)) return;
+    publish.forEach((item) => {
+      const { from, to, ext } = item || {};
+      if (!from || !to) return;
+      const src = path.join(PROJECT_ROOT, from);
+      if (!fs.existsSync(src)) {
+        logger.warn(`Publish source not found, skipped: ${from}`);
+        return;
+      }
+
+      const allowed =
+        Array.isArray(ext) && ext.length
+          ? new Set(ext.map((suffix) => String(suffix).toLowerCase()))
+          : null;
+      const options = { recursive: true };
+      if (allowed) {
+        options.filter = (srcPath) => {
+          try {
+            if (fs.statSync(srcPath).isDirectory()) return true;
+          } catch (err) {
+            return false;
+          }
+          return allowed.has(path.extname(srcPath).toLowerCase());
+        };
+      }
+
+      fs.cpSync(src, path.join(WEB_DIR, to), options);
+      logger.log(
+        `Published assets: ${from} → web/${to}${allowed ? `（仅 ${[...allowed].join(" / ")}）` : ""}`,
+      );
+    });
+  }
+
+  // options.only：只渲染指定 name 的页面（如 ["index"] 单独构建首页，见 core/site/home.js）
+  async generate(options = {}) {
     if (!this.pages || this.pages.length === 0) {
       logger.warn("No pages configured in config.site.pages");
       return;
     }
 
-    for (const pageConfig of this.pages) {
-      const { name, template, output, data: pageData, fontOutput } = pageConfig;
+    const only =
+      Array.isArray(options.only) && options.only.length ? options.only : null;
+    const pages = only
+      ? this.pages.filter((page) => only.includes(page.name))
+      : this.pages;
+
+    if (only) {
+      const unknown = only.filter(
+        (name) => !this.pages.some((page) => page.name === name),
+      );
+      unknown.forEach((name) =>
+        logger.warn(`Page not found in config.site.pages: ${name}`),
+      );
+    }
+
+    for (const pageConfig of pages) {
+      const {
+        name,
+        template,
+        output,
+        data: pageData,
+        fontOutput,
+        dataFile,
+        publish,
+      } = pageConfig;
 
       logger.log(`Generating page: ${name} (${output})`);
+
+      // 页面依赖的静态资产（如首页的照片）先发布到 web/ 下
+      this.publishAssets(publish);
+
+      // 数据驱动页面：构建期读取 JSON（首页 = data-source/timeline.json）
+      const dataFileContent = this.readDataFile(dataFile);
 
       // Merge page data with some global defaults
       const data = {
@@ -96,6 +181,7 @@ class PageGenerator {
         AUTHOR: config.defaultAuthor || "Author",
         NAV_LINKS: config.site.nav || [], // Inject global navigation
         LINKS: config.site.nav || [], // Alias for templates using LINKS
+        DATA_FILE: dataFileContent, // dataFile 的原文（模板内联用；同时参与字体取字）
         ...pageData,
       };
 
@@ -121,10 +207,16 @@ class PageGenerator {
       }
 
       // 1. Extract text from HTML template (strip tags)
+      //    注意：脚本与样式块会被剥掉，所以 JS 运行时才渲染的文案（如日期里的「年月日」）
+      //    必须由 pageData 的 UI_TEXT 之类的字段补上，否则子集缺字、这些字会回退到系统宋体。
       const templateText = this.extractTextFromHtml(templateContent);
 
       // 2. Extract text from data
       const dataText = this.collectTextFromData(pageData);
+
+      // 2b. Extract text from the page's data file（数据驱动页面：正文来自 JSON，
+      //     模板里取不到，必须按这份 JSON 取字）
+      const dataFileText = this.collectTextFromData(dataFileContent);
 
       const navText = config.site.nav.map((l) => l.text).join("");
 
@@ -139,6 +231,7 @@ class PageGenerator {
         templateText +
         navText +
         this.extractChineseChars(dataText) +
+        this.extractChineseChars(dataFileText) +
         this.extractChineseChars(config.gallery.navBrand || "");
 
       const fontOutputDir = fontOutput ? path.join(WEB_DIR, fontOutput) : null;
