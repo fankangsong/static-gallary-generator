@@ -134,8 +134,8 @@
     color: var(--ink-faint);         /* gray-400 */
   }
   .meta-line time { font-variant-numeric: tabular-nums; }
-  .meta-line .sep { color: var(--ink-faint); }
-  /* 地点：并入元信息行的高德搜索链接（项目页同款下划线 + 品牌红 hover） */
+  .meta-line + .meta-line { margin-top: .35rem; }   /* 定位独立成行时，与日期行留一点气口 */
+  /* 地点：单独一行的高德搜索链接（项目页同款下划线 + 品牌红 hover） */
   .loc-link {
     display: inline-flex; align-items: center; gap: .25rem;
     color: inherit;
@@ -196,7 +196,7 @@
     margin: auto;
     width: var(--fw, 200px);
     height: var(--fh, 266px);
-    border-radius: 17px 19px 16px 18px;
+    border-radius: 6px;
     pointer-events: auto;
     transform: rotate(var(--rrot, 0deg)) translate(calc(var(--rx, 0) * var(--fw)), calc(var(--ry, 0) * var(--fh)));
     transition: transform .42s var(--ease-spring);
@@ -216,7 +216,7 @@
     height: var(--fh, 266px);
     display: block;
     pointer-events: none;
-    border-radius: 17px 19px 16px 18px;
+    border-radius: 6px;
     background:
       var(--grain),
       radial-gradient(ellipse 96% 78% at 50% 36%, rgba(255,255,255,.62), rgba(255,255,255,0) 76%),
@@ -236,7 +236,6 @@
   /* 照片窗口：左右各内缩 5%、下方留 11%；ar = 照片比例 × (0.84/0.9) 时窗口与照片同比例 */
   .photo {
     position: absolute; inset: 5% 5% 11%;
-    border-radius: 8px;
     overflow: hidden;
     background: rgba(var(--wash-c), .5);
     box-shadow: inset 0 0 0 1px rgba(255,255,255,.5), 0 2px 7px rgba(58,42,30,.16);
@@ -252,22 +251,6 @@
     background: no-repeat center / contain
       url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' fill='none' stroke='%238C7A6B' stroke-width='2.6' stroke-linecap='round'%3E%3Cpath d='M10 38 C 16 22, 24 14, 34 10' stroke-dasharray='5 4'/%3E%3Ccircle cx='38' cy='9' r='3.4' fill='%23FF8A5C' stroke='none'/%3E%3C/svg%3E");
     opacity: .8;
-  }
-  /* 卡面说明：仅放大态显示 */
-  .card-cap {
-    position: absolute; left: 5%; right: 5%; bottom: 1%;
-    height: 11%;
-    display: flex; flex-direction: column; justify-content: center; gap: 2px;
-    font-family: var(--kai); text-align: center; color: var(--ink);
-    opacity: 0;
-    transition: opacity .3s ease;
-    pointer-events: none;
-  }
-  .card-cap b { font-size: var(--cap-size, 16px); font-weight: 700; letter-spacing: .1em; }
-  .card-cap i {
-    font-family: var(--sans); font-style: normal;
-    font-size: calc(var(--cap-size, 16px) * .76);
-    letter-spacing: .12em; color: var(--ink-soft);
   }
 
   /* 状态 2：鼠标进入组件区域 → 卡片朝各自方向散开 */
@@ -313,11 +296,10 @@
   .card.is-expanded:focus-visible .card-face {
     inset: 0; margin: 0; width: 100%; height: 100%;
     transform: none;
-    border-radius: 20px 22px 19px 21px;
+    border-radius: 6px;
     box-shadow: 0 26px 56px -24px rgba(58,42,30,.6), 0 4px 14px rgba(58,42,30,.18);
     will-change: auto;   /* 整卡作为一张图层缩放，避免嵌套层反复重栅格化 */
   }
-  .card.is-expanded .card-cap { opacity: 1; transition-delay: .4s; }
   .card.is-expanded .card-hit { pointer-events: none; }
   .stack-inner.is-open .card:not(.is-expanded) { opacity: 0; pointer-events: none; }
 
@@ -645,19 +627,7 @@
     img.src = card._thumb;
     box.appendChild(img);
 
-    var cap = document.createElement("span");
-    cap.className = "card-cap";
-    var capTitle = document.createElement("b");
-    capTitle.textContent = photo.caption || "";
-    cap.appendChild(capTitle);
-    if (photo.meta) {
-      var capMeta = document.createElement("i");
-      capMeta.textContent = photo.meta;
-      cap.appendChild(capMeta);
-    }
-
     face.appendChild(box);
-    face.appendChild(cap);
 
     /* 静态命中层：只随散开移动，不随抽出移动 */
     var hit = document.createElement("span");
@@ -801,7 +771,6 @@
     card.style.top = g.top + "px";
     card.style.width = g.w + "px";
     card.style.height = g.h + "px";
-    card.style.setProperty("--cap-size", Math.max(15, Math.round(g.w * 0.022)) + "px");
     card.classList.add("is-expanded");
     card.setAttribute("aria-expanded", "true");
     if (stack) stack.classList.add("is-open");
@@ -875,7 +844,7 @@
     var meta = document.createElement("div");
     meta.className = "meta";
 
-    /* 元信息行：日期 · 地点（地点为可选项，无则不渲染）—— 对齐项目「状态」页排版 */
+    /* 元信息行：日期一行、定位一行（地点为可选项，无则不渲染）—— 对齐项目「状态」页排版 */
     var line = document.createElement("p");
     line.className = "meta-line";
     var time = document.createElement("time");
@@ -883,16 +852,15 @@
     /* 原始数据的 date 可能带时间（"2026-09-22 07:10"）→ 一并显示 */
     time.textContent = fmtDate(rec.date) + (rec.time ? " " + rec.time : "");
     line.appendChild(time);
-    if (rec.location) {
-      var sep = document.createElement("span");
-      sep.className = "sep";
-      sep.setAttribute("aria-hidden", "true");
-      sep.textContent = "·";
-      line.appendChild(sep);
-      line.appendChild(buildLocLink(rec.location));
-    }
-
     meta.appendChild(line);
+
+    /* 定位另起一行：长地点名不会再把日期行挤断（窄屏/无图态的居中由 .meta-line 统一处理） */
+    if (rec.location) {
+      var locLine = document.createElement("p");
+      locLine.className = "meta-line";
+      locLine.appendChild(buildLocLink(rec.location));
+      meta.appendChild(locLine);
+    }
 
     /* 标题与正文在原始数据里都是可选字段：没有就不渲染，避免出现空段落 */
     if (rec.title) {
@@ -1106,12 +1074,14 @@
     if (e.target.closest(".card")) return;        /* 卡片上的按下交给卡堆 */
     programmaticUntil = 0;                        /* 用户接管，恢复实时联动 */
     drag = { id: e.pointerId, x: e.clientX, left: TRACK.scrollLeft, moved: false };
-    if (TRACK.setPointerCapture) TRACK.setPointerCapture(e.pointerId);
   });
   TRACK.addEventListener("pointermove", function (e) {
     if (!drag || e.pointerId !== drag.id) return;
     var dx = e.clientX - drag.x;
     if (!drag.moved && Math.abs(dx) < 4) return;
+    /* 指针捕获推迟到「确实开始拖拽」这一刻：若在 pointerdown 就捕获，
+       后续 click 会被重定向到 track，定位链接等子元素的点击会被整条吞掉 */
+    if (!drag.moved && TRACK.setPointerCapture) TRACK.setPointerCapture(e.pointerId);
     drag.moved = true;
     TRACK.classList.add("dragging");
     TRACK.scrollLeft = drag.left - dx;
@@ -1164,9 +1134,9 @@
 
   /* 把 data-source/timeline.json 的原始记录适配成本页渲染所需的形状：
      原始：{ date: "2026-09-22 07:10", location?, title?, text?, photos: ["demo/p1.jpg"] }
-     本页：{ date, time, title, text, location, images: [{ thumb, large, caption, meta }] }
-     —— date 拆出可选的 time；photos 补上发布后的前缀；caption / meta 取自记录标题与地点，
-        卡堆里的照片说明与放大态的说明行都用这两项。 */
+     本页：{ date, time, title, text, location, images: [{ thumb, large, caption }] }
+     —— date 拆出可选的 time；photos 补上发布后的前缀；caption 取自记录标题与地点，
+        仅用于图片 alt 与卡片 aria-label。 */
   function adapt(raw) {
     var stamp = String(raw.date || "").trim();
     var cut = stamp.indexOf(" ");
