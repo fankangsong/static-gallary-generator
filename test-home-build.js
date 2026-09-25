@@ -10,6 +10,8 @@ const homeBuild = require("./core/site/home");
  *   3. data-source/timeline 下的照片被发布到 web/assets/timeline/
  *   4. 生成首页字体子集（远小于源字体），且覆盖 JSON 里出现的全部中文字
  *      —— 这条是「从 .json 合成首页字体集」的核心断言，用极简 cmap 解析直接查码点
+ *   5. 内联脚本里「缓存的图片同步 complete」这条路径不会把 null parentNode 传给 sizeStack
+ *      —— 这是线上刷新空白（TypeError: ... 'inner.clientWidth'）的回归断言
  */
 
 // 极简 TTF cmap 解析：只回答「某个码点有没有字形」，用于校验子集覆盖
@@ -145,7 +147,22 @@ async function testHomeBuild() {
     }
   }
 
-  // 4. 字体子集：体积合理 + 覆盖 JSON 的全部中文字
+  // 4. 回归：图片命中 HTTP 缓存时 img.complete 为 true，buildCard 会在 card 尚未 appendChild
+  //    时同步调用 applyRatio → sizeStack(card.parentNode)。parentNode 此时为 null，
+  //    直接传进去会抛 "null is not an object (evaluating 'inner.clientWidth')"，
+  //    render() 在清空 TRACK 之后中断，表现就是刷新后内容区空白（本地无缓存故不复现）。
+  //    因此：同步路径必须仍在，且每一处 sizeStack(card.parentNode) 都要有 parentNode 判空。
+  const bareCalls = (html.match(/sizeStack\(card\.parentNode\)/g) || []).length;
+  const guardedCalls = (html.match(/if \(card\.parentNode\) sizeStack\(card\.parentNode\)/g) || []).length;
+  check(
+    "缓存的图片同步命中时 sizeStack 拿到的是已挂载的 parentNode",
+    /if\s*\(\s*img\.complete\s*\)\s*applyRatio\(/.test(html) &&
+      bareCalls > 0 &&
+      bareCalls === guardedCalls,
+    `sizeStack(card.parentNode) ${bareCalls} 处，其中判空 ${guardedCalls} 处`,
+  );
+
+  // 5. 字体子集：体积合理 + 覆盖 JSON 的全部中文字
   const subsetPath = path.join(webDir, "assets/fonts/index", `${config.website.font.name}.ttf`);
   const sourcePath = path.join(__dirname, config.website.font.source);
   check("生成首页字体子集", fs.existsSync(subsetPath));
@@ -180,7 +197,7 @@ async function testHomeBuild() {
     );
   }
 
-  // 5. 只构建首页：其它页面不被重写
+  // 6. 只构建首页：其它页面不被重写
   if (aboutMtime) {
     check(
       "不重写其它页面（web/about/index.html 未变）",

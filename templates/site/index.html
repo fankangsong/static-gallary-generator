@@ -558,7 +558,9 @@
     card._sized = true;
     card._ar = arFromPhoto(img.naturalWidth / img.naturalHeight);
     card.style.setProperty("--ar", card._ar.toFixed(4));
-    sizeStack(card.parentNode);
+    /* 命中缓存的图会在 buildCard 里同步 complete，此时 card 还没挂到 DOM（parentNode 为 null），
+       尺寸由 buildStack / ResizeObserver 稍后统一处理，这里只更新 --ar */
+    if (card.parentNode) sizeStack(card.parentNode);
   }
 
   /* 大图预热：指针进入 / 聚焦时取图并解码，点击放大时不必再做解码 */
