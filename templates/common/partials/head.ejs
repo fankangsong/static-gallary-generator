@@ -6,4 +6,7 @@
 <title>
   <%= TITLE %>
 </title>
-<link rel="stylesheet" href="/assets/css/tailwind.css">
+<% /* 传 { tailwind: false } 可跳过 tailwind.css —— 首页样式全部内联且不用任何 Tailwind
+       类，若仍引这份 79KB 的渲染阻塞样式，会把首次绘制推迟到它下载完，刷新时白屏。
+       其它页面（about/travel/404/相册/博客）依赖 Tailwind，保持默认引入。 */ %>
+<% if (locals.tailwind !== false) { %><link rel="stylesheet" href="/assets/css/tailwind.css"><% } %>

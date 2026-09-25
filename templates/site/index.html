@@ -9,7 +9,7 @@
         fetch，file:// 双击也能打开；同一份 JSON 的中文文本也是首页字体子集的取字来源。
   字体：/assets/fonts/index/KingHwaOldSong.ttf（构建期按上面的 JSON + 本模板文本裁出）
 */ %>
-<%- include('/partials/head') %>
+<%- include('/partials/head', { tailwind: false }) %>
 <%- include('/partials/font', { fontDir: 'index', fontDisplay: 'swap' }) %>
 <style>
   :root {
@@ -777,6 +777,13 @@
     SCRIM.classList.add("on");
     open = { card: card, face: face, stack: stack };
 
+    /* 把卡片从横向滚动容器挪到 body 下再放大。
+       iOS Safari 里，滚动容器（.track 带 overflow 与 -webkit-overflow-scrolling）
+       内的 position: fixed 会被滚动层裁剪 / 错位，导致点开大图只看到近白的 scrim
+       （「放大白屏」）。挂到 body 层，fixed 才真正相对视口定位。 */
+    card._home = { parent: card.parentNode, next: card.nextSibling };
+    document.body.appendChild(card);
+
     flip(card, first);
 
     /* 大图已解码就直接换上；否则等动画收尾再换，避免中段解码掉帧 */
@@ -799,6 +806,13 @@
     card.style.left = card.style.top = card.style.width = card.style.height = "";
     if (stack) stack.classList.remove("is-open");
     SCRIM.classList.remove("on");
+
+    /* 先放回卡堆原位，再播 FLIP 收回（插回后量到的才是散开态的落点） */
+    if (card._home) {
+      var home = card._home;
+      card._home = null;
+      home.parent.insertBefore(card, home.next);
+    }
 
     flip(card, first);
     card.focus({ preventScroll: true });

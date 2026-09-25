@@ -104,6 +104,10 @@ async function testHomeBuild() {
       !html.includes("templates/assets/fonts"),
   );
 
+  // 首页样式全部内联、不用任何 Tailwind 类；若仍引这份 79KB 的渲染阻塞样式，
+  // 浏览器要等它下载完才首次绘制，刷新时会先白屏一下（见 head.ejs 的 tailwind: false）
+  check("首页不引 tailwind.css（避免渲染阻塞样式拖慢首屏）", !html.includes("/assets/css/tailwind.css"));
+
   // 2. 数据内联 + 日期倒序（左新右旧）
   const match = /<script id="tl-data" type="application\/json">([\s\S]*?)<\/script>/.exec(html);
   check("数据内联进 #tl-data（无前端 fetch）", !!match && !html.includes('fetch("./timeline.json"'));
